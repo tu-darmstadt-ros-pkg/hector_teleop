@@ -1,6 +1,34 @@
+//=================================================================================================
+// Copyright (c) 2015, Stefan Kohlbrecher, TU Darmstadt
+// All rights reserved.
+
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//     * Redistributions of source code must retain the above copyright
+//       notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright
+//       notice, this list of conditions and the following disclaimer in the
+//       documentation and/or other materials provided with the distribution.
+//     * Neither the name of the Simulation, Systems Optimization and Robotics
+//       group, TU Darmstadt nor the names of its contributors may be used to
+//       endorse or promote products derived from this software without
+//       specific prior written permission.
+
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+// ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY
+// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//=================================================================================================
+
 #include <ros/ros.h>
 #include <sensor_msgs/Joy.h>
-#include <monstertruck_msgs/MotionCommand.h>
+#include <geometry_msgs/Twist.h>
 #include <geometry_msgs/QuaternionStamped.h>
 
 namespace JoyTeleop {
@@ -9,7 +37,7 @@ namespace JoyTeleop {
   ros::Publisher motionCommandOutput;
   ros::Publisher cameraCommandOutput;
 
-  monstertruck_msgs::MotionCommand motionCommand;
+  geometry_msgs::Twist motionCommand;
   geometry_msgs::QuaternionStamped cameraCommand;
 
   int axis_speed;
@@ -42,23 +70,27 @@ namespace JoyTeleop {
     if (axis_speed > 0 && (size_t) axis_speed <= joystick->axes.size()) {
       float value = joystick->axes[axis_speed-1];
       if (value >= 0.0)
-        motionCommand.speed = value * speedForward;
+        motionCommand.linear.x = value * speedForward;
       else
-        motionCommand.speed = value * speedBackward;
+        motionCommand.linear.x = value * speedBackward;
 
       if (button_slow > 0 && (size_t) button_slow <= joystick->buttons.size() && joystick->buttons[button_slow-1]) {
-        motionCommand.speed *= slowFactor;
+        motionCommand.linear.x *= slowFactor;
       }
     }
 
-    if (button_brake > 0 && (size_t) button_brake <= joystick->buttons.size()) {
-      motionCommand.brake = joystick->buttons[button_brake-1];
-    }
+    //Brake not applicable on many vehicles
+    //if (button_brake > 0 && (size_t) button_brake <= joystick->buttons.size()) {
+    //  motionCommand.brake = joystick->buttons[button_brake-1];
+    //}
 
     if (axis_steer > 0 && (size_t) axis_steer <= joystick->axes.size()) {
-      motionCommand.steerAngleFront = joystick->axes[axis_steer-1] * steerAngle * M_PI/180.0;
-      motionCommand.steerAngleRear  = motionCommand.steerAngleFront;
+      motionCommand.angular.z = joystick->axes[axis_steer-1] * steerAngle * M_PI/180.0;
 
+      //Angle not applicable on many vehicles
+      //motionCommand.steerAngleRear  = motionCommand.steerAngleFront;
+
+      /*
       if (button_crab > 0 && (size_t) button_crab <= joystick->buttons.size()) {
         if (joystick->buttons[button_crab-1]) {
           if (motionCommand.speed >= 0.0) {
@@ -68,6 +100,7 @@ namespace JoyTeleop {
           }
         }
       }
+      */
     }
 
     motionCommandOutput.publish(motionCommand);
@@ -118,7 +151,7 @@ int main(int argc, char **argv) {
   ros::NodeHandle n;
 
   joyInput = n.subscribe<sensor_msgs::Joy>("joy", 10, joyCallback);
-  motionCommandOutput = n.advertise<monstertruck_msgs::MotionCommand>("drive", 10, false);
+  motionCommandOutput = n.advertise<geometry_msgs::Twist>("cmd_vel", 10, false);
   cameraCommandOutput = n.advertise<geometry_msgs::QuaternionStamped>("camera/command", 10, false);
 
   ros::param::param("~axis_speed", JoyTeleop::axis_speed, 0);
@@ -140,11 +173,10 @@ int main(int argc, char **argv) {
   ros::param::param("~camera_max_tilt_down", JoyTeleop::cameraMaxTiltDown, 30.0);
   ros::param::param("~camera_max_tilt_up", JoyTeleop::cameraMaxTiltUp, 30.0);
 
-  ros::Rate rate(50.0);
+  ros::Rate rate(25.0);
   while(ros::ok()) {
-    if (motionCommand.steerAngleFront != 0.0 ||
-        motionCommand.steerAngleRear != 0.0 ||
-        motionCommand.speed != 0.0)
+    if (motionCommand.linear.x != 0.0 ||
+        motionCommand.angular.z != 0.0)
       motionCommandOutput.publish(motionCommand);
     moveCamera(rate.expectedCycleTime().toSec());
     ros::spinOnce();

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+
+<launch>
+  <arg name="dev" default="/dev/input/js0"/>
+  <arg name="config"/>
+
+  <node name="joy" pkg="joy" type="joy_node" respawn="false" output="screen">
+    <param name="dev" value="$(arg dev)" />
+    <param name="deadzone" value="0.025" />
+  </node>
+
+  <node name="hector_joystick" pkg="hector_joy_teleop" type="joy_teleop" respawn="false" output="screen">
+    <rosparam file="$(find monstertruck_joystick)/config/common.yaml" />
+    <rosparam file="$(find monstertruck_joystick)/config/$(arg config).yaml" />
+  </node>
+</launch>

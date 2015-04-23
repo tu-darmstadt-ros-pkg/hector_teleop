@@ -6,7 +6,6 @@ project(hector_joy_teleop)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
-  monstertruck_msgs
   roscpp
   sensor_msgs
 )

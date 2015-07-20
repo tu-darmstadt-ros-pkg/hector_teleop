@@ -12,5 +12,6 @@
   <node name="hector_joystick" pkg="hector_joy_teleop" type="joy_teleop" respawn="false" output="screen">
     <rosparam file="$(find monstertruck_joystick)/config/common.yaml" />
     <rosparam file="$(find monstertruck_joystick)/config/$(arg config).yaml" />
+    <remap from="cmd_vel" to="cmd_vel_teleop"/>
   </node>
 </launch>

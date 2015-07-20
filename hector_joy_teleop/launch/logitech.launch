@@ -5,7 +5,6 @@
 
   <include file="$(find hector_joy_teleop)/launch/joystick.launch">
     <arg name="dev" value="$(arg dev)"/>
-    <arg name="config" value="logitech_gamepad_sk"/>
-    <remap from="cmd_vel" to="cmd_vel_teleop"/>
+    <arg name="config" value="logitech_gamepad_sk"/>    
   </include>
 </launch>

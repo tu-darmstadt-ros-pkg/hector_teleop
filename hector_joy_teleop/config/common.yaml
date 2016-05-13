@@ -4,12 +4,3 @@ slow_factor: 0.5
 
 camera_mode: base_stabilized
 camera_speed: 60.0
-
-button_flipper_front_down: 5
-button_flipper_front_up: 7
-axis_flipper_front_up_down: 6
-axis_flipper_front_left_right: 5
-flipper_sensitivity: 0.2
-flipper_front_position_absolute_up: 1.0
-flipper_front_position_absolute_down: -1.0
-flipper_front_position_absolute_up: 0

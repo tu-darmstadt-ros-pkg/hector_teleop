@@ -1,0 +1,9 @@
+axis_speed: 2
+axis_steer: 1
+button_crab: 3
+button_slow: 6
+button_brake: 5
+
+axis_camera_pan: 4
+axis_camera_tilt: 5
+button_camera_reset: 4

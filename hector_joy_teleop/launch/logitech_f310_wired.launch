@@ -6,6 +6,5 @@
   <include file="$(find hector_joy_teleop)/launch/joystick.launch">
     <arg name="dev" value="$(arg dev)"/>
     <arg name="config" value="logitech_gamepad_sk_f310_wired"/>    
-    <remap from="cmd_vel" to="cmd_vel_raw" />
   </include>
 </launch>

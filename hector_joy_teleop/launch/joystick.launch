@@ -4,14 +4,16 @@
   <arg name="dev" default="/dev/input/js0"/>
   <arg name="config"/>
 
+  <!--
   <node name="joy" pkg="joy" type="joy_node" respawn="false" output="screen">
     <param name="dev" value="$(arg dev)" />
     <param name="deadzone" value="0.025" />
   </node>
+  -->
 
-  <node name="hector_joystick" pkg="hector_joy_teleop" type="joy_teleop" respawn="false" output="screen">
+  <node name="hector_joy_teleop" pkg="hector_joy_teleop" type="joy_teleop" respawn="false" output="screen">
     <rosparam file="$(find hector_joy_teleop)/config/common.yaml" />
     <rosparam file="$(find hector_joy_teleop)/config/$(arg config).yaml" />
-    <remap from="cmd_vel" to="cmd_vel_raw"/>
+    <remap from="/cmd_vel" to="/cmd_vel_raw"/>
   </node>
 </launch>

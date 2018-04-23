@@ -85,7 +85,7 @@ namespace JoyTeleop {
     //}
 
     if (axis_steer > 0 && (size_t) axis_steer <= joystick->axes.size()) {
-      motionCommand.angular.z = joystick->axes[axis_steer-1] * steerAngle * (M_PI/180.0) * 10.0;
+      motionCommand.angular.z = joystick->axes[axis_steer-1] * steerAngle * (M_PI/180.0) * 50.0;
 
       //Angle not applicable on many vehicles
       //motionCommand.steerAngleRear  = motionCommand.steerAngleFront;

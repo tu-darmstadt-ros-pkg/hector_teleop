@@ -49,6 +49,8 @@ namespace JoyTeleop {
   int button_slow;
   int button_brake;
   double slowFactor;
+  int button_very_slow;
+  double very_slow_factor;
 
   int axis_cameraPan;
   int axis_cameraTilt;
@@ -76,6 +78,10 @@ namespace JoyTeleop {
 
       if (button_slow > 0 && (size_t) button_slow <= joystick->buttons.size() && joystick->buttons[button_slow-1]) {
         motionCommand.linear.x *= slowFactor;
+      }
+
+      if (button_very_slow > 0 && (size_t) button_very_slow <= joystick->buttons.size() && joystick->buttons[button_very_slow-1]) {
+        motionCommand.linear.x *= very_slow_factor;
       }
     }
 
@@ -163,6 +169,8 @@ int main(int argc, char **argv) {
   ros::param::param("~button_crab", JoyTeleop::button_crab, 0);
   ros::param::param("~button_slow", JoyTeleop::button_slow, 0);
   ros::param::param("~slow_factor", JoyTeleop::slowFactor, 0.5);
+  ros::param::param("~button_very_slow", JoyTeleop::button_very_slow, 0);
+  ros::param::param("~very_slow_factor", JoyTeleop::very_slow_factor, 0.15);
 
   ros::param::param("~axis_camera_pan", JoyTeleop::axis_cameraPan, 0);
   ros::param::param("~axis_camera_tilt", JoyTeleop::axis_cameraTilt, 0);

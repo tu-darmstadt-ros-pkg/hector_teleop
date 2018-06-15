@@ -1,6 +1,7 @@
 speed_forward: 0.6
 speed_backward: 0.6
 slow_factor: 0.5
+very_slow_factor: 0.15
 
 camera_mode: base_stabilized
 camera_speed: 60.0

@@ -30,10 +30,12 @@
 #include <sensor_msgs/Joy.h>
 #include <geometry_msgs/Twist.h>
 #include <geometry_msgs/QuaternionStamped.h>
+#include <std_msgs/Bool.h>
 
 namespace JoyTeleop {
 
   ros::Subscriber joyInput;
+  ros::Subscriber enabled_sub_;
   ros::Publisher motionCommandOutput;
   ros::Publisher cameraCommandOutput;
 
@@ -66,9 +68,13 @@ namespace JoyTeleop {
   double cameraPanSpeed = 0;
   double cameraTiltSpeed = 0;
 
+  bool enabled;
+
   void publishCamera();
 
   void joyCallback(const sensor_msgs::JoyConstPtr joystick) {
+    if (!enabled) return;
+
     if (axis_speed > 0 && (size_t) axis_speed <= joystick->axes.size()) {
       float value = joystick->axes[axis_speed-1];
       if (value >= 0.0)
@@ -148,7 +154,11 @@ namespace JoyTeleop {
 
     cameraCommandOutput.publish(cameraCommand);
   }
-}; // namespace JoyTeleop
+
+  void enabledCb(const std_msgs::BoolConstPtr& bool_ptr) {
+    enabled = bool_ptr->data;
+  }
+} // namespace JoyTeleop
 
 using namespace JoyTeleop;
 
@@ -156,9 +166,13 @@ int main(int argc, char **argv) {
   ros::init(argc, argv, ROS_PACKAGE_NAME);
   ros::NodeHandle n;
 
+  ros::param::param("enable", JoyTeleop::enabled, true);
+  ros::NodeHandle pn("~");
+  enabled_sub_ = pn.subscribe<std_msgs::Bool>("enable", 10, enabledCb);
   joyInput = n.subscribe<sensor_msgs::Joy>("joy", 10, joyCallback);
   motionCommandOutput = n.advertise<geometry_msgs::Twist>("cmd_vel", 10, false);
   cameraCommandOutput = n.advertise<geometry_msgs::QuaternionStamped>("camera/command", 10, false);
+
 
   ros::param::param("~axis_speed", JoyTeleop::axis_speed, 0);
   ros::param::param("~speed_forward", JoyTeleop::speedForward, 1.0);

@@ -81,14 +81,6 @@ namespace JoyTeleop {
         motionCommand.linear.x = value * speedForward;
       else
         motionCommand.linear.x = value * speedBackward;
-
-      if (button_slow > 0 && (size_t) button_slow <= joystick->buttons.size() && joystick->buttons[button_slow-1]) {
-        motionCommand.linear.x *= slowFactor;
-      }
-
-      if (button_very_slow > 0 && (size_t) button_very_slow <= joystick->buttons.size() && joystick->buttons[button_very_slow-1]) {
-        motionCommand.linear.x *= very_slow_factor;
-      }
     }
 
     //Brake not applicable on many vehicles
@@ -113,6 +105,16 @@ namespace JoyTeleop {
         }
       }
       */
+    }
+
+    if (button_slow > 0 && (size_t) button_slow <= joystick->buttons.size() && joystick->buttons[button_slow-1]) {
+      motionCommand.linear.x *= slowFactor;
+      motionCommand.angular.z *= slowFactor;
+    }
+
+    if (button_very_slow > 0 && (size_t) button_very_slow <= joystick->buttons.size() && joystick->buttons[button_very_slow-1]) {
+      motionCommand.linear.x *= very_slow_factor;
+      motionCommand.angular.z *= very_slow_factor;
     }
 
     motionCommandOutput.publish(motionCommand);

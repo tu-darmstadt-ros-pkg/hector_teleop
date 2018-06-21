@@ -6,3 +6,4 @@ very_slow_factor: 0.15
 
 camera_mode: base_stabilized
 camera_speed: 60.0
+camera_max_tilt_up: 50.0

@@ -1,0 +1,51 @@
+#!/usr/bin/python
+import roslib; roslib.load_manifest('hector_joy_teleop')
+from geometry_msgs.msg import Twist
+
+import rospy
+import rostopic
+import argparse
+
+last_msg = None
+zero_twist = Twist()
+
+
+def argument_parse():
+    parser = argparse.ArgumentParser(description='Republish a topic at a specific rate.')
+    parser.add_argument('in_topic_name', type=str, help='Input topic')
+    parser.add_argument('rate', type=float, help='Republishing rate (Hz)')
+    parser.add_argument('out_topic_name', type=str, default=None, help='Out topic')
+    return parser.parse_args(rospy.myargv()[1:])
+
+
+def msg_callback(msg):
+    global last_msg, pub
+    last_msg = msg
+    # immediately republish msg for responsiveness and to still send zero_twist at least once
+    pub.publish(last_msg)
+
+
+def timer_callback(_):
+    global last_msg, pub
+    # do not republish zero_twist commands to avoid disturbing other publishers
+    if last_msg is not None and last_msg != zero_twist:
+        pub.publish(last_msg)
+
+
+args = argument_parse()
+
+rospy.init_node('message_republisher', anonymous=True)
+
+rospy.loginfo('waiting for topic "%s"' % args.in_topic_name)
+topic_class, _, _ = rostopic.get_topic_class(args.in_topic_name, blocking=True)
+
+if topic_class is not None:
+    rospy.loginfo('republishing topic "%s" of type "%s" to "%s" at %.2f Hz' %
+          (args.in_topic_name, topic_class._type, args.out_topic_name, args.rate))
+
+    rospy.Subscriber(args.in_topic_name, topic_class, msg_callback, queue_size=1, buff_size=2 ** 24)
+
+    pub = rospy.Publisher(args.out_topic_name, topic_class, queue_size=1)
+    rospy.Timer(period=rospy.Duration(1.0 / args.rate), callback=timer_callback)
+
+    rospy.spin()

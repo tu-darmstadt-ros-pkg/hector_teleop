@@ -46,7 +46,7 @@ namespace JoyTeleop {
   double speedForward;
   double speedBackward;
   int axis_steer;
-  double steerAngle;
+  double turn_speed;
   int button_crab;
   int button_slow;
   int button_brake;
@@ -89,7 +89,7 @@ namespace JoyTeleop {
     //}
 
     if (axis_steer > 0 && (size_t) axis_steer <= joystick->axes.size()) {
-      motionCommand.angular.z = joystick->axes[axis_steer-1] * steerAngle * (M_PI/180.0) * 6.0;
+      motionCommand.angular.z = joystick->axes[axis_steer-1] * turn_speed;
 
       //Angle not applicable on many vehicles
       //motionCommand.steerAngleRear  = motionCommand.steerAngleFront;
@@ -180,7 +180,7 @@ int main(int argc, char **argv) {
   ros::param::param("~speed_forward", JoyTeleop::speedForward, 1.0);
   ros::param::param("~speed_backward", JoyTeleop::speedBackward, 1.0);
   ros::param::param("~axis_steer", JoyTeleop::axis_steer, 0);
-  ros::param::param("~steer_angle", JoyTeleop::steerAngle, 30.0);
+  ros::param::param("~turn_speed", JoyTeleop::turn_speed, 0.3);
   ros::param::param("~button_brake", JoyTeleop::button_brake, 0);
   ros::param::param("~button_crab", JoyTeleop::button_crab, 0);
   ros::param::param("~button_slow", JoyTeleop::button_slow, 0);

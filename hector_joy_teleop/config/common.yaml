@@ -1,6 +1,7 @@
 enable: true
-speed_forward: 0.6
-speed_backward: 0.6
+speed_forward: 0.4
+speed_backward: 0.4
+turn_speed: 0.3
 slow_factor: 0.5
 very_slow_factor: 0.15
 

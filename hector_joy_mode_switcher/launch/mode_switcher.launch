@@ -4,8 +4,8 @@
     <param name="switch_mode_button" value="7"/>
     
     <rosparam param="modes">
-      Driving: /hector_joy_teleop/enable
-      Manipulation: /manipulator_arm_joystick_control/enable
+      driving: /hector_joy_teleop/enable
+      manipulation: /manipulator_arm_joystick_control/enable
     </rosparam>
   </node>
 

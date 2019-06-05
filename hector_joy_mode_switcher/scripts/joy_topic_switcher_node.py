@@ -65,10 +65,8 @@ class ModeSwitcher:
 
         # Republish to topic of current mode
         joy_msg_copy = copy.deepcopy(joy_msg)
-        print(type(joy_msg_copy.buttons))
         joy_msg_copy.buttons = list(joy_msg_copy.buttons)  # needed to make buttons mutable
         joy_msg_copy.buttons[self.switch_mode_button] = 0  # Do not forward button press for mode switching
-        print(type(joy_msg_copy.buttons))
         self.modes[self.current_mode].publisher.publish(joy_msg_copy)
 
     def switch_mode(self):

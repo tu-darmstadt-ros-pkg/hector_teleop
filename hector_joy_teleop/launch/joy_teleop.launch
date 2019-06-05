@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+
+<launch>
+  <node name="hector_joy_teleop" pkg="hector_joy_teleop" type="joy_teleop" respawn="false" output="screen">
+    <rosparam file="$(find hector_joy_teleop)/config/common.yaml" />
+    <rosparam file="$(find hector_joy_teleop)/config/logitech_gamepad_sk_f310_wired.yaml" />
+    <remap from="/joy" to="~joy"/>
+  </node>
+</launch>

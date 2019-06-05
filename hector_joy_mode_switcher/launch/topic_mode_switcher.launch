@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>
+  <node name="mode_switcher" pkg="hector_joy_mode_switcher" type="joy_topic_switcher_node.py" output="screen">
+    <param name="switch_mode_button" value="7"/>
+    
+    <rosparam param="modes">
+      driving: /hector_joy_teleop/joy
+      manipulation: /manipulator_arm_joystick_control/joy
+    </rosparam>
+  </node>
+
+</launch>

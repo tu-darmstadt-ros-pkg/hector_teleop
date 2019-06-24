@@ -1,0 +1,8 @@
+joy_tcp_controller:
+  type: hector_joy_tcp_teleop/JoyTcpController
+  max_speed_linear: 0.1
+  max_speed_angular: 0.4
+  joy_topic: /manipulator_arm_joystick_control/joy
+  twist_topic: /manipulator_arm_joystick_control/twist_cmd
+  
+  #TODO: robot_description

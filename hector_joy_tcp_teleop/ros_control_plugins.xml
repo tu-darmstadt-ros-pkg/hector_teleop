@@ -1,0 +1,9 @@
+<library path="lib/libhector_joy_tcp_teleop">
+  <class name="hector_joy_tcp_teleop/JoyTcpController"
+         type="hector_joy_tcp_teleop::JoyTcpController" 
+         base_class_type="controller_interface::ControllerBase">
+    <description>
+      Joy to twist for TCP control.
+    </description>
+  </class>
+</library>

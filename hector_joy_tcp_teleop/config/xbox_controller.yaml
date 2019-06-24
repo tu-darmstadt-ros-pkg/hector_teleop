@@ -1,0 +1,29 @@
+controller_configuration:
+  reset:
+    button_index: 6
+  translate_x:
+    axis_inc_index: 2
+    axis_dec_index: 5 
+  translate_y:
+    axis_index: 0
+  translate_z:
+    axis_index: 1
+  rotate_roll:
+    axis_index: 3
+    scale: -2.0
+  rotate_pitch:
+    axis_index: 4
+    scale: -1.0
+  rotate_yaw:
+    button_inc_index: 0
+    button_dec_index: 1
+  gripper:
+    button_inc_index: 3
+    button_dec_index: 2
+  move_tool_center:
+    button_index: 5
+  reset_tool_center: 
+    button_index: 4
+  hold_pose:
+    axis_index: 7
+  

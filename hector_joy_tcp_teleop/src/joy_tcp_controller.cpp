@@ -18,6 +18,11 @@ bool JoyTcpController::init(hardware_interface::JointStateInterface* /*hw*/, ros
 
 void JoyTcpController::starting(const ros::Time&)
 {
+  // Reset twist
+  twist_.linear.x = twist_.linear.y = twist_.linear.z = 0;
+  twist_.angular.x = twist_.angular.y = twist_.angular.z = 0;
+
+  // Set up subscribers and publishers
   twist_pub_ = nh_.advertise<geometry_msgs::Twist>(twist_topic_, 10, false);
   joy_sub_ = nh_.subscribe<sensor_msgs::Joy>(joy_topic_, 10, &JoyTcpController::joyCb, this);
 }
@@ -29,6 +34,7 @@ void JoyTcpController::update(const ros::Time& /*time*/, const ros::Duration& /*
 
 void JoyTcpController::stopping(const ros::Time&)
 {
+  // Shutdown subscribers / publishers
   joy_sub_.shutdown();
   twist_pub_.shutdown();
 }

@@ -5,8 +5,10 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   roscpp
   sensor_msgs
+  eigen_conversions
 )
 
+find_package(Eigen3 REQUIRED)
 
 catkin_package(
 #  INCLUDE_DIRS include
@@ -18,6 +20,7 @@ catkin_package(
 
 include_directories(
   ${catkin_INCLUDE_DIRS}
+  ${EIGEN3_INCLUDE_DIRS}
 )
 
 add_executable(joy_teleop src/${PROJECT_NAME}/joy_teleop.cpp)

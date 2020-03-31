@@ -30,7 +30,9 @@
 #include <sensor_msgs/Joy.h>
 #include <geometry_msgs/Twist.h>
 #include <geometry_msgs/QuaternionStamped.h>
+#include <geometry_msgs/Pose.h>
 #include <std_msgs/Bool.h>
+#include <eigen_conversions/eigen_msg.h>
 
 namespace JoyTeleop {
 
@@ -40,7 +42,7 @@ namespace JoyTeleop {
   ros::Publisher cameraCommandOutput;
 
   geometry_msgs::Twist motionCommand;
-  geometry_msgs::QuaternionStamped cameraCommand;
+  geometry_msgs::Pose cameraCommand;
 
   int axis_speed;
   double speedForward;
@@ -147,13 +149,15 @@ namespace JoyTeleop {
   }
 
   void publishCamera() {
-    cameraCommand.header.stamp = ros::Time::now();
-    cameraCommand.header.frame_id = cameraMode;
-    cameraCommand.quaternion.w =  cos(cameraPan/2)*cos(cameraTilt/2);
-    cameraCommand.quaternion.x = -sin(cameraPan/2)*sin(cameraTilt/2);
-    cameraCommand.quaternion.y =  cos(cameraPan/2)*sin(cameraTilt/2);
-    cameraCommand.quaternion.z =  sin(cameraPan/2)*cos(cameraTilt/2);
+    Eigen::Quaterniond quat;
+    quat.w() =  cos(cameraPan/2)*cos(cameraTilt/2);
+    quat.x() = -sin(cameraPan/2)*sin(cameraTilt/2);
+    quat.y() =  cos(cameraPan/2)*sin(cameraTilt/2);
+    quat.z() =  sin(cameraPan/2)*cos(cameraTilt/2);
+    Eigen::Isometry3d pose(quat);
+    pose.translation() = Eigen::Vector3d::Zero();
 
+    tf::poseEigenToMsg(pose, cameraCommand);
     cameraCommandOutput.publish(cameraCommand);
   }
 
@@ -173,7 +177,7 @@ int main(int argc, char **argv) {
   enabled_sub_ = pn.subscribe<std_msgs::Bool>("enable", 10, enabledCb);
   joyInput = n.subscribe<sensor_msgs::Joy>("joy", 10, joyCallback);
   motionCommandOutput = n.advertise<geometry_msgs::Twist>("cmd_vel", 10, false);
-  cameraCommandOutput = n.advertise<geometry_msgs::QuaternionStamped>("camera/command", 10, false);
+  cameraCommandOutput = n.advertise<geometry_msgs::Pose>("/camera360_pinhole_front/set_pose", 10, false);
 
 
   ros::param::param("~axis_speed", JoyTeleop::axis_speed, 0);

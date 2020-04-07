@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+
+<!-- TODO: now "$ rosrun joy joy_node" needed, run node here in launch file -->
+
+<launch>
+  <node name="hector_joy_teleop_plugin" pkg="hector_joy_teleop_plugin" type="hector_joy_teleop_plugin_node" respawn="false" output="screen">
+    <rosparam file="$(find hector_joy_teleop_plugin)/config/plugins/drive_common.yaml" ns="DrivePlugin" />
+    <rosparam file="$(find hector_joy_teleop_plugin)/config/plugins/drive_mapping_logitech_f710.yaml" ns="DrivePlugin" />
+    <rosparam param="init_plugins">["Drive"]</rosparam>
+  </node>
+</launch>

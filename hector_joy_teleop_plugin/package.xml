@@ -52,6 +52,10 @@
   <depend>geometry_msgs</depend>
   <depend>roscpp</depend>
   <depend>sensor_msgs</depend>
+  <build_depend>message_runtime</build_depend>
+  <build_export_depend>message_generation</build_export_depend>
+  <exec_depend>message_runtime</exec_depend>
+
 
 
   <!-- The export tag contains other, unspecified, tags -->

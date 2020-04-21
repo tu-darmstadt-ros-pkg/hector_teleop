@@ -15,39 +15,40 @@ DrivePlugin::DrivePlugin(ros::NodeHandle& nh, ros::NodeHandle& pnh) : PluginBase
 
 void DrivePlugin::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
 {
+
     // compute linear speed (forward/backward)
     try
     {
-        int speed = axes_.at("speed");
-        float value = msg->axes[speed];
-        if (value >= 0.0)
-            motionCommand.linear.x = value * speed_forward_;
+        int speed_mapping = axes_.at("speed");
+        float speed_joystick = msg->axes[speed_mapping];
+        if (speed_joystick >= 0.0)
+            motionCommand.linear.x = speed_joystick * speed_forward_;
         else
-            motionCommand.linear.x = value * speed_backward_;
+            motionCommand.linear.x = speed_joystick * speed_backward_;
     }
     catch (std::out_of_range& e)
     {
-        ROS_ERROR_STREAM("The required axis/button mapping for value \"speed\" is missing (maybe misspelled?).");
+        printMissingParameter("speed");
     }
 
 
     // compute angular speed (left/right turn)
     try
     {
-        int steer = axes_.at("steer");
-        motionCommand.angular.z = msg->axes[steer] * turn_speed_;
+        int steer_mapping = axes_.at("steer");
+        motionCommand.angular.z = msg->axes[steer_mapping] * turn_speed_;
     }
     catch (std::out_of_range& e)
     {
-        ROS_ERROR_STREAM("The required axis/button mapping for value \"steer\" is missing (maybe misspelled?).");
+        printMissingParameter("steer");
     }
 
 
     // compute slow linear and angular speed
     try
     {
-        int slow = axes_.at("slow");
-        if (msg->buttons[slow])
+        int slow_mapping = axes_.at("slow");
+        if (msg->buttons[slow_mapping])
         {
             motionCommand.linear.x *= slow_factor_;
             motionCommand.angular.z *= slow_factor_;
@@ -55,15 +56,15 @@ void DrivePlugin::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
     }
     catch (std::out_of_range& e)
     {
-        ROS_ERROR_STREAM("The required axis/button mapping for value \"slow\" is missing (maybe misspelled?).");
+        printMissingParameter("slow");
     }
 
 
     // compute very slow linear and angular speed
     try
     {
-        int very_slow = axes_.at("very_slow");
-        if (msg->buttons[very_slow])
+        int very_slow_mapping = axes_.at("very_slow");
+        if (msg->buttons[very_slow_mapping])
         {
             motionCommand.linear.x *= very_slow_factor_;
             motionCommand.angular.z *= very_slow_factor_;
@@ -71,7 +72,7 @@ void DrivePlugin::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
     }
     catch (std::out_of_range& e)
     {
-        ROS_ERROR_STREAM("The required axis/button mapping for value \"very_slow\" is missing (maybe misspelled?).");
+        printMissingParameter("very_slow");
     }
 
 

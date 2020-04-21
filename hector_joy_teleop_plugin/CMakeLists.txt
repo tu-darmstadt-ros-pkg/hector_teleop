@@ -31,14 +31,18 @@ include_directories(
 set(HEADER_FILES
         include/hector_joy_teleop_plugin/joy_teleop_plugin.h
         include/hector_joy_teleop_plugin/plugin_base.h
+
         include/hector_joy_teleop_plugin/plugins/drive_plugin.h
+        include/hector_joy_teleop_plugin/plugins/sensorhead_plugin.h
         )
 
 set(SOURCES
         src/joy_teleop_plugin_node.cpp
         src/joy_teleop_plugin.cpp
         src/plugin_base.cpp
-        src/plugins/drive_plugin.cpp)
+
+        src/plugins/drive_plugin.cpp
+        src/plugins/sensorhead_plugin.cpp)
 
 
 add_executable(${PROJECT_NAME}_node ${SOURCES} ${HEADER_FILES})

@@ -1,5 +1,5 @@
 
-#include "../include/hector_joy_teleop_plugin/plugin_base.h"
+#include "hector_joy_teleop_plugin/plugin_base.h"
 
 PluginBase::PluginBase(ros::NodeHandle& nh, ros::NodeHandle& pnh, std::string plugin_name): nh_(nh), pnh_(pnh), plugin_name_(plugin_name)
 {
@@ -56,4 +56,10 @@ std::pair<std::map<std::string, int>&, std::map<std::string, int>&> PluginBase::
 std::string PluginBase::getPluginName()
 {
     return plugin_name_;
+}
+
+
+void PluginBase::printMissingParameter(std::string param_name)
+{
+    ROS_ERROR_STREAM(plugin_name_ << ": The required axis/button mapping for value \"" << param_name << "\" is missing (maybe misspelled?).");
 }

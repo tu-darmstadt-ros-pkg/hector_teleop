@@ -1,10 +1,10 @@
 
 #include "hector_joy_teleop_plugin/joy_teleop_plugin.h"
 
-JoyTeleopPlugin::JoyTeleopPlugin(ros::NodeHandle& nh, ros::NodeHandle& pnh) : nh_(nh), pnh_(pnh)
+JoyTeleopPlugin::JoyTeleopPlugin(ros::NodeHandle& nh, ros::NodeHandle& pnh, const ros::Rate& rate) : nh_(nh), pnh_(pnh), rate_(rate)
 {
 
-    joy_sub_ = nh.subscribe<sensor_msgs::Joy>("joy", 10, &JoyTeleopPlugin::JoyCallback, this);
+    joy_sub_ = nh_.subscribe<sensor_msgs::Joy>("joy", 10, &JoyTeleopPlugin::JoyCallback, this);
 
     load_plugin_service_ = pnh_.advertiseService("LoadPlugin", &JoyTeleopPlugin::LoadPluginServiceCB, this);
 
@@ -146,11 +146,14 @@ std::string JoyTeleopPlugin::addMapping(std::unique_ptr<PluginBase>& plugin)
         if (!res.second)
         {
             // if insertion failed because element was present before restore old mapping and return false
+            axes_.clear();
+            buttons_.clear();
+
             axes_ = axes_old;
             buttons_ = buttons_old;
 
             ROS_ERROR_STREAM("Plugin \"" << plugin->getPluginName()
-                                         << "\" cannot be loaded, axes mapping overlaps with already loaded plugin \""
+                                         << "\" cannot be loaded, axes mapping overlaps at index " << x.second << " with already loaded plugin \""
                                          << (*(res.first)).second << "\".");
 
             return (*(res.first)).second;
@@ -165,12 +168,15 @@ std::string JoyTeleopPlugin::addMapping(std::unique_ptr<PluginBase>& plugin)
 
         if (!res.second)
         {
-            // if insertion failed because element was present before restore old mapping and return false
+            // if insertion failed because element was present before restore old mapping and return name of overlapping plugin
+            axes_.clear();
+            buttons_.clear();
+
             axes_ = axes_old;
             buttons_ = buttons_old;
 
             ROS_ERROR_STREAM("Plugin \"" << plugin->getPluginName()
-                                         << "\" cannot be loaded, buttons mapping overlaps with already loaded plugin \""
+                                         << "\" cannot be loaded, buttons mapping overlaps at index " << x.second << " with already loaded plugin \""
                                          << (*(res.first)).second << "\".");
 
             return (*(res.first)).second;
@@ -182,29 +188,49 @@ std::string JoyTeleopPlugin::addMapping(std::unique_ptr<PluginBase>& plugin)
 
 void JoyTeleopPlugin::removeMapping(std::string plugin_name)
 {
+    std::vector<int> axes_to_delete;
     for (auto const& x : axes_)
     {
         if (x.second == plugin_name)
         {
-            axes_.erase(x.first);
+            axes_to_delete.push_back(x.first);
         }
     }
+    for (int i : axes_to_delete)
+    {
+        axes_.erase(i);
+    }
 
+    std::vector<int> buttons_to_delete;
     for (auto const& x : buttons_)
     {
         if (x.second == plugin_name)
         {
-            buttons_.erase(x.first);
+            buttons_to_delete.push_back(x.first);
         }
+    }
+    for(int i: buttons_to_delete)
+    {
+        buttons_.erase(i);
     }
 }
 
 int JoyTeleopPlugin::pluginFactory(std::string plugin_name)
 {
-    // TODO maybe lower case all?
-    if (plugin_name == "Drive" || plugin_name == "DrivePlugin")
+    // lower plugin_name
+    for (char& c : plugin_name)
     {
-        // check if plugin was instanciated before, if yes, return its index
+        c = tolower(c);
+    }
+
+
+    // Plugins:
+
+
+    // if plugin_name contains drive, load DrivePlugin
+    if (plugin_name.find("drive") != std::string::npos)
+    {
+        // check if plugin was instantiated before, if yes, return its index
         for (size_t i = 0; i < plugins_.size(); i++)
         {
             if (plugins_[i]->getPluginName() == "DrivePlugin")
@@ -212,9 +238,28 @@ int JoyTeleopPlugin::pluginFactory(std::string plugin_name)
                 return i;
             }
         }
+
         // otherwise create an instance and return its index
         plugins_.push_back(std::make_unique<DrivePlugin>(nh_, pnh_));
-        return (plugins_.size() - 1);
+        return ((int) plugins_.size() - 1);
+
+    }
+
+    else if (plugin_name.find("sensorhead") != std::string::npos)
+    {
+        // check if plugin was instantiated before, if yes, return its index
+        for (size_t i = 0; i < plugins_.size(); i++)
+        {
+            if (plugins_[i]->getPluginName() == "SensorheadPlugin")
+            {
+                return i;
+            }
+        }
+
+        // otherwise create an instance and return its index
+        plugins_.push_back(std::make_unique<SensorheadPlugin>(nh_, pnh_, rate_));
+        return ((int) plugins_.size() - 1);
+
     }
 
     // NOTE: for new plugins add a new else if(...) case

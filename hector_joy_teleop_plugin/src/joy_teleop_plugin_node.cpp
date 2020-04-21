@@ -11,10 +11,12 @@ int main(int argc, char** argv)
     ros::NodeHandle nh;
     ros::NodeHandle pnh("~");
 
-    JoyTeleopPlugin jtp = JoyTeleopPlugin(nh, pnh);
-
     // TODO rate ok?
     ros::Rate rate(25.0);
+
+    JoyTeleopPlugin jtp = JoyTeleopPlugin(nh, pnh, rate);
+
+
 
     ros::spin();
 

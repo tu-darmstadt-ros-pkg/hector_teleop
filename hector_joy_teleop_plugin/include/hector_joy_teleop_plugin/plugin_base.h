@@ -28,6 +28,10 @@ class PluginBase
   virtual void forwardMsg(const sensor_msgs::JoyConstPtr& msg) = 0;
 
  protected:
+
+  void printMissingParameter(std::string param_name);
+
+
   bool active_ = false;
 
   // mapping of usage names to message array index

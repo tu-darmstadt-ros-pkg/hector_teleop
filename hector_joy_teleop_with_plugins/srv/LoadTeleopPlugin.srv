@@ -1,0 +1,11 @@
+#request fields
+string plugin_name
+bool load
+---
+#response constants
+int8 SUCCESS=0
+int8 UNKNOWN_PLUGINNAME=1
+int8 OVERLAPPING_BUTTON_MAPPING=2
+#response fields
+int8 result
+string overlapping_plugin

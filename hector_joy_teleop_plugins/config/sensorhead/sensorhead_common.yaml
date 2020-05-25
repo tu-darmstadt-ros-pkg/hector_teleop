@@ -1,0 +1,3 @@
+sensorhead_mode: base_stabilized
+sensorhead_speed: 60.0
+sensorhead_max_tilt_up: 50.0

@@ -1,0 +1,11 @@
+<library path="lib/libhector_joy_teleop_plugins">
+    <class type="hector_joy_teleop_plugins::DriveTeleop" base_class_type="hector_joy_teleop_plugin_interface::TeleopBase">
+        <description>Drive teleop plugin</description>
+    </class>
+    <class type="hector_joy_teleop_plugins::FlipperTeleop" base_class_type="hector_joy_teleop_plugin_interface::TeleopBase">
+        <description>Flipper teleop plugin</description>
+    </class>
+    <class type="hector_joy_teleop_plugins::SensorheadTeleop" base_class_type="hector_joy_teleop_plugin_interface::TeleopBase">
+        <description>Sensorhead teleop plugin</description>
+    </class>
+</library>

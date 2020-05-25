@@ -1,5 +1,0 @@
-speed_forward: 0.6
-speed_backward: 0.6
-turn_speed: 1
-slow_factor: 0.5
-very_slow_factor: 0.15

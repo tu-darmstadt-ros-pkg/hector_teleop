@@ -40,10 +40,22 @@ class TeleopBase
   /**
    * Method which is called in the while(ros::ok) {ros::SpinOnce(); // called here; ros::Sleep();} loop of node, e.g.
    * for publishing messages periodically.
-   * Can be overwritten by plugins if needed
+   * Can be overwritten by plugins if needed.
    * @param rate rate which is used for node and therefore for calling this method
    */
   virtual void executePeriodically(const ros::Rate& rate);
+
+  /**
+   * Method which is called after a plugin is loaded successfully, right before active_ is set to true.
+   * Can be overwritten by plugins if needed.
+   */
+  virtual void onLoad();
+
+  /**
+   * Method which is called before a plugin is unloaded, right after active_ is set to false.
+   * Can be overwritten by plugins if needed.
+   */
+  virtual void onUnload();
 
   virtual ~TeleopBase();
 

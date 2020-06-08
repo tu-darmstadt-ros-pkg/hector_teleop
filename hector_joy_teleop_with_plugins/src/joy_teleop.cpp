@@ -94,6 +94,7 @@ bool JoyTeleop::LoadPluginServiceCB(LoadTeleopPlugin::Request& request, LoadTele
                 // if was successful, set plugin active
                 if (res_add_mapping.empty())
                 {
+                    plugins_[plugin_idx]->onLoad();
                     plugins_[plugin_idx]->setActive(true);
                     response.result = response.SUCCESS;
                     ROS_INFO_STREAM("joy_teleop_plugin: Plugin \"" << request.plugin_name << "\" loaded successfully.");
@@ -111,6 +112,7 @@ bool JoyTeleop::LoadPluginServiceCB(LoadTeleopPlugin::Request& request, LoadTele
         } else // unload plugin
         {
             plugins_[plugin_idx]->setActive(false);
+            plugins_[plugin_idx]->onUnload();
             removeMapping(plugins_[plugin_idx]->getPluginName());
             response.result = response.SUCCESS;
             ROS_INFO_STREAM("joy_teleop_plugin: Plugin \"" << request.plugin_name << "\" unloaded.");

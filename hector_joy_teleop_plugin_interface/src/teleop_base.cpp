@@ -79,6 +79,16 @@ void TeleopBase::executePeriodically(const ros::Rate& rate)
     return;
 }
 
+void TeleopBase::onLoad()
+{
+    return;
+}
+
+void TeleopBase::onUnload()
+{
+    return;
+}
+
 
 TeleopBase::~TeleopBase()
 {

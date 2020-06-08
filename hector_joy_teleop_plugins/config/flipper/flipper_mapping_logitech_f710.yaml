@@ -8,8 +8,8 @@ axes:
   - ""  # 3: right joystick: left/right
   - ""  # 4: right joystick: up/down
   - ""  # 5: RT
-  - ""  # 6: cross: left/right
-  - ""  # 7: cross: up/down
+  - "back"  # 6: cross: left/right
+  - "front"  # 7: cross: up/down
 
 
 buttons:

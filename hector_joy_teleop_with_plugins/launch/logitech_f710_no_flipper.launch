@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+
+<launch>
+  <node name="hector_joy_teleop_with_plugins" pkg="hector_joy_teleop_with_plugins" type="hector_joy_teleop_with_plugins_node" respawn="false" output="screen">
+
+    <!-- Drive Teleop Plugin Parameter -->
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/drive/drive_common.yaml" ns="hector_joy_teleop_plugins/DriveTeleop" />
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/drive/drive_mapping_logitech_f710.yaml" ns="hector_joy_teleop_plugins/DriveTeleop" />
+
+    <!-- Sensorhead Teleop Plugin Parameter -->
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/sensorhead/sensorhead_common.yaml" ns="hector_joy_teleop_plugins/SensorheadTeleop" />
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/sensorhead/sensorhead_mapping_logitech_f710.yaml" ns="hector_joy_teleop_plugins/SensorheadTeleop" />
+
+    <rosparam param="init_plugins">["hector_joy_teleop_plugins::DriveTeleop"]</rosparam>
+  </node>
+</launch>

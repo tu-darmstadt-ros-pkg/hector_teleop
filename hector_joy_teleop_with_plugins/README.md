@@ -4,7 +4,7 @@ Plugins are loaded/unloaded using the rosservice "/hector_joy_teleop_with_plugin
 
 The service has the following parameters:
 * **Request**:
-    * **string plugin_name**: Name of the plugin which should be (un-)loaded as `<namespace>::<Classname>`
+    * **string plugin_name**: Name of the plugin which should be (un-)loaded as `<namespace>::<Classname>`.
     * **bool load**: true to load the plugin, false to unload the plugin.
 
 * **Response**:
@@ -15,3 +15,6 @@ The service has the following parameters:
     * int8 SUCCESS=0
     * int8 UNKNOWN_PLUGINNAME=1
     * int8 OVERLAPPING_BUTTON_MAPPING=2
+    
+### Special requests:
+* Unload all loaded plugins: set plugin_name to "all" and load to false.

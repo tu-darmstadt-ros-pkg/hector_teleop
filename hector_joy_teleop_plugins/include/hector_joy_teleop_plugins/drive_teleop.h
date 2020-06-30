@@ -17,6 +17,8 @@ namespace hector_joy_teleop_plugins
 
   void forwardMsg(const sensor_msgs::JoyConstPtr& msg) override;
 
+   void executePeriodically(const ros::Rate& rate) override;
+
  private:
   double speed_forward_;
   double speed_backward_;

@@ -84,6 +84,18 @@ void DriveTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
     motionCommandOutput.publish(motionCommand);
 }
 
+void DriveTeleop::executePeriodically(const ros::Rate& rate)
+{
+    // The publishing needs to be done here, as the joy messages are published only once when holding a joystick at a
+    // fixed position. So if the drive message is only send once, after a timeout of a few seconds the robot stops as
+    // there are no new commands. Not done for zero commands to avoid disturbing other modules sending on cmd_vel.
+
+    if (motionCommand.linear.x != 0.0 || motionCommand.angular.z != 0.0)
+    {
+        motionCommandOutput.publish(motionCommand);
+    }
+}
+
 }
 
 PLUGINLIB_EXPORT_CLASS(hector_joy_teleop_plugins::DriveTeleop, hector_joy_teleop_plugin_interface::TeleopBase)

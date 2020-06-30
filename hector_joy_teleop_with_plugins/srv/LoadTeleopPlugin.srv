@@ -6,6 +6,7 @@ bool load
 int8 SUCCESS=0
 int8 UNKNOWN_PLUGINNAME=1
 int8 OVERLAPPING_BUTTON_MAPPING=2
+int8 PLUGIN_LOAD_ERROR=3
 #response fields
 int8 result
-string overlapping_plugin
+string error_msg

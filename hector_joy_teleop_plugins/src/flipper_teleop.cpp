@@ -47,7 +47,7 @@ void FlipperTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
 
 }
 
-void FlipperTeleop::onLoad()
+std::string FlipperTeleop::onLoad()
 {
     switch_controller_srv_.request.start_controllers = {"flipper_front_velocity_controller","flipper_back_velocity_controller"};
     switch_controller_srv_.request.stop_controllers = {"flipper_traj_controller"};
@@ -57,11 +57,13 @@ void FlipperTeleop::onLoad()
 
     if(!switch_controller_client_.call(switch_controller_srv_))
     {
-        ROS_ERROR_STREAM("Failed to switch to flipper velocity controller!");
+        return "Failed to switch to flipper velocity controller!";
+
     }
+    return "";
 }
 
-void FlipperTeleop::onUnload()
+std::string FlipperTeleop::onUnload()
 {
     switch_controller_srv_.request.start_controllers = {"flipper_traj_controller"};
     switch_controller_srv_.request.stop_controllers = {"flipper_front_velocity_controller","flipper_back_velocity_controller"};
@@ -71,8 +73,9 @@ void FlipperTeleop::onUnload()
 
     if(!switch_controller_client_.call(switch_controller_srv_))
     {
-        ROS_ERROR_STREAM("Failed to switch to flipper trajectory controller!");
+        return"Failed to switch to flipper trajectory controller!";
     }
+    return "";
 }
 
 }

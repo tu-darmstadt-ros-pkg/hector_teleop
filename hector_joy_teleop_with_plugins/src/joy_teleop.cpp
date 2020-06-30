@@ -43,7 +43,7 @@ JoyTeleop::JoyTeleop(ros::NodeHandle& nh, ros::NodeHandle& pnh)
                     "joy_teleop_with_plugins: Plugin \"" << name
                                                          << "\" given in parameter \"init_plugins\" cannot be loaded "
                                                          << "due to overlapping button mappings with already loaded plugin \""
-                                                         << res.overlapping_plugin << "\".");
+                                                         << res.error_msg << "\".");
             }
         }
     } else
@@ -79,10 +79,36 @@ bool JoyTeleop::LoadPluginServiceCB(LoadTeleopPlugin::Request& request, LoadTele
                 if (plugin->isActive())
                 {
                     plugin->setActive(false);
-                    plugin->onUnload();
-                    removeMapping(plugin->getPluginName());
-                    response.result = response.SUCCESS;
-                    ROS_INFO_STREAM("joy_teleop_with_plugins: Plugin \"" << plugin->getPluginName() << "\" unloaded.");
+                    std::string res_unload = plugin->onUnload();
+
+                    if(res_unload.empty())
+                    {
+                        removeMapping(plugin->getPluginName());
+
+                        // set result only to true if there was no plugin before which returned errors
+                        if(response.result != response.PLUGIN_LOAD_ERROR)
+                        {
+                            response.result = response.SUCCESS;
+                        }
+
+                        ROS_INFO_STREAM("joy_teleop_with_plugins: Plugin \"" << plugin->getPluginName() << "\" unloaded.");
+                    } else
+                    {
+                        plugin->setActive(true);
+                        response.result = response.PLUGIN_LOAD_ERROR;
+
+                        // add new error message to existing
+                        if(response.error_msg.empty())
+                        {
+                            response.error_msg = res_unload;
+                        } else
+                        {
+                            response.error_msg = response.error_msg + "; " + res_unload;
+                        }
+
+                        ROS_ERROR_STREAM("joy_teleop_with_plugins: An error occured while unloading plugin "
+                                             << request.plugin_name << " in onUnload(): " << res_unload << ".");
+                    }
                 }
             }
         } else
@@ -101,6 +127,7 @@ bool JoyTeleop::LoadPluginServiceCB(LoadTeleopPlugin::Request& request, LoadTele
     if (plugin_idx == -1)
     {
         response.result = response.UNKNOWN_PLUGINNAME;
+        response.error_msg = request.plugin_name;
         ROS_WARN_STREAM("joy_teleop_with_plugins: No plugin with name \"" << request.plugin_name << "\" found.");
     } else
     {
@@ -121,17 +148,32 @@ bool JoyTeleop::LoadPluginServiceCB(LoadTeleopPlugin::Request& request, LoadTele
                 // if was successful, set plugin active
                 if (res_add_mapping.empty())
                 {
-                    plugins_[plugin_idx]->onLoad();
-                    plugins_[plugin_idx]->setActive(true);
-                    response.result = response.SUCCESS;
-                    ROS_INFO_STREAM("joy_teleop_with_plugins: Plugin \"" << request.plugin_name << "\" loaded successfully.");
+                    std::string res_load = plugins_[plugin_idx]->onLoad();
+
+                    // check if there was an error while loading the plugin
+                    if (res_load.empty())
+                    {
+                        plugins_[plugin_idx]->setActive(true);
+                        response.result = response.SUCCESS;
+                        ROS_INFO_STREAM(
+                            "joy_teleop_with_plugins: Plugin \"" << request.plugin_name << "\" loaded successfully.");
+                    } else
+                    {
+                        // remove already loaded mapping
+                        removeMapping(plugins_[plugin_idx]->getPluginName());
+                        response.result = response.PLUGIN_LOAD_ERROR;
+                        response.error_msg = res_load;
+                        ROS_ERROR_STREAM("joy_teleop_with_plugins: An error occured while loading plugin "
+                                             << request.plugin_name << " in onLoad(): " << res_load << ".");
+                    }
+
                 } else
                 {
                     response.result = response.OVERLAPPING_BUTTON_MAPPING;
-                    response.overlapping_plugin = res_add_mapping;
+                    response.error_msg = res_add_mapping;
                     ROS_WARN_STREAM("joy_teleop_with_plugins: Plugin \"" << request.plugin_name
-                                                                   << "\" cannot be loaded due to overlapping button mappings with plugin \""
-                                                                   << res_add_mapping << "\".");
+                                                                         << "\" cannot be loaded due to overlapping button mappings with plugin \""
+                                                                         << res_add_mapping << "\".");
                 }
 
             }
@@ -141,10 +183,22 @@ bool JoyTeleop::LoadPluginServiceCB(LoadTeleopPlugin::Request& request, LoadTele
             if (plugins_[plugin_idx]->isActive())
             {
                 plugins_[plugin_idx]->setActive(false);
-                plugins_[plugin_idx]->onUnload();
-                removeMapping(plugins_[plugin_idx]->getPluginName());
-                response.result = response.SUCCESS;
-                ROS_INFO_STREAM("joy_teleop_with_plugins: Plugin \"" << request.plugin_name << "\" unloaded.");
+                std::string res_unload = plugins_[plugin_idx]->onUnload();
+
+                // check if there was a problem while unloading
+                if(res_unload.empty())
+                {
+                    removeMapping(plugins_[plugin_idx]->getPluginName());
+                    response.result = response.SUCCESS;
+                    ROS_INFO_STREAM("joy_teleop_with_plugins: Plugin \"" << request.plugin_name << "\" unloaded.");
+                } else
+                {
+                    plugins_[plugin_idx]->setActive(true);
+                    response.result = response.PLUGIN_LOAD_ERROR;
+                    response.error_msg = res_unload;
+                    ROS_ERROR_STREAM("joy_teleop_with_plugins: An error occured while unloading plugin "
+                                         << request.plugin_name << " in onUnload(): " << res_unload << ".");
+                }
             } else
             {
                 response.result = response.SUCCESS;

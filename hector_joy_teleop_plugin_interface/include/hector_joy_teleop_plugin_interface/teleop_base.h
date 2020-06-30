@@ -48,14 +48,16 @@ class TeleopBase
   /**
    * Method which is called after a plugin is loaded successfully, right before active_ is set to true.
    * Can be overwritten by plugins if needed.
+   * @return empty string if successful, otherwise an error string describing the problem that occurred
    */
-  virtual void onLoad();
+  virtual std::string onLoad();
 
   /**
    * Method which is called before a plugin is unloaded, right after active_ is set to false.
    * Can be overwritten by plugins if needed.
+   * @return empty string if successful, otherwise an error string describing the problem that occurred
    */
-  virtual void onUnload();
+  virtual std::string onUnload();
 
   virtual ~TeleopBase();
 

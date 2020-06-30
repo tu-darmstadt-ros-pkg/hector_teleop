@@ -17,9 +17,9 @@ class FlipperTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
 
   void forwardMsg(const sensor_msgs::JoyConstPtr& msg) override;
 
-  void onLoad() override;
+  std::string onLoad() override;
 
-  void onUnload() override;
+  std::string onUnload() override;
 
  private:
 

@@ -79,14 +79,14 @@ void TeleopBase::executePeriodically(const ros::Rate& rate)
     return;
 }
 
-void TeleopBase::onLoad()
+std::string TeleopBase::onLoad()
 {
-    return;
+    return "";
 }
 
-void TeleopBase::onUnload()
+std::string TeleopBase::onUnload()
 {
-    return;
+    return "";
 }
 
 

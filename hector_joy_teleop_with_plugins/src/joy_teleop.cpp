@@ -19,38 +19,6 @@ JoyTeleop::JoyTeleop(ros::NodeHandle& nh, ros::NodeHandle& pnh)
     std::vector<std::string> init_plugins;
 
     bool res_init_plugins = pnh_.getParam("init_plugins", init_plugins);
-
-    if (res_init_plugins)
-    {
-        for (auto& name: init_plugins)
-        {
-            LoadTeleopPlugin::Request req;
-            req.load = true;
-            req.plugin_name = name;
-
-            LoadTeleopPlugin::Response res;
-
-            LoadPluginServiceCB(req, res);
-
-            if (res.result == res.UNKNOWN_PLUGINNAME)
-            {
-                ROS_ERROR_STREAM(
-                    "joy_teleop_with_plugins: plugin name \"" << name
-                                                              << "\" unknown which was given in parameter \"init_plugins\".");
-            } else if (res.result == res.OVERLAPPING_BUTTON_MAPPING)
-            {
-                ROS_ERROR_STREAM(
-                    "joy_teleop_with_plugins: Plugin \"" << name
-                                                         << "\" given in parameter \"init_plugins\" cannot be loaded "
-                                                         << "due to overlapping button mappings with already loaded plugin \""
-                                                         << res.error_msg << "\".");
-            }
-        }
-    } else
-    {
-        ROS_WARN_STREAM("No plugins to be loaded initially given.");
-    }
-
 }
 
 void JoyTeleop::executePeriodically(const ros::Rate& rate)

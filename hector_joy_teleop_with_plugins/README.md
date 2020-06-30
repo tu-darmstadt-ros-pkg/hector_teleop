@@ -21,4 +21,6 @@ The service has the following parameters:
     * int8 PLUGIN_LOAD_ERROR=3
     
 ### Special requests:
-* Unload all loaded plugins: set plugin_name to "all" and load to false.
+* **Load plugins on init**: add the following line in the launch-file for each plugin which should be loaded on init. Due to the parameter --wait it will be executed when the service is available.\
+`<node pkg="rosservice" type="rosservice" name="LoadPlugin<UniqueName>" args="call --wait /hector_joy_teleop_with_plugins/LoadPlugin &quot;{plugin_name: '<namespace>::<Classname>', load: true}&quot;" />`
+* **Unload all loaded plugins**: set plugin_name to "all" and load to false.

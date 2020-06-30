@@ -32,15 +32,12 @@ JoyTeleop::JoyTeleop(ros::NodeHandle& nh, ros::NodeHandle& pnh)
 
             LoadPluginServiceCB(req, res);
 
-            if (res.result == res.SUCCESS)
-            {
-                break;
-            } else if (res.result == res.UNKNOWN_PLUGINNAME)
+            if (res.result == res.UNKNOWN_PLUGINNAME)
             {
                 ROS_ERROR_STREAM(
                     "joy_teleop_with_plugins: plugin name \"" << name
                                                               << "\" unknown which was given in parameter \"init_plugins\".");
-            } else if (res.OVERLAPPING_BUTTON_MAPPING)
+            } else if (res.result == res.OVERLAPPING_BUTTON_MAPPING)
             {
                 ROS_ERROR_STREAM(
                     "joy_teleop_with_plugins: Plugin \"" << name
@@ -85,14 +82,14 @@ bool JoyTeleop::LoadPluginServiceCB(LoadTeleopPlugin::Request& request, LoadTele
                     plugin->onUnload();
                     removeMapping(plugin->getPluginName());
                     response.result = response.SUCCESS;
-                    ROS_INFO_STREAM("joy_teleop_plugin: Plugin \"" << plugin->getPluginName() << "\" unloaded.");
+                    ROS_INFO_STREAM("joy_teleop_with_plugins: Plugin \"" << plugin->getPluginName() << "\" unloaded.");
                 }
             }
         } else
         {
             response.result = response.SUCCESS;
             ROS_WARN_STREAM(
-                "joy_teleop_plugin: All plugins cannot be loaded simultaneously, please load them one by one.");
+                "joy_teleop_with_plugins: All plugins cannot be loaded simultaneously, please load them one by one.");
         }
         return true;
     }
@@ -127,12 +124,12 @@ bool JoyTeleop::LoadPluginServiceCB(LoadTeleopPlugin::Request& request, LoadTele
                     plugins_[plugin_idx]->onLoad();
                     plugins_[plugin_idx]->setActive(true);
                     response.result = response.SUCCESS;
-                    ROS_INFO_STREAM("joy_teleop_plugin: Plugin \"" << request.plugin_name << "\" loaded successfully.");
+                    ROS_INFO_STREAM("joy_teleop_with_plugins: Plugin \"" << request.plugin_name << "\" loaded successfully.");
                 } else
                 {
                     response.result = response.OVERLAPPING_BUTTON_MAPPING;
                     response.overlapping_plugin = res_add_mapping;
-                    ROS_WARN_STREAM("joy_teleop_plugin: Plugin \"" << request.plugin_name
+                    ROS_WARN_STREAM("joy_teleop_with_plugins: Plugin \"" << request.plugin_name
                                                                    << "\" cannot be loaded due to overlapping button mappings with plugin \""
                                                                    << res_add_mapping << "\".");
                 }
@@ -147,7 +144,7 @@ bool JoyTeleop::LoadPluginServiceCB(LoadTeleopPlugin::Request& request, LoadTele
                 plugins_[plugin_idx]->onUnload();
                 removeMapping(plugins_[plugin_idx]->getPluginName());
                 response.result = response.SUCCESS;
-                ROS_INFO_STREAM("joy_teleop_plugin: Plugin \"" << request.plugin_name << "\" unloaded.");
+                ROS_INFO_STREAM("joy_teleop_with_plugins: Plugin \"" << request.plugin_name << "\" unloaded.");
             } else
             {
                 response.result = response.SUCCESS;

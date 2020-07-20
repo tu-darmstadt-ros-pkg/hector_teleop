@@ -7,7 +7,9 @@ In order to implement a new plugin the followings steps need to be done:
     3. Overwrite the initialize method and inside of it first call the method 
     `TeleopBase::initializeBase(nh, pnh, "<namespace>::<pluginname>");`.
     4. Overwrite / Implement the function  
-    `void forwardMsg(const sensor_msgs::JoyConstPtr& msg) override;` with the plugin functionality.
+    `void forwardMsg(const sensor_msgs::JoyConstPtr& msg) override;` with the plugin functionality.\
+    *Note*: use the protected method `TeleopBase::getJoyMeasurement` to get the joy measurement without caring whether the requested measurement is part of the buttons or axes array of the joy message.
+    
     5. The following methods can be overwritten by plugins if required:
         1. `executePeriodically(const ros::Rate& rate)` for parts that should be executed in every run of the ros loop.
         2. `onLoad()` which is called after a plugin is loaded successfully, right before active_ is set to true.

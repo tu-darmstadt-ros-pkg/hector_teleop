@@ -74,6 +74,31 @@ void TeleopBase::printMissingParameter(std::string param_name)
                                   << "\" is missing (maybe misspelled?).");
 }
 
+bool TeleopBase::getJoyMeasurement(std::string name, const sensor_msgs::JoyConstPtr& msg, float& result, bool print_missing_parameter)
+{
+    auto it_axes = axes_.find(name);
+    if(it_axes != axes_.end())
+    {
+        result = msg->axes[it_axes->second];
+        return true;
+    }
+
+    auto it_buttons = buttons_.find(name);
+    if(it_buttons != buttons_.end())
+    {
+        result = msg->buttons[it_buttons->second];
+        return true;
+    }
+
+    if(print_missing_parameter)
+    {
+        printMissingParameter(name);
+    }
+
+    return false;
+}
+
+
 void TeleopBase::executePeriodically(const ros::Rate& rate)
 {
     return;
@@ -98,5 +123,7 @@ std::string TeleopBase::getParameterServerPrefix()
 {
     return plugin_namespace_ + "/" + plugin_name_;
 }
+
+
 
 }

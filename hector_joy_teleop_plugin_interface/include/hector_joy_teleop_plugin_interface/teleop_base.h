@@ -63,6 +63,21 @@ class TeleopBase
 
  protected:
 
+  /**
+   * get the joy measurements for a given name from axes or buttons list of message. Returns false if name cannot be found.
+   * @param name name of mapping for measurement
+   * @param msg message of which the measurement will be taken
+   * @param result measurement for name
+   * @param print_missing_parameter true by default, if false there will no message be printed if the parameter is
+   *                                        missing, but false will be returned
+   *                                        (set to false e.g. when there are alternative names which are checked one by one)
+   * @return false if name was not found in buttons_ or axes_ mapping
+   */
+  bool getJoyMeasurement(std::string name,
+                         const sensor_msgs::JoyConstPtr& msg,
+                         float& result,
+                         bool print_missing_parameter = true);
+
   void printMissingParameter(std::string param_name);
 
   /**
@@ -76,7 +91,8 @@ class TeleopBase
   // mapping of usage names to message array index
   std::map<std::string, int> axes_;
   std::map<std::string, int> buttons_;
-  std::string plugin_namespace_; // <<< plugin namespace (first part from <namespace>::<classname> of complete pluginname used for service calls)
+  std::string
+      plugin_namespace_; // <<< plugin namespace (first part from <namespace>::<classname> of complete pluginname used for service calls)
   std::string plugin_name_; //<<< plugin name: <classname>
 
   ros::NodeHandle nh_;

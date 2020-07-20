@@ -1,15 +1,19 @@
 # for unknown mappings of [joystick axes or buttons] to [array index]: "sudo jstest /dev/input/jsX" (X is often 0) and then test each axis/button on gamepad
 
 # order needs to be same as in joy message!
+
+# WARNING: when using LT/RT the code probably needs to be adapted, since LT/RT axes are from [-1.0,1.0] with 1.0 as default value!
+
+## use "front" or "back" if an axis in range [-1,1] is used, use "front_up" and "front_down" and same for back if buttons/axes are used which are in range [0,1]
 axes:
   - ""  # 0: left joystick: left/right
   - ""  # 1: left joystick: up/down
-  - ""  # 2: LT
+  - "front_down"  # 2: LT
   - ""  # 3: right joystick: left/right
   - ""  # 4: right joystick: up/down
-  - ""  # 5: RT
-  - "back"  # 6: cross: left/right
-  - "front"  # 7: cross: up/down
+  - "back_down"  # 5: RT
+  - ""  # 6: cross: left/right
+  - ""  # 7: cross: up/down
 
 
 buttons:
@@ -17,8 +21,8 @@ buttons:
   - ""  # 1: B
   - ""  # 2: X
   - ""  # 3: Y
-  - ""  # 4: LB
-  - ""  # 5: RB
+  - "front_up"  # 4: LB
+  - "back_up"  # 5: RB
   - ""  # 6: back
   - ""  # 7: start
   - ""  # 8: logitech

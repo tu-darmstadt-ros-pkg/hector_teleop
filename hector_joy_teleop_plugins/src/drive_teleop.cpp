@@ -8,13 +8,12 @@ void DriveTeleop::initialize(ros::NodeHandle& nh, ros::NodeHandle& pnh)
 {
     TeleopBase::initializeBase(nh, pnh, "hector_joy_teleop_plugins::DriveTeleop");
 
-
     // get values from common config file
-    speed_forward_ = pnh_.param(getParameterServerPrefix() + "/" + "speed_forward", 0);
-    speed_backward_ = pnh_.param(getParameterServerPrefix() + "/" + "speed_backward", 0);
-    turn_speed_ = pnh_.param(getParameterServerPrefix() + "/" + "turn_speed", 0);
-    slow_factor_ = pnh_.param(getParameterServerPrefix() + "/" + "slow_factor", 0);
-    very_slow_factor_ = pnh_.param(getParameterServerPrefix() + "/" + "very_slow_factor", 0);
+    speed_forward_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "speed_forward", 0.0);
+    speed_backward_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "speed_backward", 0.0);
+    turn_speed_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "turn_speed", 0.0);
+    slow_factor_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "slow_factor", 1.0);
+    very_slow_factor_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "very_slow_factor", 1.0);
 
     motionCommandOutput = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 10, false);
 }
@@ -23,62 +22,47 @@ void DriveTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
 {
 
     // compute linear speed (forward/backward)
-    try
+    float speed_joystick;
+    if(getJoyMeasurement("speed", msg, speed_joystick))
     {
-        int speed_mapping = axes_.at("speed");
-        float speed_joystick = msg->axes[speed_mapping];
         if (speed_joystick >= 0.0)
             motionCommand.linear.x = speed_joystick * speed_forward_;
         else
             motionCommand.linear.x = speed_joystick * speed_backward_;
     }
-    catch (std::out_of_range& e)
-    {
-        printMissingParameter("speed");
-    }
+
 
 
     // compute angular speed (left/right turn)
-    try
+    float steer_joystick;
+    if(getJoyMeasurement("steer", msg, steer_joystick))
     {
-        int steer_mapping = axes_.at("steer");
-        motionCommand.angular.z = msg->axes[steer_mapping] * turn_speed_;
+        motionCommand.angular.z = steer_joystick * turn_speed_;
     }
-    catch (std::out_of_range& e)
-    {
-        printMissingParameter("steer");
-    }
+
 
 
     // compute slow linear and angular speed
-    try
+    float slow_joystick;
+    if(getJoyMeasurement("slow", msg, slow_joystick))
     {
-        int slow_mapping = axes_.at("slow");
-        if (msg->buttons[slow_mapping])
+        if (slow_joystick == 1.0)
         {
             motionCommand.linear.x *= slow_factor_;
             motionCommand.angular.z *= slow_factor_;
         }
     }
-    catch (std::out_of_range& e)
-    {
-        printMissingParameter("slow");
-    }
 
 
     // compute very slow linear and angular speed
-    try
+    float very_slow_joystick;
+    if(getJoyMeasurement("very_slow", msg, very_slow_joystick))
     {
-        int very_slow_mapping = axes_.at("very_slow");
-        if (msg->buttons[very_slow_mapping])
+        if (very_slow_joystick == 1.0)
         {
             motionCommand.linear.x *= very_slow_factor_;
             motionCommand.angular.z *= very_slow_factor_;
         }
-    }
-    catch (std::out_of_range& e)
-    {
-        printMissingParameter("very_slow");
     }
 
     motionCommandOutput.publish(motionCommand);

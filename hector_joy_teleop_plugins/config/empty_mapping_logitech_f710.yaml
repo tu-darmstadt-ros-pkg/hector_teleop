@@ -1,6 +1,9 @@
 # for unknown mappings of [joystick axes or buttons] to [array index]: "sudo jstest /dev/input/jsX" (X is often 0) and then test each axis/button on gamepad
 
 # order needs to be same as in joy message!
+
+# WARNING: when using LT/RT probably the code needs to be adapted, as LT/RT are axes from [-1,1] with 1 as default value!
+
 axes:
   - ""  # 0: left joystick: left/right
   - ""  # 1: left joystick: up/down

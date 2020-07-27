@@ -1,0 +1,32 @@
+# for unknown mappings of [joystick axes or buttons] to [array index]: "sudo jstest /dev/input/jsX" (X is often 0) and then test each axis/button on gamepad
+
+# order needs to be same as in joy message!
+
+# WARNING: when using LT/RT the code probably needs to be adapted, since LT/RT axes are from [-1.0,1.0] with 1.0 as default value!
+
+
+## If an axis is used for two behaviors list both of them in one string, separated with a semicolon, e.g. "Behavior 1;Behavior 2"
+##    The first is the one which will be executed for value -1, the second for +1.
+axes:
+  - ""  # 0: left joystick: left/right
+  - ""  # 1: left joystick: up/down
+  - ""  # 2: LT
+  - ""  # 3: right joystick: left/right
+  - ""  # 4: right joystick: up/down
+  - ""  # 5: RT
+  - "Move flipper"  # 6: cross: left/right
+  - ""  # 7: cross: up/down
+
+
+buttons:
+  - ""  # 0: A
+  - ""  # 1: B
+  - ""  # 2: X
+  - ""  # 3: Y
+  - ""  # 4: LB
+  - ""  # 5: RB
+  - ""  # 6: back
+  - ""  # 7: start
+  - ""  # 8: logitech
+  - ""  # 9: left joystick press
+  - ""  # 10:right joystick press

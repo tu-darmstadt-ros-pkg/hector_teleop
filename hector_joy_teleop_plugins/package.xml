@@ -51,6 +51,8 @@
   <depend>roscpp</depend>
   <depend>sensor_msgs</depend>
   <depend>pluginlib</depend>
+  <depend>flexbe_msgs</depend>
+  <depend>actionlib</depend>
   <depend>hector_joy_teleop_plugin_interface</depend>
 
 

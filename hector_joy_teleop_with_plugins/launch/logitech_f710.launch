@@ -14,6 +14,10 @@
     <!-- Flipper Teleop Plugin Parameter -->
     <rosparam file="$(find hector_joy_teleop_plugins)/config/flipper/flipper_common.yaml" ns="hector_joy_teleop_plugins/FlipperTeleop" />
     <rosparam file="$(find hector_joy_teleop_plugins)/config/flipper/flipper_mapping_logitech_f710.yaml" ns="hector_joy_teleop_plugins/FlipperTeleop" />
+
+     <!-- Behavior Teleop Plugin Parameter -->
+     <rosparam file="$(find hector_joy_teleop_plugins)/config/behavior/behavior_common.yaml" ns="hector_joy_teleop_plugins/BehaviorTeleop" />
+     <rosparam file="$(find hector_joy_teleop_plugins)/config/behavior/behavior_mapping_logitech_f710.yaml" ns="hector_joy_teleop_plugins/BehaviorTeleop" />
   </node>
 
   <!-- Load initial plugins (the service call with parameter wait will be executed when the service is available) -->

@@ -8,13 +8,15 @@ find_package(catkin REQUIRED COMPONENTS
         roscpp
         sensor_msgs
         pluginlib
+        flexbe_msgs
+        actionlib
         hector_joy_teleop_plugin_interface
         )
 
 catkin_package(
         INCLUDE_DIRS include
         LIBRARIES hector_joy_teleop_plugins
-        CATKIN_DEPENDS geometry_msgs roscpp sensor_msgs pluginlib hector_joy_teleop_plugin_interface
+        CATKIN_DEPENDS geometry_msgs roscpp sensor_msgs pluginlib flexbe_msgs hector_joy_teleop_plugin_interface
 )
 
 
@@ -25,12 +27,14 @@ include_directories(
 
 
 set(HEADER_FILES
+        include/${PROJECT_NAME}/behavior_teleop.h
         include/${PROJECT_NAME}/drive_teleop.h
         include/${PROJECT_NAME}/flipper_teleop.h
         include/${PROJECT_NAME}/sensorhead_teleop.h
         )
 
 set(SOURCES
+        src/behavior_teleop.cpp
         src/drive_teleop.cpp
         src/flipper_teleop.cpp
         src/sensorhead_teleop.cpp

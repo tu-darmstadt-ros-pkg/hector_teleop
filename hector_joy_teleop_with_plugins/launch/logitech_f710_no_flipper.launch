@@ -13,7 +13,8 @@
   </node>
 
   <!-- Load initial plugins (the service call with parameter wait will be executed when the service is available) -->
-  <node pkg="rosservice" type="rosservice" name="LoadPluginDrive" args="call --wait /hector_joy_teleop_with_plugins/LoadPlugin &quot;{plugin_name: 'hector_joy_teleop_plugins::DriveTeleop', load: true}&quot;" />
-  <node pkg="rosservice" type="rosservice" name="LoadPluginSensorhead" args="call --wait /hector_joy_teleop_with_plugins/LoadPlugin &quot;{plugin_name: 'hector_joy_teleop_plugins::SensorheadTeleop', load: true}&quot;" />
+  <node pkg="rosservice" type="rosservice" name="LoadPluginDrive" args="call --wait /hector_joy_teleop_with_plugins/load_plugin &quot;{plugin_name: 'hector_joy_teleop_plugins::DriveTeleop', load: true}&quot;" />
+  <node pkg="rosservice" type="rosservice" name="LoadPluginSensorhead" args="call --wait /hector_joy_teleop_with_plugins/load_plugin &quot;{plugin_name: 'hector_joy_teleop_plugins::SensorheadTeleop', load: true}&quot;" />
+  <node pkg="rosservice" type="rosservice" name="LoadPluginManageProperties" args="call --wait /hector_joy_teleop_with_plugins/load_plugin &quot;{plugin_name: 'hector_joy_teleop_plugins::ManageProperties', load: true}&quot;" />
 
 </launch>

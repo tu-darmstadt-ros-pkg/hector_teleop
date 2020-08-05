@@ -70,6 +70,8 @@ class JoyTeleop
   ros::NodeHandle& nh_;
   ros::NodeHandle& pnh_;
 
+  std::shared_ptr<std::map<std::string, double>> property_map_;
+
   ros::Subscriber joy_sub_;
 
   ros::ServiceServer load_plugin_service_;

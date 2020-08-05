@@ -5,9 +5,9 @@
 namespace hector_joy_teleop_plugins
 {
 
-void SensorheadTeleop::initialize(ros::NodeHandle& nh, ros::NodeHandle& pnh)
+void SensorheadTeleop::initialize(ros::NodeHandle& nh, ros::NodeHandle& pnh, std::shared_ptr<std::map<std::string, double>> property_map)
 {
-    TeleopBase::initializeBase(nh, pnh, "hector_joy_teleop_plugins::SensorheadTeleop");
+    TeleopBase::initializeBase(nh, pnh, property_map, "hector_joy_teleop_plugins::SensorheadTeleop");
 
     sensorhead_command_output = nh_.advertise<geometry_msgs::QuaternionStamped>("camera/command", 10, false);
 

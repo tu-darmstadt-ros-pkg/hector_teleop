@@ -54,6 +54,9 @@
   <depend>flexbe_msgs</depend>
   <depend>actionlib</depend>
   <depend>hector_joy_teleop_plugin_interface</depend>
+  <build_depend>message_runtime</build_depend>
+  <build_export_depend>message_generation</build_export_depend>
+  <exec_depend>message_runtime</exec_depend>
 
 
 

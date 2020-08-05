@@ -4,6 +4,7 @@ project(hector_joy_teleop_plugins)
 set(CMAKE_CXX_STANDARD 14)
 
 find_package(catkin REQUIRED COMPONENTS
+        message_generation
         geometry_msgs
         roscpp
         sensor_msgs
@@ -13,10 +14,16 @@ find_package(catkin REQUIRED COMPONENTS
         hector_joy_teleop_plugin_interface
         )
 
+add_service_files(FILES
+        SetProperty.srv
+        )
+
+generate_messages()
+
 catkin_package(
         INCLUDE_DIRS include
         LIBRARIES hector_joy_teleop_plugins
-        CATKIN_DEPENDS geometry_msgs roscpp sensor_msgs pluginlib flexbe_msgs hector_joy_teleop_plugin_interface
+        CATKIN_DEPENDS message_runtime geometry_msgs roscpp sensor_msgs pluginlib flexbe_msgs hector_joy_teleop_plugin_interface
 )
 
 
@@ -30,6 +37,7 @@ set(HEADER_FILES
         include/${PROJECT_NAME}/behavior_teleop.h
         include/${PROJECT_NAME}/drive_teleop.h
         include/${PROJECT_NAME}/flipper_teleop.h
+        include/${PROJECT_NAME}/manage_properties.h
         include/${PROJECT_NAME}/sensorhead_teleop.h
         )
 
@@ -37,6 +45,7 @@ set(SOURCES
         src/behavior_teleop.cpp
         src/drive_teleop.cpp
         src/flipper_teleop.cpp
+        src/manage_properties.cpp
         src/sensorhead_teleop.cpp
         )
 

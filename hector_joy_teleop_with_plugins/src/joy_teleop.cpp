@@ -11,14 +11,13 @@ JoyTeleop::JoyTeleop(ros::NodeHandle& nh, ros::NodeHandle& pnh)
                                   "hector_joy_teleop_plugin_interface::TeleopBase")
 {
 
+    // create an empty property map
+    property_map_ = std::make_shared<std::map<std::string, double>>();
+
+    // setup topics and services
     joy_sub_ = nh_.subscribe<sensor_msgs::Joy>("joy", 10, &JoyTeleop::JoyCallback, this);
 
-    load_plugin_service_ = pnh_.advertiseService("LoadPlugin", &JoyTeleop::LoadPluginServiceCB, this);
-
-    // if there are initial plugins given, load them
-    std::vector<std::string> init_plugins;
-
-    bool res_init_plugins = pnh_.getParam("init_plugins", init_plugins);
+    load_plugin_service_ = pnh_.advertiseService("load_plugin", &JoyTeleop::LoadPluginServiceCB, this);
 }
 
 void JoyTeleop::executePeriodically(const ros::Rate& rate)
@@ -44,11 +43,13 @@ bool JoyTeleop::LoadPluginServiceCB(LoadTeleopPlugin::Request& request, LoadTele
         {
             for (TeleopBasePtr& plugin: plugins_)
             {
+                // unload all active plugins
                 if (plugin->isActive())
                 {
                     plugin->setActive(false);
                     std::string res_unload = plugin->onUnload();
 
+                    // if there was no error while unloading, continue to unload plugin
                     if(res_unload.empty())
                     {
                         removeMapping(plugin->getPluginName());
@@ -62,6 +63,7 @@ bool JoyTeleop::LoadPluginServiceCB(LoadTeleopPlugin::Request& request, LoadTele
                         ROS_INFO_STREAM("joy_teleop_with_plugins: Plugin \"" << plugin->getPluginName() << "\" unloaded.");
                     } else
                     {
+                        // if plugin could not be unloaded send error
                         plugin->setActive(true);
                         response.result = response.PLUGIN_LOAD_ERROR;
 
@@ -88,7 +90,7 @@ bool JoyTeleop::LoadPluginServiceCB(LoadTeleopPlugin::Request& request, LoadTele
         return true;
     }
 
-    // load/unload requested plugin
+    // load/unload requested plugin: get index of earlier instantiated plugin or create a new instance otherwise
     int plugin_idx = pluginFactory(request.plugin_name);
 
     // plugin name not found
@@ -317,7 +319,7 @@ int JoyTeleop::pluginFactory(std::string teleop_plugin_name)
                             &teleop_plugin_class_loader_,
                             teleop_plugin_name));
 
-        ptr->initialize(nh_, pnh_);
+        ptr->initialize(nh_, pnh_, property_map_);
 
         plugins_.push_back(ptr);
 

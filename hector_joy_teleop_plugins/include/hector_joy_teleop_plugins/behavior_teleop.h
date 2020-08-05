@@ -17,7 +17,7 @@ class BehaviorTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
 
   BehaviorTeleop();
 
-  void initialize(ros::NodeHandle& nh, ros::NodeHandle& pnh) override;
+  void initialize(ros::NodeHandle& nh, ros::NodeHandle& pnh, std::shared_ptr<std::map<std::string, double>> property_map) override;
 
   void forwardMsg(const sensor_msgs::JoyConstPtr& msg) override;
 

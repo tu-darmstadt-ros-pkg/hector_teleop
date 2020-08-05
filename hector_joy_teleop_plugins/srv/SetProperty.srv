@@ -1,0 +1,9 @@
+#request fields
+string property_name
+float64 value
+---
+#response constants
+int8 SUCCESS=0
+int8 UNKNOWN_PROPERTYNAME=1
+#response fields
+int8 result

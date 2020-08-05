@@ -4,13 +4,14 @@
 namespace hector_joy_teleop_plugins
 {
 
-void DriveTeleop::initialize(ros::NodeHandle& nh, ros::NodeHandle& pnh)
+void DriveTeleop::initialize(ros::NodeHandle& nh,
+                             ros::NodeHandle& pnh,
+                             std::shared_ptr<std::map<std::string, double>> property_map)
 {
-    TeleopBase::initializeBase(nh, pnh, "hector_joy_teleop_plugins::DriveTeleop");
+    TeleopBase::initializeBase(nh, pnh, property_map, "hector_joy_teleop_plugins::DriveTeleop");
 
     // get values from common config file
-    speed_forward_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "speed_forward", 0.0);
-    speed_backward_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "speed_backward", 0.0);
+    speed_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "speed", 0.0);
     turn_speed_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "turn_speed", 0.0);
     slow_factor_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "slow_factor", 1.0);
     very_slow_factor_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "very_slow_factor", 1.0);
@@ -21,30 +22,30 @@ void DriveTeleop::initialize(ros::NodeHandle& nh, ros::NodeHandle& pnh)
 void DriveTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
 {
 
+    // if the direction value is available in map use it, otherwise use default value of 1.0
+    // (1.0 => forward mode, -1.0 => reverse mode)
+    auto iter = property_map_->find("direction");
+    double direction = (iter != property_map_->end()) ? iter->second : 1.0;
+
     // compute linear speed (forward/backward)
     float speed_joystick;
-    if(getJoyMeasurement("speed", msg, speed_joystick))
+    if (getJoyMeasurement("speed", msg, speed_joystick))
     {
-        if (speed_joystick >= 0.0)
-            motionCommand.linear.x = speed_joystick * speed_forward_;
-        else
-            motionCommand.linear.x = speed_joystick * speed_backward_;
+        motionCommand.linear.x = speed_joystick * speed_ * direction;
     }
-
 
 
     // compute angular speed (left/right turn)
     float steer_joystick;
-    if(getJoyMeasurement("steer", msg, steer_joystick))
+    if (getJoyMeasurement("steer", msg, steer_joystick))
     {
         motionCommand.angular.z = steer_joystick * turn_speed_;
     }
 
 
-
     // compute slow linear and angular speed
     float slow_joystick;
-    if(getJoyMeasurement("slow", msg, slow_joystick))
+    if (getJoyMeasurement("slow", msg, slow_joystick))
     {
         if (slow_joystick == 1.0)
         {
@@ -56,7 +57,7 @@ void DriveTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
 
     // compute very slow linear and angular speed
     float very_slow_joystick;
-    if(getJoyMeasurement("very_slow", msg, very_slow_joystick))
+    if (getJoyMeasurement("very_slow", msg, very_slow_joystick))
     {
         if (very_slow_joystick == 1.0)
         {

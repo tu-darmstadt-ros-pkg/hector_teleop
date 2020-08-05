@@ -3,26 +3,34 @@
 <launch>
   <node name="hector_joy_teleop_with_plugins" pkg="hector_joy_teleop_with_plugins" type="hector_joy_teleop_with_plugins_node" respawn="false" output="screen">
 
+    <!-- Behavior Teleop Plugin Parameter -->
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/behavior/behavior_common.yaml" ns="hector_joy_teleop_plugins/BehaviorTeleop" />
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/behavior/behavior_mapping_logitech_f710.yaml" ns="hector_joy_teleop_plugins/BehaviorTeleop" />
+
     <!-- Drive Teleop Plugin Parameter -->
     <rosparam file="$(find hector_joy_teleop_plugins)/config/drive/drive_common.yaml" ns="hector_joy_teleop_plugins/DriveTeleop" />
     <rosparam file="$(find hector_joy_teleop_plugins)/config/drive/drive_mapping_logitech_f710.yaml" ns="hector_joy_teleop_plugins/DriveTeleop" />
-
-    <!-- Sensorhead Teleop Plugin Parameter -->
-    <rosparam file="$(find hector_joy_teleop_plugins)/config/sensorhead/sensorhead_common.yaml" ns="hector_joy_teleop_plugins/SensorheadTeleop" />
-    <rosparam file="$(find hector_joy_teleop_plugins)/config/sensorhead/sensorhead_mapping_logitech_f710.yaml" ns="hector_joy_teleop_plugins/SensorheadTeleop" />
 
     <!-- Flipper Teleop Plugin Parameter -->
     <rosparam file="$(find hector_joy_teleop_plugins)/config/flipper/flipper_common.yaml" ns="hector_joy_teleop_plugins/FlipperTeleop" />
     <rosparam file="$(find hector_joy_teleop_plugins)/config/flipper/flipper_mapping_logitech_f710.yaml" ns="hector_joy_teleop_plugins/FlipperTeleop" />
 
-     <!-- Behavior Teleop Plugin Parameter -->
-     <rosparam file="$(find hector_joy_teleop_plugins)/config/behavior/behavior_common.yaml" ns="hector_joy_teleop_plugins/BehaviorTeleop" />
-     <rosparam file="$(find hector_joy_teleop_plugins)/config/behavior/behavior_mapping_logitech_f710.yaml" ns="hector_joy_teleop_plugins/BehaviorTeleop" />
+    <!-- Manage properties Plugin Parameter -->
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/properties/properties_common.yaml" ns="hector_joy_teleop_plugins/ManageProperties" />
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/properties/properties_mapping_logitech_f710.yaml" ns="hector_joy_teleop_plugins/ManageProperties" />
+
+    <!-- Sensorhead Teleop Plugin Parameter -->
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/sensorhead/sensorhead_common.yaml" ns="hector_joy_teleop_plugins/SensorheadTeleop" />
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/sensorhead/sensorhead_mapping_logitech_f710.yaml" ns="hector_joy_teleop_plugins/SensorheadTeleop" />
+
+
+
   </node>
 
   <!-- Load initial plugins (the service call with parameter wait will be executed when the service is available) -->
-  <node pkg="rosservice" type="rosservice" name="LoadPluginDrive" args="call --wait /hector_joy_teleop_with_plugins/LoadPlugin &quot;{plugin_name: 'hector_joy_teleop_plugins::DriveTeleop', load: true}&quot;" />
-  <node pkg="rosservice" type="rosservice" name="LoadPluginFlipper" args="call --wait /hector_joy_teleop_with_plugins/LoadPlugin &quot;{plugin_name: 'hector_joy_teleop_plugins::FlipperTeleop', load: true}&quot;" />
-  <node pkg="rosservice" type="rosservice" name="LoadPluginSensorhead" args="call --wait /hector_joy_teleop_with_plugins/LoadPlugin &quot;{plugin_name: 'hector_joy_teleop_plugins::SensorheadTeleop', load: true}&quot;" />
+  <node pkg="rosservice" type="rosservice" name="LoadPluginDrive" args="call --wait /hector_joy_teleop_with_plugins/load_plugin &quot;{plugin_name: 'hector_joy_teleop_plugins::DriveTeleop', load: true}&quot;" />
+  <node pkg="rosservice" type="rosservice" name="LoadPluginFlipper" args="call --wait /hector_joy_teleop_with_plugins/load_plugin &quot;{plugin_name: 'hector_joy_teleop_plugins::FlipperTeleop', load: true}&quot;" />
+  <node pkg="rosservice" type="rosservice" name="LoadPluginSensorhead" args="call --wait /hector_joy_teleop_with_plugins/load_plugin &quot;{plugin_name: 'hector_joy_teleop_plugins::SensorheadTeleop', load: true}&quot;" />
+  <node pkg="rosservice" type="rosservice" name="LoadPluginManageProperties" args="call --wait /hector_joy_teleop_with_plugins/load_plugin &quot;{plugin_name: 'hector_joy_teleop_plugins::ManageProperties', load: true}&quot;" />
 
 </launch>

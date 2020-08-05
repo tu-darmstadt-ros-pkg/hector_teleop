@@ -4,10 +4,12 @@
 namespace hector_joy_teleop_plugin_interface
 {
 
-void TeleopBase::initializeBase(ros::NodeHandle& nh, ros::NodeHandle& pnh, std::string plugin_name)
+void TeleopBase::initializeBase(ros::NodeHandle& nh, ros::NodeHandle& pnh, std::shared_ptr<std::map<std::string, double>> property_map, std::string plugin_name)
 {
     nh_ = nh;
     pnh_ = pnh;
+
+    property_map_ = property_map;
 
     std::string delimiter = ":";
     plugin_namespace_ = plugin_name.substr(0, plugin_name.find(delimiter));
@@ -114,16 +116,15 @@ std::string TeleopBase::onUnload()
     return "";
 }
 
-
-TeleopBase::~TeleopBase()
-{
-
-}
 std::string TeleopBase::getParameterServerPrefix()
 {
     return plugin_namespace_ + "/" + plugin_name_;
 }
 
 
+TeleopBase::~TeleopBase()
+{
+
+}
 
 }

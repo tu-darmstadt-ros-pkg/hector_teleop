@@ -5,7 +5,7 @@ In order to implement a new plugin the followings steps need to be done:
     1. Locate it e.g. in the existing namespace "hector_joy_teleop_plugins" or in a new namespace.
     2. Make it an derived class of class "hector_joy_teleop_plugin_interface::TeleopBase".
     3. Overwrite the initialize method and inside of it first call the method 
-    `TeleopBase::initializeBase(nh, pnh, "<namespace>::<pluginname>");`.
+    `TeleopBase::initializeBase(nh, pnh, property_map, "<namespace>::<pluginname>");`.
     4. Overwrite / Implement the function  
     `void forwardMsg(const sensor_msgs::JoyConstPtr& msg) override;` with the plugin functionality.\
     *Note*: use the protected method `TeleopBase::getJoyMeasurement` to get the joy measurement without caring whether the requested measurement is part of the buttons or axes array of the joy message.

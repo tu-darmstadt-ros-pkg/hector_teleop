@@ -11,7 +11,7 @@ namespace hector_joy_teleop_plugin_interface
 class TeleopBase
 {
  public:
-  void initializeBase(ros::NodeHandle& nh, ros::NodeHandle& pnh, std::string plugin_name);
+  void initializeBase(ros::NodeHandle& nh, ros::NodeHandle& pnh, std::shared_ptr<std::map<std::string, double>> property_map, std::string plugin_name);
 
   bool isActive();
 
@@ -30,7 +30,7 @@ class TeleopBase
    * @param nh nodehandle
    * @param pnh nodehandle for private namespace
    */
-  virtual void initialize(ros::NodeHandle& nh, ros::NodeHandle& pnh) = 0;
+  virtual void initialize(ros::NodeHandle& nh, ros::NodeHandle& pnh, std::shared_ptr<std::map<std::string, double>> property_map) = 0;
 
   /**
    * Convert and forward joy message to respective topic/package. Details in each plugin.
@@ -95,8 +95,11 @@ class TeleopBase
       plugin_namespace_; // <<< plugin namespace (first part from <namespace>::<classname> of complete pluginname used for service calls)
   std::string plugin_name_; //<<< plugin name: <classname>
 
+  //NOTE: also change to shared pointer if required
   ros::NodeHandle nh_;
   ros::NodeHandle pnh_;
+
+  std::shared_ptr<std::map<std::string, double>> property_map_;
 
 };
 }

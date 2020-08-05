@@ -4,9 +4,9 @@
 namespace hector_joy_teleop_plugins
 {
 
-void FlipperTeleop::initialize(ros::NodeHandle& nh, ros::NodeHandle& pnh)
+void FlipperTeleop::initialize(ros::NodeHandle& nh, ros::NodeHandle& pnh, std::shared_ptr<std::map<std::string, double>> property_map)
 {
-    TeleopBase::initializeBase(nh, pnh, "hector_joy_teleop_plugins::FlipperTeleop");
+    TeleopBase::initializeBase(nh, pnh, property_map, "hector_joy_teleop_plugins::FlipperTeleop");
 
     speed_ = pnh_.param<float>(getParameterServerPrefix() + "/" + "speed", 0.0);
 
@@ -21,6 +21,9 @@ void FlipperTeleop::initialize(ros::NodeHandle& nh, ros::NodeHandle& pnh)
 
 void FlipperTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
 {
+    // if the direction value is available in map and it is -1.0, reverse mode is active (handled when published!)
+    auto iter = property_map_->find("direction");
+    bool reverse_direction = (iter != property_map_->end()) && (iter->second == -1.0);
 
     // front flipper
     float front_up_joystick, front_down_joystick, front_joystick;
@@ -98,8 +101,18 @@ void FlipperTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
                              << ": The required axis/button mapping for value \"back\" or \"back_up\" and \"back_down\" are missing (maybe misspelled?).");
     }
 
-    flipper_front_pub_.publish(flipper_front_command_);
-    flipper_back_pub_.publish(flipper_back_command_);
+
+    if(!reverse_direction)
+    {
+        flipper_front_pub_.publish(flipper_front_command_);
+        flipper_back_pub_.publish(flipper_back_command_);
+    } else
+    {
+        // in reverse mode also reverse button mapping for front and back flippers, hence swap commands
+        flipper_front_pub_.publish(flipper_back_command_);
+        flipper_back_pub_.publish(flipper_front_command_);
+    }
+
 
 }
 

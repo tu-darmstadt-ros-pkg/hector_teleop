@@ -15,7 +15,7 @@ void ManageProperties::initialize(ros::NodeHandle& nh,
 
 
     // setup service and topics
-    direction_status_pub_ = pnh_.advertise<std_msgs::Float64>("direction_status", 10, false);
+    direction_status_pub_ = pnh_.advertise<std_msgs::Float64>("direction_status", 10, true);
 
     set_property_service_ = pnh_.advertiseService("set_property", &ManageProperties::SetPropertyServiceCB, this);
 }

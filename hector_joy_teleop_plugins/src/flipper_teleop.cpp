@@ -121,14 +121,14 @@ std::string FlipperTeleop::onLoad()
     switch_controller_srv_.request.start_controllers =
         {"flipper_front_velocity_controller", "flipper_back_velocity_controller"};
     switch_controller_srv_.request.stop_controllers = {"flipper_traj_controller"};
-    switch_controller_srv_.request.strictness = 1;
+    switch_controller_srv_.request.strictness = 2;
     switch_controller_srv_.request.start_asap = false;
     switch_controller_srv_.request.timeout = 0.0;
 
-    if (!switch_controller_client_.call(switch_controller_srv_))
+
+    if (!switch_controller_client_.call(switch_controller_srv_) || !switch_controller_srv_.response.ok)
     {
         return "Failed to switch to flipper velocity controller!";
-
     }
     return "";
 }
@@ -138,11 +138,11 @@ std::string FlipperTeleop::onUnload()
     switch_controller_srv_.request.start_controllers = {"flipper_traj_controller"};
     switch_controller_srv_.request.stop_controllers =
         {"flipper_front_velocity_controller", "flipper_back_velocity_controller"};
-    switch_controller_srv_.request.strictness = 1;
+    switch_controller_srv_.request.strictness = 2;
     switch_controller_srv_.request.start_asap = false;
     switch_controller_srv_.request.timeout = 0.0;
 
-    if (!switch_controller_client_.call(switch_controller_srv_))
+    if (!switch_controller_client_.call(switch_controller_srv_) || !switch_controller_srv_.response.ok)
     {
         return "Failed to switch to flipper trajectory controller!";
     }

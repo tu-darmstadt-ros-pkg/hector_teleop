@@ -1,9 +1,11 @@
 <?xml version="1.0"?>
 
 <launch>
-  <group ns="manipulator_arm_control">
+  <arg name="namespace" default="manipulator_arm_control"/>
+
+  <group ns="$(arg namespace)">
     <node name="joy_tcp_controller_spawner" pkg="controller_manager" type="spawner" respawn="true" output="screen" args="--stopped joy_tcp_controller" />
-    
+
     <!--parameters-->
     <rosparam file="$(find hector_joy_tcp_teleop)/config/controllers.yaml" command="load" />
     <rosparam file="$(find hector_joy_tcp_teleop)/config/xbox_controller.yaml" command="load" ns="joy_tcp_controller"/>

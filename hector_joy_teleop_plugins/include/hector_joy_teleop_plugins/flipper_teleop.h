@@ -24,6 +24,11 @@ class FlipperTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
  private:
 
   float speed_;
+  std::string flipper_front_command_topic_;
+  std::string flipper_back_command_topic_;
+  std::string controller_manager_switch_service_;
+  std::vector<std::string> standard_controllers_;
+  std::vector<std::string> teleop_controllers_;
 
   std_msgs::Float64 flipper_front_command_;
   std_msgs::Float64 flipper_back_command_;

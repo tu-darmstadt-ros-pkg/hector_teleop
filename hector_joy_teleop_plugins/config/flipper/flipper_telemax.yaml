@@ -1,0 +1,11 @@
+speed: 0.5
+flipper_front_command_topic: /telemax_control/flipper_front_velocity/command 
+flipper_back_command_topic: /telemax_control/flipper_back_velocity/command
+controller_manager_switch_service: /telemax_control/controller_manager/switch_controller
+standard_controllers: 
+  - flipper_traj_controller
+teleop_controllers: 
+  - flipper_front_left_velocity_controller 
+  - flipper_front_right_velocity_controller 
+  - flipper_back_left_velocity_controller 
+  - flipper_back_right_velocity_controller

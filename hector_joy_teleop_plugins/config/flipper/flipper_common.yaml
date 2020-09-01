@@ -1,1 +1,9 @@
 speed: 0.5
+flipper_front_command_topic: /flipper_control/flipper_front_velocity_controller/command
+flipper_back_command_topic: /flipper_control/flipper_back_velocity_controller/command
+controller_manager_switch_service: /flipper_control/controller_manager/switch_controller
+standard_controllers:
+  - flipper_traj_controller
+teleop_controllers:
+  - flipper_front_velocity_controller
+  - flipper_back_velocity_controller

@@ -53,9 +53,11 @@
   <depend>sensor_msgs</depend>
   <depend>pluginlib</depend>
   <depend>hector_joy_teleop_plugin_interface</depend>
-  <build_depend>message_runtime</build_depend>
+  <build_depend>message_generation</build_depend>
   <build_export_depend>message_generation</build_export_depend>
   <exec_depend>message_runtime</exec_depend>
+  <exec_depend>hector_joy_teleop_plugins</exec_depend>
+  <exec_depend>rosservice</exec_depend>
 
 
 

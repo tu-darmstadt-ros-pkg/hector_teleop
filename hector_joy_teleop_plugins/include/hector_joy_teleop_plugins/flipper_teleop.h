@@ -23,6 +23,8 @@ class FlipperTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
 
  private:
 
+  void joyToFlipperCommand(const sensor_msgs::JoyConstPtr& msg);
+
   float speed_;
   std::string flipper_front_command_topic_;
   std::string flipper_back_command_topic_;
@@ -37,6 +39,7 @@ class FlipperTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
 
   ros::ServiceClient switch_controller_client_;
   controller_manager_msgs::SwitchController switch_controller_srv_;
+
 
 };
 

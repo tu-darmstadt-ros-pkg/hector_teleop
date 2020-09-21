@@ -2,7 +2,13 @@
 
 # order needs to be same as in joy message!
 
-# WARNING: when using LT/RT the code probably needs to be adapted, since LT/RT axes are from [-1.0,1.0] with 1.0 as default value!
+# WARNING: when using LT/RT the code probably needs to be adapted, since LT/RT axes are from [-1.0,1.0] with 1.0 as default value
+#  (or use mapTriggerAxes(msg) to map it to [0,1] with 0.0 as default)
+
+# NOTES:
+# 1. In oder to split an axis into two partial axes or buttons write the tow names seperated with a semicolon (and no spaces!).
+#     The first one belongs to the part < 0, the second one to the part > 0 (e.g. "<nameA>_inc;<nameB>_inc")
+# 2. In order to combine two (partial) axes or buttons into one axis use the suffixes <name>_inc and <name>_dec (e.g. front_inc and front_dec)
 
 
 ## If an axis is used for two behaviors list both of them in one string, separated with a semicolon, e.g. "Behavior 1;Behavior 2"

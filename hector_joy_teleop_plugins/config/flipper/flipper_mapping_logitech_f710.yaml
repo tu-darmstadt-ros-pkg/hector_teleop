@@ -2,16 +2,21 @@
 
 # order needs to be same as in joy message!
 
-# WARNING: when using LT/RT the code probably needs to be adapted, since LT/RT axes are from [-1.0,1.0] with 1.0 as default value!
+# WARNING: when using LT/RT the code probably needs to be adapted, since LT/RT axes are from [-1.0,1.0] with 1.0 as default value
+#  (or use mapTriggerAxes(msg) to map it to [0,1] with 0.0 as default)
 
-## use "front" or "back" if an axis in range [-1,1] is used, use "front_up" and "front_down" and same for back if buttons/axes are used which are in range [0,1]
+# NOTES:
+# 1. In oder to split an axis into two partial axes or buttons write the tow names seperated with a semicolon (and no spaces!).
+#     The first one belongs to the part < 0, the second one to the part > 0 (e.g. "<nameA>_inc;<nameB>_inc")
+# 2. In order to combine two (partial) axes or buttons into one axis use the suffixes <name>_inc and <name>_dec (e.g. front_inc and front_dec)
+
 axes:
   - ""  # 0: left joystick: left/right
   - ""  # 1: left joystick: up/down
-  - "back_down"  # 2: LT
+  - "back_dec"  # 2: LT
   - ""  # 3: right joystick: left/right
   - ""  # 4: right joystick: up/down
-  - "front_down"  # 5: RT
+  - "front_dec"  # 5: RT
   - ""  # 6: cross: left/right
   - ""  # 7: cross: up/down
 
@@ -21,8 +26,8 @@ buttons:
   - ""  # 1: B
   - ""  # 2: X
   - ""  # 3: Y
-  - "back_up"  # 4: LB
-  - "front_up"  # 5: RB
+  - "back_inc"  # 4: LB
+  - "front_inc"  # 5: RB
   - ""  # 6: back
   - ""  # 7: start
   - ""  # 8: logitech

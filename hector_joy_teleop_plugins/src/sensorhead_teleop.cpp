@@ -29,6 +29,7 @@ void SensorheadTeleop::executePeriodically(const ros::Rate& rate)
     // if there are no changes, don't publish anything
     if (sensorhead_pan_speed_ == 0.0 && sensorhead_tilt_speed_ == 0.0)
     {
+        ROS_WARN_THROTTLE(2, "executePeriodically: speed 0");
         return;
     }
 
@@ -61,44 +62,34 @@ void SensorheadTeleop::executePeriodically(const ros::Rate& rate)
 
 void SensorheadTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
 {
+
     // pan sensorhead
-    try
+    float pan_joystick;
+    if (getJoyMeasurement("pan", msg, pan_joystick))
     {
-        int pan_mapping = axes_.at("pan");
-        sensorhead_pan_speed_ = msg->axes[pan_mapping] * sensorhead_speed_ * M_PI / 180.0;
-    }
-    catch (std::out_of_range& e)
-    {
-        printMissingParameter("pan");
+        sensorhead_pan_speed_ = pan_joystick * sensorhead_speed_ * M_PI / 180.0;
     }
 
     // tilt sensorhead
-    try
+    float tilt_joystick;
+    if (getJoyMeasurement("tilt", msg, tilt_joystick))
     {
-        int tilt_mapping = axes_.at("tilt");
-        sensorhead_tilt_speed_ = msg->axes[tilt_mapping] * sensorhead_speed_ * M_PI / 180.0;
-    }
-    catch (std::out_of_range& e)
-    {
-        printMissingParameter("tilt");
+        sensorhead_tilt_speed_ = tilt_joystick * sensorhead_speed_ * M_PI / 180.0;
     }
 
+
     // reset sensorhead position (and publish immediately as the position is not computed using the rate)
-    try
+    float reset_joystick;
+    if (getJoyMeasurement("reset", msg, reset_joystick))
     {
-        int reset_mapping = buttons_.at("reset");
-        if (msg->buttons[reset_mapping])
+        if(reset_joystick)
         {
             sensorhead_pan_ = 0;
             sensorhead_tilt_ = 0;
             publishCommand();
         }
-    }
-    catch (std::out_of_range& e)
-    {
-        printMissingParameter("reset");
-    }
 
+    }
 }
 
 void SensorheadTeleop::publishCommand()

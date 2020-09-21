@@ -3,6 +3,10 @@
 <launch>
   <node name="hector_joy_teleop_with_plugins" pkg="hector_joy_teleop_with_plugins" type="hector_joy_teleop_with_plugins_node" respawn="false" output="screen">
 
+    <!-- define trigger positions in axes array of gamepad (used if a mapping of trigger axes values from [-1,1] to [0,1] i requested) -->
+    <param name="left_trigger" type="int" value="2"/>
+    <param name="right_trigger" type="int" value="5"/>
+
     <!-- Drive Teleop Plugin Parameter -->
     <rosparam file="$(find hector_joy_teleop_plugins)/config/drive/drive_common.yaml" ns="hector_joy_teleop_plugins/DriveTeleop" />
     <rosparam file="$(find hector_joy_teleop_plugins)/config/drive/drive_mapping_logitech_f710.yaml" ns="hector_joy_teleop_plugins/DriveTeleop" />
@@ -10,6 +14,10 @@
     <!-- Sensorhead Teleop Plugin Parameter -->
     <rosparam file="$(find hector_joy_teleop_plugins)/config/sensorhead/sensorhead_common.yaml" ns="hector_joy_teleop_plugins/SensorheadTeleop" />
     <rosparam file="$(find hector_joy_teleop_plugins)/config/sensorhead/sensorhead_mapping_logitech_f710.yaml" ns="hector_joy_teleop_plugins/SensorheadTeleop" />
+
+    <!-- Manage properties Plugin Parameter -->
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/properties/properties_common.yaml" ns="hector_joy_teleop_plugins/ManageProperties" />
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/properties/properties_mapping_logitech_f710.yaml" ns="hector_joy_teleop_plugins/ManageProperties" />
   </node>
 
   <!-- Load initial plugins (the service call with parameter wait will be executed when the service is available) -->

@@ -11,7 +11,10 @@ namespace hector_joy_teleop_plugin_interface
 class TeleopBase
 {
  public:
-  void initializeBase(ros::NodeHandle& nh, ros::NodeHandle& pnh, std::shared_ptr<std::map<std::string, double>> property_map, std::string plugin_name);
+  void initializeBase(ros::NodeHandle& nh,
+                      ros::NodeHandle& pnh,
+                      std::shared_ptr<std::map<std::string, double>> property_map,
+                      std::string plugin_name);
 
   bool isActive();
 
@@ -30,7 +33,9 @@ class TeleopBase
    * @param nh nodehandle
    * @param pnh nodehandle for private namespace
    */
-  virtual void initialize(ros::NodeHandle& nh, ros::NodeHandle& pnh, std::shared_ptr<std::map<std::string, double>> property_map) = 0;
+  virtual void initialize(ros::NodeHandle& nh,
+                          ros::NodeHandle& pnh,
+                          std::shared_ptr<std::map<std::string, double>> property_map) = 0;
 
   /**
    * Convert and forward joy message to respective topic/package. Details in each plugin.
@@ -71,14 +76,20 @@ class TeleopBase
    * @param print_missing_parameter true by default, if false there will no message be printed if the parameter is
    *                                        missing, but false will be returned
    *                                        (set to false e.g. when there are alternative names which are checked one by one)
-   * @return false if name was not found in buttons_ or axes_ mapping
+   * @return false if name was not found in buttons_, axes_ or axis_split mapping
    */
   bool getJoyMeasurement(std::string name,
                          const sensor_msgs::JoyConstPtr& msg,
                          float& result,
                          bool print_missing_parameter = true);
 
-  void printMissingParameter(std::string param_name);
+  /**
+   * Map the trigger axes from [-1,1] (with 1 as default) to [0,1] (with 0 as default)
+   * (the index of the trigger axes are defined with the left_trigger and right_trigger parameters on parameter server)
+   * @param msg original message
+   * @return message with mapped trigger axes
+   */
+  sensor_msgs::JoyPtr mapTriggerAxes(const sensor_msgs::JoyConstPtr& msg);
 
   /**
    * Get the string "<namespace>/<classname>" as prefix for getting parameters from parameter server
@@ -91,8 +102,15 @@ class TeleopBase
   // mapping of usage names to message array index
   std::map<std::string, int> axes_;
   std::map<std::string, int> buttons_;
+
+  // contains entries where an axis is used as two buttons or two partial axes,
+  // first part of pair is the index in axes array, second part a bool if it is the < 0 part of axis (false) or the > 0 part (true)
+  // WARNING: if an axis is used as two buttons or partial axes there must be (up to) two entries in this map and additionally one entry
+  // in the axes map to check overlapping mappings
+  std::map<std::string, std::pair<int, bool>> axis_split_;
+
   std::string
-      plugin_namespace_; // <<< plugin namespace (first part from <namespace>::<classname> of complete pluginname used for service calls)
+      plugin_namespace_; //<<< plugin namespace (first part from <namespace>::<classname> of complete pluginname used for service calls)
   std::string plugin_name_; //<<< plugin name: <classname>
 
   //NOTE: also change to shared pointer if required
@@ -100,6 +118,9 @@ class TeleopBase
   ros::NodeHandle pnh_;
 
   std::shared_ptr<std::map<std::string, double>> property_map_;
+
+  int left_trigger_;
+  int right_trigger_;
 
 };
 }

@@ -29,7 +29,6 @@ void SensorheadTeleop::executePeriodically(const ros::Rate& rate)
     // if there are no changes, don't publish anything
     if (sensorhead_pan_speed_ == 0.0 && sensorhead_tilt_speed_ == 0.0)
     {
-        ROS_WARN_THROTTLE(2, "executePeriodically: speed 0");
         return;
     }
 

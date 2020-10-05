@@ -16,7 +16,8 @@ void DriveTeleop::initialize(ros::NodeHandle& nh,
     slow_factor_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "slow_factor", 1.0);
     very_slow_factor_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "very_slow_factor", 1.0);
 
-    motionCommandOutput = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 10, false);
+    drive_command_topic_ = pnh_.param<std::string>(getParameterServerPrefix() + "/" + "drive_command_topic", "cmd_vel");
+    drive_pub_ = nh_.advertise<geometry_msgs::Twist>(drive_command_topic_, 10, false);
 }
 
 void DriveTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
@@ -31,7 +32,7 @@ void DriveTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
     float speed_joystick;
     if (getJoyMeasurement("speed", msg, speed_joystick))
     {
-        motionCommand.linear.x = speed_joystick * speed_ * direction;
+        drive_command_.linear.x = speed_joystick * speed_ * direction;
     }
 
 
@@ -39,7 +40,7 @@ void DriveTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
     float steer_joystick;
     if (getJoyMeasurement("steer", msg, steer_joystick))
     {
-        motionCommand.angular.z = steer_joystick * turn_speed_;
+        drive_command_.angular.z = steer_joystick * turn_speed_;
     }
 
 
@@ -49,8 +50,8 @@ void DriveTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
     {
         if (slow_joystick == 1.0)
         {
-            motionCommand.linear.x *= slow_factor_;
-            motionCommand.angular.z *= slow_factor_;
+            drive_command_.linear.x *= slow_factor_;
+            drive_command_.angular.z *= slow_factor_;
         }
     }
 
@@ -61,12 +62,12 @@ void DriveTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
     {
         if (very_slow_joystick == 1.0)
         {
-            motionCommand.linear.x *= very_slow_factor_;
-            motionCommand.angular.z *= very_slow_factor_;
+            drive_command_.linear.x *= very_slow_factor_;
+            drive_command_.angular.z *= very_slow_factor_;
         }
     }
 
-    motionCommandOutput.publish(motionCommand);
+    drive_pub_.publish(drive_command_);
 }
 
 void DriveTeleop::executePeriodically(const ros::Rate& rate)
@@ -75,9 +76,9 @@ void DriveTeleop::executePeriodically(const ros::Rate& rate)
     // fixed position. So if the drive message is only send once, after a timeout of a few seconds the robot stops as
     // there are no new commands. Not done for zero commands to avoid disturbing other modules sending on cmd_vel.
 
-    if (motionCommand.linear.x != 0.0 || motionCommand.angular.z != 0.0)
+    if (drive_command_.linear.x != 0.0 || drive_command_.angular.z != 0.0)
     {
-        motionCommandOutput.publish(motionCommand);
+        drive_pub_.publish(drive_command_);
     }
 }
 

@@ -25,8 +25,9 @@ class DriveTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
   double slow_factor_;
   double very_slow_factor_;
 
-  ros::Publisher motionCommandOutput;
-  geometry_msgs::Twist motionCommand;
+  std::string drive_command_topic_;
+  ros::Publisher drive_pub_;
+  geometry_msgs::Twist drive_command_;
 };
 
 }

@@ -20,9 +20,6 @@ class SensorheadTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
 
   void publishCommand();
 
-  geometry_msgs::QuaternionStamped sensorheadCommand;
-  ros::Publisher sensorhead_command_output;
-
   std::string sensorhead_mode_;
   double sensorhead_speed_;
 
@@ -34,6 +31,10 @@ class SensorheadTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
   double sensorhead_max_pan_;
   double sensorhead_max_tilt_down_;
   double sensorhead_max_tilt_up_;
+
+  std::string sensorhead_command_topic_;
+  geometry_msgs::QuaternionStamped sensorhead_command_;
+  ros::Publisher sensorhead_pub_;
 };
 
 }

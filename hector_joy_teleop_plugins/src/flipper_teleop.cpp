@@ -9,16 +9,22 @@ void FlipperTeleop::initialize(ros::NodeHandle& nh, ros::NodeHandle& pnh, std::s
     TeleopBase::initializeBase(nh, pnh, property_map, "hector_joy_teleop_plugins::FlipperTeleop");
 
     speed_ = pnh_.param<float>(getParameterServerPrefix() + "/" + "speed", 0.0);
+
+    // get flipper topics
     flipper_front_command_topic_ = pnh_.param<std::string>(getParameterServerPrefix() + "/" + "flipper_front_command_topic",
                                                            "/flipper_control/flipper_front_velocity_controller/command");
     flipper_back_command_topic_ = pnh_.param<std::string>(getParameterServerPrefix() + "/" + "flipper_back_command_topic",
                                                            "/flipper_control/flipper_back_velocity_controller/command");
+
+    // get names for switching controllers
     standard_controllers_ = pnh_.param<std::vector<std::string>>(getParameterServerPrefix() + "/" + "standard_controllers",
                                                              {"flipper_traj_controller"});
     teleop_controllers_ = pnh_.param<std::vector<std::string>>(getParameterServerPrefix() + "/" + "teleop_controllers",
                                                               {"flipper_front_velocity_controller", "flipper_back_velocity_controller"});
     controller_manager_switch_service_ = pnh_.param<std::string>(getParameterServerPrefix() + "/" + "controller_manager_switch_service",
                                                                  "/flipper_control/controller_manager/switch_controller");
+
+    // init publisher and service
     flipper_front_pub_ =
         nh_.advertise<std_msgs::Float64>(flipper_front_command_topic_, 10, false);
     flipper_back_pub_ =

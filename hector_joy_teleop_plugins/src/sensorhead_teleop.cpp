@@ -9,13 +9,15 @@ void SensorheadTeleop::initialize(ros::NodeHandle& nh, ros::NodeHandle& pnh, std
 {
     TeleopBase::initializeBase(nh, pnh, property_map, "hector_joy_teleop_plugins::SensorheadTeleop");
 
-    sensorhead_command_output = nh_.advertise<geometry_msgs::QuaternionStamped>("camera/command", 10, false);
-
     sensorhead_mode_ = pnh_.param(getParameterServerPrefix() + "/" + "sensorhead_mode", std::string("base_stabilized"));
     sensorhead_speed_ = pnh_.param(getParameterServerPrefix() + "/" + "sensorhead_speed", 60.0);
     sensorhead_max_pan_ = pnh_.param(getParameterServerPrefix() + "/" + "sensorhead_max_pan", 120.0);
     sensorhead_max_tilt_down_ = pnh_.param(getParameterServerPrefix() + "/" + "sensorhead_max_tilt_down", 30.0);
     sensorhead_max_tilt_up_ = pnh_.param(getParameterServerPrefix() + "/" + "sensorhead_max_tilt_up", 30.0);
+
+    sensorhead_command_topic_ = pnh_.param<std::string>(getParameterServerPrefix() + "/" + "sensorhead_command_topic", "camera/command");
+
+    sensorhead_pub_ = nh_.advertise<geometry_msgs::QuaternionStamped>(sensorhead_command_topic_, 10, false);
 
 }
 
@@ -94,14 +96,14 @@ void SensorheadTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
 void SensorheadTeleop::publishCommand()
 {
     // publish command
-    sensorheadCommand.header.stamp = ros::Time::now();
-    sensorheadCommand.header.frame_id = sensorhead_mode_;
-    sensorheadCommand.quaternion.w = cos(sensorhead_pan_ / 2) * cos(sensorhead_tilt_ / 2);
-    sensorheadCommand.quaternion.x = -sin(sensorhead_pan_ / 2) * sin(sensorhead_tilt_ / 2);
-    sensorheadCommand.quaternion.y = cos(sensorhead_pan_ / 2) * sin(sensorhead_tilt_ / 2);
-    sensorheadCommand.quaternion.z = sin(sensorhead_pan_ / 2) * cos(sensorhead_tilt_ / 2);
+    sensorhead_command_.header.stamp = ros::Time::now();
+    sensorhead_command_.header.frame_id = sensorhead_mode_;
+    sensorhead_command_.quaternion.w = cos(sensorhead_pan_ / 2) * cos(sensorhead_tilt_ / 2);
+    sensorhead_command_.quaternion.x = -sin(sensorhead_pan_ / 2) * sin(sensorhead_tilt_ / 2);
+    sensorhead_command_.quaternion.y = cos(sensorhead_pan_ / 2) * sin(sensorhead_tilt_ / 2);
+    sensorhead_command_.quaternion.z = sin(sensorhead_pan_ / 2) * cos(sensorhead_tilt_ / 2);
 
-    sensorhead_command_output.publish(sensorheadCommand);
+    sensorhead_pub_.publish(sensorhead_command_);
 }
 
 }

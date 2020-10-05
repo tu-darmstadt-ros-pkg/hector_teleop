@@ -2,3 +2,5 @@ speed: 0.6
 turn_speed: 1
 slow_factor: 0.5
 very_slow_factor: 0.15
+
+drive_command_topic: "cmd_vel"

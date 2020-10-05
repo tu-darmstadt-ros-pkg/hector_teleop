@@ -18,6 +18,11 @@
     <!-- Manage properties Plugin Parameter -->
     <rosparam file="$(find hector_joy_teleop_plugins)/config/properties/properties_common.yaml" ns="hector_joy_teleop_plugins/ManageProperties" />
     <rosparam file="$(find hector_joy_teleop_plugins)/config/properties/properties_mapping_logitech_f710.yaml" ns="hector_joy_teleop_plugins/ManageProperties" />
+
+    <!-- Manipulator Teleop Plugin Parameter -->
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/manipulator/manipulator_common.yaml" ns="hector_joy_teleop_plugins/ManipulatorTeleop" />
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/manipulator/manipulator_mapping_logitech_f710.yaml" ns="hector_joy_teleop_plugins/ManipulatorTeleop" />
+
   </node>
 
   <!-- Load initial plugins (the service call with parameter wait will be executed when the service is available) -->

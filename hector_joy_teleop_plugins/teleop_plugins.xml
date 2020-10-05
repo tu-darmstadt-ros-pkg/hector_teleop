@@ -11,6 +11,9 @@
     <class type="hector_joy_teleop_plugins::ManageProperties" base_class_type="hector_joy_teleop_plugin_interface::TeleopBase">
         <description>Set/publish properties, e.g. the driving direction</description>
     </class>
+    <class type="hector_joy_teleop_plugins::ManipulatorTeleop" base_class_type="hector_joy_teleop_plugin_interface::TeleopBase">
+        <description>Move manipulator</description>
+    </class>
     <class type="hector_joy_teleop_plugins::SensorheadTeleop" base_class_type="hector_joy_teleop_plugin_interface::TeleopBase">
         <description>Move sensorhead</description>
     </class>

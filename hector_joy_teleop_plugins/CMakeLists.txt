@@ -41,14 +41,17 @@ set(HEADER_FILES
         include/${PROJECT_NAME}/drive_teleop.h
         include/${PROJECT_NAME}/flipper_teleop.h
         include/${PROJECT_NAME}/manage_properties.h
+        include/${PROJECT_NAME}/manipulator_teleop.h
         include/${PROJECT_NAME}/sensorhead_teleop.h
         )
+
 
 set(SOURCES
         src/behavior_teleop.cpp
         src/drive_teleop.cpp
         src/flipper_teleop.cpp
         src/manage_properties.cpp
+        src/manipulator_teleop.cpp
         src/sensorhead_teleop.cpp
         )
 

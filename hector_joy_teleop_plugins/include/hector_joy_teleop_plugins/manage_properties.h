@@ -4,7 +4,7 @@
 #include <hector_joy_teleop_plugin_interface/teleop_base.h>
 #include <pluginlib/class_list_macros.h>
 
-#include "hector_joy_teleop_plugins/SetProperty.h"
+#include "hector_joy_teleop_plugin_msgs/SetProperty.h"
 
 namespace hector_joy_teleop_plugins
 {
@@ -27,8 +27,8 @@ class ManageProperties : public hector_joy_teleop_plugin_interface::TeleopBase
   /**
    * Callback for service to load and unload plugins
    */
-  bool SetPropertyServiceCB(hector_joy_teleop_plugins::SetProperty::Request& request,
-                            hector_joy_teleop_plugins::SetProperty::Response& response);
+  bool SetPropertyServiceCB(hector_joy_teleop_plugin_msgs::SetProperty::Request& request,
+                            hector_joy_teleop_plugin_msgs::SetProperty::Response& response);
 
   ros::Publisher direction_status_pub_;
 

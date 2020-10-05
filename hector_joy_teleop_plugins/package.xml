@@ -47,16 +47,14 @@
   <!-- Use doc_depend for packages you need only for building documentation: -->
   <!--   <doc_depend>doxygen</doc_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
-  <depend>geometry_msgs</depend>
   <depend>roscpp</depend>
+  <depend>geometry_msgs</depend>
   <depend>sensor_msgs</depend>
   <depend>pluginlib</depend>
   <depend>flexbe_msgs</depend>
   <depend>actionlib</depend>
   <depend>hector_joy_teleop_plugin_interface</depend>
-  <build_depend>message_generation</build_depend>
-  <build_export_depend>message_generation</build_export_depend>
-  <exec_depend>message_runtime</exec_depend>
+  <depend>hector_joy_teleop_plugin_msgs</depend>
 
 
 

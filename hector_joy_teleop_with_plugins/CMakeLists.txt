@@ -4,26 +4,17 @@ project(hector_joy_teleop_with_plugins)
 set(CMAKE_CXX_STANDARD 14)
 
 find_package(catkin REQUIRED COMPONENTS
-        message_generation
-        geometry_msgs
         roscpp
         sensor_msgs
         pluginlib
         hector_joy_teleop_plugin_interface
+        hector_joy_teleop_plugin_msgs
         )
-
-add_service_files(FILES
-        LoadTeleopPlugin.srv
-        )
-
-generate_messages()
 
 catkin_package(
         INCLUDE_DIRS include
         LIBRARIES ${PROJECT_NAME}
         CATKIN_DEPENDS
-        message_runtime
-        geometry_msgs
         roscpp
         sensor_msgs
         pluginlib

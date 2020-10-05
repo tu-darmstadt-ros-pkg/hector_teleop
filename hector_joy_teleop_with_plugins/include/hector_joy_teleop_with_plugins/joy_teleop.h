@@ -9,7 +9,7 @@
 #include <pluginlib/class_loader.h>
 #include <hector_joy_teleop_plugin_interface/teleop_base.h>
 
-#include "hector_joy_teleop_with_plugins/LoadTeleopPlugin.h"
+#include "hector_joy_teleop_plugin_msgs/LoadTeleopPlugin.h"
 
 
 namespace hector_joy_teleop_with_plugins
@@ -42,8 +42,8 @@ class JoyTeleop
   /**
    * Callback for service to load and unload plugins
    */
-  bool LoadPluginServiceCB(hector_joy_teleop_with_plugins::LoadTeleopPlugin::Request& request,
-                           hector_joy_teleop_with_plugins::LoadTeleopPlugin::Response& response);
+  bool LoadPluginServiceCB(hector_joy_teleop_plugin_msgs::LoadTeleopPlugin::Request& request,
+                           hector_joy_teleop_plugin_msgs::LoadTeleopPlugin::Response& response);
 
   /**
    * add mapping of passed plugin to current mapping, if not possible it prints a ROS_ERROR, restores old mapping and returns the name of the overlapping plugin

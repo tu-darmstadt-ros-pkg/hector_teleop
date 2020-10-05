@@ -56,11 +56,12 @@ void ManageProperties::publishPropertyChanged(std::string property_name)
     }
 }
 
-bool ManageProperties::SetPropertyServiceCB(hector_joy_teleop_plugins::SetProperty::Request& request,
-                                            hector_joy_teleop_plugins::SetProperty::Response& response)
+bool ManageProperties::SetPropertyServiceCB(hector_joy_teleop_plugin_msgs::SetProperty::Request& request,
+                                            hector_joy_teleop_plugin_msgs::SetProperty::Response& response)
 {
     auto iter = property_map_->find(request.property_name);
 
+    // Check if property exists
     if (iter == property_map_->end())
     {
         response.result = response.UNKNOWN_PROPERTYNAME;

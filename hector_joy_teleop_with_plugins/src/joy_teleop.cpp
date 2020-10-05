@@ -31,7 +31,8 @@ void JoyTeleop::executePeriodically(const ros::Rate& rate)
     }
 }
 
-bool JoyTeleop::LoadPluginServiceCB(LoadTeleopPlugin::Request& request, LoadTeleopPlugin::Response& response)
+bool JoyTeleop::LoadPluginServiceCB(hector_joy_teleop_plugin_msgs::LoadTeleopPlugin::Request& request,
+                                    hector_joy_teleop_plugin_msgs::LoadTeleopPlugin::Response& response)
 {
     // special request: unload all loaded plugins
     std::string pluginname_lower = request.plugin_name;
@@ -50,17 +51,18 @@ bool JoyTeleop::LoadPluginServiceCB(LoadTeleopPlugin::Request& request, LoadTele
                     std::string res_unload = plugin->onUnload();
 
                     // if there was no error while unloading, continue to unload plugin
-                    if(res_unload.empty())
+                    if (res_unload.empty())
                     {
                         removeMapping(plugin->getPluginName());
 
                         // set result only to true if there was no plugin before which returned errors
-                        if(response.result != response.PLUGIN_LOAD_ERROR)
+                        if (response.result != response.PLUGIN_LOAD_ERROR)
                         {
                             response.result = response.SUCCESS;
                         }
 
-                        ROS_INFO_STREAM("joy_teleop_with_plugins: Plugin \"" << plugin->getPluginName() << "\" unloaded.");
+                        ROS_INFO_STREAM(
+                            "joy_teleop_with_plugins: Plugin \"" << plugin->getPluginName() << "\" unloaded.");
                     } else
                     {
                         // if plugin could not be unloaded send error
@@ -68,7 +70,7 @@ bool JoyTeleop::LoadPluginServiceCB(LoadTeleopPlugin::Request& request, LoadTele
                         response.result = response.PLUGIN_LOAD_ERROR;
 
                         // add new error message to existing
-                        if(response.error_msg.empty())
+                        if (response.error_msg.empty())
                         {
                             response.error_msg = res_unload;
                         } else
@@ -156,7 +158,7 @@ bool JoyTeleop::LoadPluginServiceCB(LoadTeleopPlugin::Request& request, LoadTele
                 std::string res_unload = plugins_[plugin_idx]->onUnload();
 
                 // check if there was a problem while unloading
-                if(res_unload.empty())
+                if (res_unload.empty())
                 {
                     removeMapping(plugins_[plugin_idx]->getPluginName());
                     response.result = response.SUCCESS;

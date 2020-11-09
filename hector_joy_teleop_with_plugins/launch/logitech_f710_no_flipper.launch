@@ -3,9 +3,7 @@
 <launch>
   <node name="hector_joy_teleop_with_plugins" pkg="hector_joy_teleop_with_plugins" type="hector_joy_teleop_with_plugins_node" respawn="false" output="screen">
 
-    <!-- define trigger positions in axes array of gamepad (used if a mapping of trigger axes values from [-1,1] to [0,1] i requested) -->
-    <param name="left_trigger" type="int" value="2"/>
-    <param name="right_trigger" type="int" value="5"/>
+    <rosparam file="$(find hector_joy_teleop_with_plugins)/config/f710.yaml" />
 
     <!-- Drive Teleop Plugin Parameter -->
     <rosparam file="$(find hector_joy_teleop_plugins)/config/drive/drive_common.yaml" ns="hector_joy_teleop_plugins/DriveTeleop" />

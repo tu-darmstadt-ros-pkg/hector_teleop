@@ -1,0 +1,6 @@
+top_plugin: "hector_joy_teleop_plugins::ChangeProfile"
+
+
+# define trigger positions in axes array of gamepad (used if a mapping of trigger axes values from [-1,1] to [0,1] i requested) -->
+left_trigger: 2
+right_trigger: 5

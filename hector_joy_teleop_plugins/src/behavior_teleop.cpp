@@ -18,14 +18,9 @@ void BehaviorTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
     if (!action_client_.isServerConnected())
     {
         ROS_ERROR_STREAM(
-            "Actionserver not connected! Please execute '$ rosnode kill /behavior_execution_server', it will respawn.");
+            "hector_joy_teleop_with_plugins: Behavior Plugin: Actionserver not connected! Please execute '$ rosnode kill /behavior_execution_server', it will respawn.");
         return;
-    } else
-    {
-        ROS_ERROR_STREAM("Server is connected");
     }
-
-    flexbe_msgs::BehaviorExecutionGoal goal;
 
     std::string name;
 
@@ -58,15 +53,23 @@ void BehaviorTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
         }
     }
 
+
+    flexbe_msgs::BehaviorExecutionGoal goal;
+
     if (!name.empty())
     {
+        ROS_WARN_STREAM("hector_joy_teleop_with_plugins: Behavior Plugin: Try to start behavior : " + name);
         goal.behavior_name = name;
+
+
         action_client_.sendGoal(goal, boost::bind(&BehaviorTeleop::doneCB, this, _1, _2));
         behavior_started = true;
     } else
     {
+        //ROS_WARN_STREAM("Behavior name was empty");
         if (behavior_started)
         {
+            ROS_WARN_STREAM("hector_joy_teleop_with_plugins: Behavior Plugin: Cancel goal");
             action_client_.cancelGoal();
         }
     }

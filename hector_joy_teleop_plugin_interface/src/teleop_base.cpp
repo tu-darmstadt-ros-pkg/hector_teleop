@@ -251,6 +251,17 @@ sensor_msgs::JoyPtr TeleopBase::mapTriggerAxes(const sensor_msgs::JoyConstPtr& m
     return newMsg;
 }
 
+bool TeleopBase::hasUsedMsg()
+{
+    // store value
+    bool tmp = used_msg_;
+
+    // reset variable
+    used_msg_ = false;
+
+    return tmp;
+}
+
 void TeleopBase::executePeriodically(const ros::Rate& rate)
 {
     return;
@@ -275,4 +286,5 @@ TeleopBase::~TeleopBase()
 {
 
 }
+
 }

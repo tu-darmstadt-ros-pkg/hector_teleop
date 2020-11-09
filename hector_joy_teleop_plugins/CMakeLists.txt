@@ -38,6 +38,7 @@ include_directories(
 
 set(HEADER_FILES
         include/${PROJECT_NAME}/behavior_teleop.h
+        include/${PROJECT_NAME}/change_profile.h
         include/${PROJECT_NAME}/drive_teleop.h
         include/${PROJECT_NAME}/flipper_teleop.h
         include/${PROJECT_NAME}/manage_properties.h
@@ -48,6 +49,7 @@ set(HEADER_FILES
 
 set(SOURCES
         src/behavior_teleop.cpp
+        src/change_profile.cpp
         src/drive_teleop.cpp
         src/flipper_teleop.cpp
         src/manage_properties.cpp

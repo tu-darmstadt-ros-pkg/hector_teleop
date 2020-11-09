@@ -105,6 +105,11 @@ std::string FlipperTeleop::onLoad()
     switch_controller_srv_.request.timeout = 0.0;
 
 
+    if(!switch_controller_client_.waitForExistence(ros::Duration(2)))
+    {
+        return "hector_joy_teleop_with_plugins: Service " + switch_controller_client_.getService() + " does not exist (timed out after 2 sec).";
+    }
+
     if (!switch_controller_client_.call(switch_controller_srv_) || !switch_controller_srv_.response.ok)
     {
       std::stringstream ss;

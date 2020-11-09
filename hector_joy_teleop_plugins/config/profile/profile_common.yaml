@@ -1,0 +1,29 @@
+
+# NOTE: All profiles need to be listed with <profile_name> in the "profiles" list.
+#    The required plugins are listed with key <profile_name>.
+
+# NOTE: In order to change the profile, the list can be iterated with the "change_forward" / "change_backward" buttons
+#    combined with the button "enable_change" written in the mapping config file.
+#    If buttons are used for "change_forward/-backward" the key "use_buttons_to_iter" needs to be true, if one axis is used set it to
+#    false and set one of the iteration keys to +axis_index, the other to -axis_index (+ = use positive part of axis, - = use negative part)
+
+profiles:
+    - drive
+    - arm
+
+drive:
+    - hector_joy_teleop_plugins::DriveTeleop
+    - hector_joy_teleop_plugins::FlipperTeleop
+    - hector_joy_teleop_plugins::ManageProperties
+    - hector_joy_teleop_plugins::SensorheadTeleop
+
+arm:
+    - hector_joy_teleop_plugins::FlipperTeleop
+    - hector_joy_teleop_plugins::ManageProperties
+    - hector_joy_teleop_plugins::ManipulatorTeleop
+
+
+change_forward: 5
+change_backward: 4
+use_buttons_to_iter: true
+reload_profile: 6

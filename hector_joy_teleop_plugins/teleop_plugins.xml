@@ -2,6 +2,9 @@
     <class type="hector_joy_teleop_plugins::BehaviorTeleop" base_class_type="hector_joy_teleop_plugin_interface::TeleopBase">
         <description>Start a given behavior</description>
     </class>
+    <class type="hector_joy_teleop_plugins::ChangeProfile" base_class_type="hector_joy_teleop_plugin_interface::TeleopBase">
+        <description>Change profile of loaded plugins</description>
+    </class>
     <class type="hector_joy_teleop_plugins::DriveTeleop" base_class_type="hector_joy_teleop_plugin_interface::TeleopBase">
         <description>Move base</description>
     </class>

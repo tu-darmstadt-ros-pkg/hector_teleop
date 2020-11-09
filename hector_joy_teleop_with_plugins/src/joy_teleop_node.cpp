@@ -15,9 +15,11 @@ int main(int argc, char** argv)
 
     ros::Rate rate(25.0);
 
+    ros::AsyncSpinner spinner(2);
+    spinner.start();
+
     while (ros::ok())
     {
-        ros::spinOnce();
 
         joy_teleop.executePeriodically(rate);
 

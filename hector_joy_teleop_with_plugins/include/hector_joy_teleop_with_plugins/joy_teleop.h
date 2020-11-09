@@ -82,6 +82,8 @@ class JoyTeleop
 
   std::vector<TeleopBasePtr> plugins_;
 
+  std::pair<std::string, int> top_plugin_;
+
   TeleopPluginClassLoader teleop_plugin_class_loader_;
 
 };

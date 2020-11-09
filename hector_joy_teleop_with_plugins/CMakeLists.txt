@@ -19,6 +19,7 @@ catkin_package(
         sensor_msgs
         pluginlib
         hector_joy_teleop_plugin_interface
+        hector_joy_teleop_plugin_msgs
 )
 
 
@@ -48,19 +49,24 @@ target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
 
 
 install(DIRECTORY
-  launch
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
+        launch
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+        )
+
+install(DIRECTORY
+        config
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+        )
 
 install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_node
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+        )
 
 # Mark cpp header files for installation
 install(DIRECTORY include/${PROJECT_NAME}/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-  FILES_MATCHING PATTERN "*.h"
-  PATTERN ".svn" EXCLUDE
-)
+        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+        FILES_MATCHING PATTERN "*.h"
+        PATTERN ".svn" EXCLUDE
+        )

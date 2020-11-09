@@ -14,6 +14,9 @@ JoyTeleop::JoyTeleop(ros::NodeHandle& nh, ros::NodeHandle& pnh)
     // create an empty property map
     property_map_ = std::make_shared<std::map<std::string, double>>();
 
+    // get the name of the top plugin and init its vector index with -1
+    top_plugin_ = std::make_pair(pnh_.param<std::string>("top_plugin", "ChangeProfile"), -1);
+
     // setup topics and services
     joy_sub_ = nh_.subscribe<sensor_msgs::Joy>("joy", 10, &JoyTeleop::JoyCallback, this);
 
@@ -34,6 +37,7 @@ void JoyTeleop::executePeriodically(const ros::Rate& rate)
 bool JoyTeleop::LoadPluginServiceCB(hector_joy_teleop_plugin_msgs::LoadTeleopPlugin::Request& request,
                                     hector_joy_teleop_plugin_msgs::LoadTeleopPlugin::Response& response)
 {
+
     // special request: unload all loaded plugins
     std::string pluginname_lower = request.plugin_name;
     std::transform(pluginname_lower.begin(), pluginname_lower.end(), pluginname_lower.begin(), ::tolower);
@@ -42,10 +46,11 @@ bool JoyTeleop::LoadPluginServiceCB(hector_joy_teleop_plugin_msgs::LoadTeleopPlu
     {
         if (!request.load)
         {
+
             for (TeleopBasePtr& plugin: plugins_)
             {
-                // unload all active plugins
-                if (plugin->isActive())
+                // unload all active plugins (except of top_plugin)
+                if (plugin->isActive() && (plugin->getPluginName() != top_plugin_.first))
                 {
                     plugin->setActive(false);
                     std::string res_unload = plugin->onUnload();
@@ -69,7 +74,7 @@ bool JoyTeleop::LoadPluginServiceCB(hector_joy_teleop_plugin_msgs::LoadTeleopPlu
                         plugin->setActive(true);
                         response.result = response.PLUGIN_LOAD_ERROR;
 
-                        // add new error message to existing
+                        // add new error message to existing one
                         if (response.error_msg.empty())
                         {
                             response.error_msg = res_unload;
@@ -89,6 +94,7 @@ bool JoyTeleop::LoadPluginServiceCB(hector_joy_teleop_plugin_msgs::LoadTeleopPlu
             ROS_WARN_STREAM(
                 "joy_teleop_with_plugins: All plugins cannot be loaded simultaneously, please load them one by one.");
         }
+
         return true;
     }
 
@@ -125,18 +131,26 @@ bool JoyTeleop::LoadPluginServiceCB(hector_joy_teleop_plugin_msgs::LoadTeleopPlu
                     // check if there was an error while loading the plugin
                     if (res_load.empty())
                     {
+                        // if it is the top_plugin, store its index
+                        if (plugins_[plugin_idx]->getPluginName() == top_plugin_.first)
+                        {
+                            top_plugin_.second = plugin_idx;
+                        }
+
                         plugins_[plugin_idx]->setActive(true);
                         response.result = response.SUCCESS;
                         ROS_INFO_STREAM(
                             "joy_teleop_with_plugins: Plugin \"" << request.plugin_name << "\" loaded successfully.");
                     } else
                     {
+
                         // remove already loaded mapping
                         removeMapping(plugins_[plugin_idx]->getPluginName());
+
                         response.result = response.PLUGIN_LOAD_ERROR;
                         response.error_msg = res_load;
                         ROS_ERROR_STREAM("joy_teleop_with_plugins: An error occured while loading plugin "
-                                             << request.plugin_name << " in onLoad(): " << res_load << ".");
+                                             << request.plugin_name << " in onLoad():  " << res_load << ".");
                     }
 
                 } else
@@ -160,6 +174,12 @@ bool JoyTeleop::LoadPluginServiceCB(hector_joy_teleop_plugin_msgs::LoadTeleopPlu
                 // check if there was a problem while unloading
                 if (res_unload.empty())
                 {
+                    // if it is the top_plugin, reset its index
+                    if (plugins_[plugin_idx]->getPluginName() == top_plugin_.first)
+                    {
+                        top_plugin_.second = -1;
+                    }
+
                     removeMapping(plugins_[plugin_idx]->getPluginName());
                     response.result = response.SUCCESS;
                     ROS_INFO_STREAM("joy_teleop_with_plugins: Plugin \"" << request.plugin_name << "\" unloaded.");
@@ -187,6 +207,7 @@ bool JoyTeleop::LoadPluginServiceCB(hector_joy_teleop_plugin_msgs::LoadTeleopPlu
 
 void JoyTeleop::JoyCallback(const sensor_msgs::JoyConstPtr& msg)
 {
+
     // check that no mapping indices are greater than message array lengths
     if (!axes_.empty() && axes_.rbegin()->first >= msg->axes.size())
     {
@@ -200,18 +221,35 @@ void JoyTeleop::JoyCallback(const sensor_msgs::JoyConstPtr& msg)
         return;
     }
 
-    // forward message to all active plugins so that they can convert and forward its parts to the respecitve topic/package
-    for (auto& plugin : plugins_)
+
+    // execute forwardMsg for top_plugin first (if it is loaded) and check if it used the message (= a button/axes was pressed which is used by top plugin
+    bool top_plugin_executed = false;
+
+    if (top_plugin_.second >= 0 && top_plugin_.second < plugins_.size())
     {
-        if (plugin->isActive())
+        plugins_[top_plugin_.second]->forwardMsg(msg);
+        top_plugin_executed = plugins_[top_plugin_.second]->hasUsedMsg();
+    }
+
+
+    // only forward the message to the other plugins if the top-plugin was not triggered
+    if (!top_plugin_executed)
+    {
+        // forward message to all active plugins so that they can convert and forward its parts to the respecitve topic/package
+        for (auto& plugin : plugins_)
         {
-            plugin->forwardMsg(msg);
+            if (plugin->isActive() && plugin->getPluginName() != top_plugin_.first)
+            {
+                plugin->forwardMsg(msg);
+            }
         }
     }
+
 }
 
 std::string JoyTeleop::addMapping(TeleopBasePtr& plugin)
 {
+
     std::pair<std::map<std::string, int>&, std::map<std::string, int>&> axesButtons = plugin->getMapping();
 
     // backup current button mapping
@@ -225,6 +263,9 @@ std::string JoyTeleop::addMapping(TeleopBasePtr& plugin)
 
         if (!res.second)
         {
+            // get name from iterator
+            std::string overlapping_plugin_name = (res.first)->second;
+
             // if insertion failed because element was present before restore old mapping and return false
             axes_.clear();
             buttons_.clear();
@@ -235,9 +276,9 @@ std::string JoyTeleop::addMapping(TeleopBasePtr& plugin)
             ROS_ERROR_STREAM("Plugin \"" << plugin->getPluginName()
                                          << "\" cannot be loaded, axes mapping overlaps at index " << x.second
                                          << " with already loaded plugin \""
-                                         << (*(res.first)).second << "\".");
+                                         << overlapping_plugin_name << "\".");
 
-            return (*(res.first)).second;
+            return overlapping_plugin_name;
         }
     }
 
@@ -249,6 +290,9 @@ std::string JoyTeleop::addMapping(TeleopBasePtr& plugin)
 
         if (!res.second)
         {
+            // get name from iterator
+            std::string overlapping_plugin_name = (res.first)->second;
+
             // if insertion failed because element was present before restore old mapping and return name of overlapping plugin
             axes_.clear();
             buttons_.clear();
@@ -259,9 +303,9 @@ std::string JoyTeleop::addMapping(TeleopBasePtr& plugin)
             ROS_ERROR_STREAM("Plugin \"" << plugin->getPluginName()
                                          << "\" cannot be loaded, buttons mapping overlaps at index " << x.second
                                          << " with already loaded plugin \""
-                                         << (*(res.first)).second << "\".");
+                                         << overlapping_plugin_name << "\".");
 
-            return (*(res.first)).second;
+            return overlapping_plugin_name;
         }
     }
 

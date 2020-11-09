@@ -43,6 +43,14 @@ class TeleopBase
   virtual void forwardMsg(const sensor_msgs::JoyConstPtr& msg) = 0;
 
   /**
+   * if the value of used_mags_ is set in forwardMsg implementation, this method can be used to check,
+   * whether the buttons for this plugin were pressed or not.
+   * The method resets used_msgs_ to false.
+   * @return true if in forwardMsg the message was used (buttons/axes of this plugin pressed)
+   */
+  virtual bool hasUsedMsg();
+
+  /**
    * Method which is called in the while(ros::ok) {ros::SpinOnce(); // called here; ros::Sleep();} loop of node, e.g.
    * for publishing messages periodically.
    * Can be overwritten by plugins if needed.
@@ -118,6 +126,8 @@ class TeleopBase
   ros::NodeHandle pnh_;
 
   std::shared_ptr<std::map<std::string, double>> property_map_;
+
+  bool used_msg_ = false;
 
   int left_trigger_;
   int right_trigger_;

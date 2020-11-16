@@ -174,8 +174,8 @@ std::string FlipperTeleop::switchControllers(std::vector<std::string> start_cont
     // check if service exists
     if (!switch_controller_client_.exists())
     {
-        // use a sleep here, as waitForExistence use real time if ros time is not started yet
-        ros::Duration(1).sleep();
+        // wait until rostime has started
+        ros::Time::waitForValid();
 
         if (!switch_controller_client_.waitForExistence(ros::Duration(2)))
         {

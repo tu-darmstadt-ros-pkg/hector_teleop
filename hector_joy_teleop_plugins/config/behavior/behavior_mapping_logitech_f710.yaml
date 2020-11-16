@@ -20,7 +20,7 @@ axes:
   - ""  # 3: right joystick: left/right
   - ""  # 4: right joystick: up/down
   - ""  # 5: RT
-  - "Move flipper"  # 6: cross: left/right
+  - "Move asterix flipper"  # 6: cross: left/right
   - ""  # 7: cross: up/down
 
 

@@ -24,12 +24,12 @@ axes:
 buttons:
   - "rotate_yaw_inc"  # 0: A
   - "rotate_yaw_dec"  # 1: B
-  - ""  # 2: X
-  - ""  # 3: Y
-  - ""  # 4: LB
-  - ""  # 5: RB
+  - "gripper_dec"  # 2: X
+  - "gripper_inc"  # 3: Y
+  - "reset_pose"  # 4: LB
+  - "hold_pose"  # 5: RB
   - ""  # 6: back
-  - ""  # 7: startSensorhead
+  - ""  # 7: start
   - ""  # 8: logitech
   - ""  # 9: left joystick press
   - ""  # 10:right joystick press

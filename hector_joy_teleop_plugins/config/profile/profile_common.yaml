@@ -18,7 +18,6 @@ drive:
     - hector_joy_teleop_plugins::SensorheadTeleop
 
 arm:
-    - hector_joy_teleop_plugins::FlipperTeleop
     - hector_joy_teleop_plugins::ManageProperties
     - hector_joy_teleop_plugins::ManipulatorTeleop
 

@@ -10,29 +10,71 @@ void ManipulatorTeleop::initialize(ros::NodeHandle& nh,
     TeleopBase::initializeBase(nh, pnh, property_map, "hector_joy_teleop_plugins::ManipulatorTeleop");
 
     // get values from common config file
-    max_speed_linear_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "max_speed_linear", 0.05);
-    max_speed_angular_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "max_speed_angular", 0.01);
+    max_speed_linear_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "max_speed_linear", 0.1);
+    max_speed_angular_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "max_speed_angular", 0.4);
+    max_gripper_speed_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "max_gripper_speed", 1);
 
+
+    // get topic names
     manipulator_command_topic_ = pnh_.param<std::string>(getParameterServerPrefix() + "/" + "manipulator_command_topic",
                                                          "/manipulator_arm_control/twist_cmd");
+    gripper_command_topic_ = pnh_.param<std::string>(getParameterServerPrefix() + "/" + "gripper_command_topic",
+                                                         "/manipulator_arm_control/gripper_cmd");
+
+
+    // init topics
+    twist_pub_ = nh_.advertise<geometry_msgs::Twist>(manipulator_command_topic_, 10, false);
+
+    gripper_pub_ = nh_.advertise<std_msgs::Float64>(gripper_command_topic_, 10, false);
+
+
+    // get service names
+    std::string hold_pose_srv = pnh_.param<std::string>(getParameterServerPrefix() + "/" + "hold_pose_service",
+                                                         "/manipulator_arm_control/arm_tcp_controller/hold_pose");
+
+    std::string reset_pose_srv = pnh_.param<std::string>(getParameterServerPrefix() + "/" + "reset_pose_service",
+                                                        "/manipulator_arm_control/arm_tcp_controller/reset_pose");
+
+    std::string move_tc_srv = pnh_.param<std::string>(getParameterServerPrefix() + "/" + "move_tool_center_service",
+                                                        "/manipulator_arm_control/arm_tcp_controller/move_tool_center");
+
+    std::string reset_tc_srv = pnh_.param<std::string>(getParameterServerPrefix() + "/" + "reset_tool_center_service",
+                                                        "/manipulator_arm_control/arm_tcp_controller/reset_tool_center");
+
+    // init service clients
+    hold_pose_srv_client_ = pnh.serviceClient<std_srvs::SetBool>(hold_pose_srv);
+    reset_pose_srv_client_ = pnh.serviceClient<std_srvs::Empty>(reset_pose_srv);
+    move_tc_srv_client_ = pnh.serviceClient<std_srvs::SetBool>(move_tc_srv);
+    reset_tc_srv_client_ = pnh.serviceClient<std_srvs::Empty>(reset_tc_srv);
 
     // get parameter for switching controllers
     standard_controllers_ =
         pnh_.param<std::vector<std::string>>(getParameterServerPrefix() + "/" + "standard_controllers",
-                                             {"manipulator_arm_traj_controller", "gripper_traj_controller"});
+                                             {});
 
     teleop_controllers_ = pnh_.param<std::vector<std::string>>(getParameterServerPrefix() + "/" + "teleop_controllers",
-                                                               {"arm_joystick_control"});
+                                                               {});
 
-    controller_manager_switch_service_ =
+    // get values for switching controllers
+    std::string controller_manager_switch_service =
         pnh_.param<std::string>(getParameterServerPrefix() + "/" + "controller_manager_switch_service",
                                 "/manipulator_arm_control/controller_manager/switch_controller");
+    std::string controller_manager_list_service =
+        pnh_.param<std::string>(getParameterServerPrefix() + "/" + "controller_manager_list_service",
+                                "/manipulator_arm_control/controller_manager/list_controllers");
+
+    int num_tries_switch_controller =
+        pnh_.param<int>(getParameterServerPrefix() + "/" + "num_tries_switch_controller", 5);
+    int sleep_time = pnh_.param<int>(getParameterServerPrefix() + "/" + "sleep_between_tries_sec", 1);
 
 
-    // init topics and service
-    switch_controller_client_ =
-        pnh_.serviceClient<controller_manager_msgs::SwitchController>(controller_manager_switch_service_);
-    twist_pub_ = nh_.advertise<geometry_msgs::Twist>(manipulator_command_topic_, 10, false);
+    // init ControllerHelper for switching services later
+    controller_helper_ = ControllerHelper(pnh,
+                                          controller_manager_switch_service,
+                                          controller_manager_list_service,
+                                          num_tries_switch_controller,
+                                          sleep_time,
+                                          plugin_name_);
 }
 
 void ManipulatorTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
@@ -40,13 +82,98 @@ void ManipulatorTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
     // map trigger axes from [-1,1] to [0,1]
     auto mappedMsg = mapTriggerAxes(msg);
 
+    // if one of the special buttons was pressed, do not continue to twist and gripper command
+    if(joyToSpecial(mappedMsg))
+    {
+        return;
+    }
+
     twist_command_ = joyToTwist(mappedMsg);
+
+    gripper_command_ = joyToGripper(mappedMsg);
+    gripper_pub_.publish(gripper_command_);
+
 }
 
 void ManipulatorTeleop::executePeriodically(const ros::Rate& rate)
 {
     twist_pub_.publish(twist_command_);
 }
+
+
+bool ManipulatorTeleop::joyToSpecial(const sensor_msgs::JoyConstPtr& msg)
+{
+    float hold_pose_joy;
+    if (getJoyMeasurement("hold_pose", msg, hold_pose_joy) && hold_pose_joy != 0)
+    {
+        std_srvs::SetBool srv;
+        srv.request.data = !hold_pose_;
+
+        // send value
+        if (hold_pose_srv_client_.call(srv) && srv.response.success)
+        {
+            hold_pose_ = !hold_pose_;
+            return true;
+        } else
+        {
+            ROS_ERROR_STREAM("Manipulator_teleop: Unable to send value " << !hold_pose_ << " to service " << hold_pose_srv_client_.getService() << ". Please try again.");
+        }
+    }
+
+
+    float reset_pose_joy;
+    if (getJoyMeasurement("reset_pose", msg, reset_pose_joy) && reset_pose_joy != 0)
+    {
+        std_srvs::Empty srv;
+
+        // send value
+        if (reset_pose_srv_client_.call(srv))
+        {
+            return true;
+        } else
+        {
+            ROS_ERROR_STREAM("Manipulator_teleop: Unable to call service " << reset_pose_srv_client_.getService() << ". Please try again.");
+        }
+    }
+
+
+    float move_tool_center_joy;
+    if (getJoyMeasurement("move_tool_center", msg, move_tool_center_joy, false) && move_tool_center_joy != 0)
+    {
+        std_srvs::SetBool srv;
+        srv.request.data = !move_tool_center_;
+
+        // send value
+        if (move_tc_srv_client_.call(srv) && srv.response.success)
+        {
+            move_tool_center_ = !move_tool_center_;
+            return true;
+        } else
+        {
+            ROS_ERROR_STREAM("Manipulator_teleop: Unable to send value " << !move_tool_center_ << " to service " << move_tc_srv_client_.getService() << ". Please try again.");
+        }
+    }
+
+
+    float reset_tool_center_joy;
+    if (getJoyMeasurement("reset_tool_center", msg, reset_tool_center_joy, false) && reset_tool_center_joy != 0)
+    {
+        std_srvs::Empty srv;
+
+        // send value
+        if (reset_tc_srv_client_.call(srv))
+        {
+            return true;
+        } else
+        {
+            ROS_ERROR_STREAM("Manipulator_teleop: Unable to call service " << reset_tc_srv_client_.getService() << ". Please try again.");
+        }
+    }
+
+
+    return false;
+}
+
 
 geometry_msgs::Twist ManipulatorTeleop::joyToTwist(const sensor_msgs::JoyConstPtr& msg)
 {
@@ -97,39 +224,35 @@ geometry_msgs::Twist ManipulatorTeleop::joyToTwist(const sensor_msgs::JoyConstPt
     return twist;
 }
 
+std_msgs::Float64 ManipulatorTeleop::joyToGripper(const sensor_msgs::JoyConstPtr& msg)
+{
+    std_msgs::Float64 command;
+
+    float joystick;
+    if (getJoyMeasurement("gripper", msg, joystick))
+    {
+        command.data = max_gripper_speed_ * joystick;
+    }
+
+    return command;
+}
+
+
+
 std::string ManipulatorTeleop::onLoad()
 {
-    switch_controller_srv_.request.start_controllers = teleop_controllers_;
-    switch_controller_srv_.request.stop_controllers = standard_controllers_;
-    switch_controller_srv_.request.strictness = 2;
-    switch_controller_srv_.request.start_asap = false;
-    switch_controller_srv_.request.timeout = 0.0;
-
-    if (!switch_controller_client_.call(switch_controller_srv_) || !switch_controller_srv_.response.ok)
-    {
-        std::stringstream ss;
-        for (const std::string& s: teleop_controllers_)
-        {
-            ss << s << " ";
-        }
-        return "Failed to switch arm controllers: " + ss.str();
-    }
-    return "";
+    return controller_helper_.switchControllers(teleop_controllers_, standard_controllers_);
 }
 
 std::string ManipulatorTeleop::onUnload()
 {
-    switch_controller_srv_.request.start_controllers = standard_controllers_;
-    switch_controller_srv_.request.stop_controllers = teleop_controllers_;
-    switch_controller_srv_.request.strictness = 2;
-    switch_controller_srv_.request.start_asap = false;
-    switch_controller_srv_.request.timeout = 0.0;
-
-    if (!switch_controller_client_.call(switch_controller_srv_) || !switch_controller_srv_.response.ok)
+    // do not switch controllers if hold pose is activated
+    if(hold_pose_)
     {
-        return "Failed to switch arm controllers!";
+        return "";
     }
-    return "";
+
+    return controller_helper_.switchControllers(standard_controllers_, teleop_controllers_);
 }
 
 }

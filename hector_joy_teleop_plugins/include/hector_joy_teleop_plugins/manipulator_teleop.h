@@ -5,6 +5,11 @@
 #include <pluginlib/class_list_macros.h>
 #include <controller_manager_msgs/SwitchController.h>
 
+#include <hector_joy_teleop_plugins/controller_helper.h>
+#include <std_msgs/Float64.h>
+#include <std_srvs/Empty.h>
+#include <std_srvs/SetBool.h>
+
 namespace hector_joy_teleop_plugins
 {
 
@@ -24,25 +29,37 @@ class ManipulatorTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
 
  private:
 
+  bool joyToSpecial(const sensor_msgs::JoyConstPtr& msg);
   geometry_msgs::Twist joyToTwist(const sensor_msgs::JoyConstPtr& msg);
+  std_msgs::Float64 joyToGripper(const sensor_msgs::JoyConstPtr& msg);
 
   double max_speed_linear_;
   double max_speed_angular_;
+  double max_gripper_speed_;
 
   std::string manipulator_command_topic_;
+  std::string gripper_command_topic_;
 
   ros::Publisher twist_pub_;
   geometry_msgs::Twist twist_command_;
 
+  ros::Publisher gripper_pub_;
+  std_msgs::Float64 gripper_command_;
 
-  std::string controller_manager_switch_service_;
+  bool hold_pose_ = false;
+  bool move_tool_center_ = false;
+
+  ros::ServiceClient hold_pose_srv_client_;
+  ros::ServiceClient reset_pose_srv_client_;
+  ros::ServiceClient move_tc_srv_client_;
+  ros::ServiceClient reset_tc_srv_client_;
+
+
+
   std::vector<std::string> standard_controllers_;
   std::vector<std::string> teleop_controllers_;
 
-  ros::ServiceClient switch_controller_client_;
-  controller_manager_msgs::SwitchController switch_controller_srv_;
-
-
+  ControllerHelper controller_helper_;
 };
 
 }

@@ -67,8 +67,28 @@ void FlipperTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
     // map trigger axis
     sensor_msgs::JoyPtr mappedMsg = mapTriggerAxes(msg);
 
+
+    // check if last command was zero
+    bool last_cmd_zero = abs(flipper_front_command_.data) < 0.05 && abs(flipper_back_command_.data) < 0.05;
+
+
     // compute flipper commands
     joyToFlipperCommand(mappedMsg);
+
+
+    // check if current command is zero
+    bool current_cmd_zero = abs(flipper_front_command_.data) < 0.05 && abs(flipper_back_command_.data) < 0.05;
+
+    // if last command was zero and current is not, switch controllers
+    if(last_cmd_zero && !current_cmd_zero)
+    {
+        std::string result = controller_helper_.switchControllers(teleop_controllers_, standard_controllers_);
+
+        if(!result.empty())
+        {
+            ROS_ERROR_STREAM(result);
+        }
+    }
 
     // publish
     if (!reverse_direction)

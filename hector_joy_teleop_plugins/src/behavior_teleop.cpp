@@ -56,8 +56,8 @@ void BehaviorTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
 
     flexbe_msgs::BehaviorExecutionGoal goal;
 
-    // if a name was given and no behavior is currently running, start behavior
-    if (!name.empty() && !behavior_started)
+    // if a name was given and no behavior is currently running and no behavior button is pressed, start behavior
+    if (!name.empty() && !behavior_started && !behavior_button_triggered)
     {
         ROS_WARN_STREAM("hector_joy_teleop_with_plugins: Behavior Plugin: Try to start behavior : " + name);
         goal.behavior_name = name;
@@ -65,6 +65,7 @@ void BehaviorTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
 
         action_client_.sendGoal(goal, boost::bind(&BehaviorTeleop::doneCB, this, _1, _2));
         behavior_started = true;
+        behavior_button_triggered = true;
 
         return;
     }
@@ -79,6 +80,8 @@ void BehaviorTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
             action_client_.cancelGoal();
         }
 
+        behavior_button_triggered = false;
+
         return;
     }
 
@@ -89,8 +92,9 @@ void BehaviorTeleop::doneCB(const actionlib::SimpleClientGoalState& state,
 {
     if (state.state_ == actionlib::SimpleClientGoalState::SUCCEEDED)
     {
-
+        ROS_INFO_STREAM("hector_joy_teleop_with_plugins: Behavior Plugin: Behavior succeeded.");
     }
+
     behavior_started = false;
 }
 

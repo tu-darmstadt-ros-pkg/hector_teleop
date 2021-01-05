@@ -33,8 +33,9 @@
     <rosparam file="$(find hector_joy_teleop_plugins)/config/sensorhead/sensorhead_common.yaml" ns="hector_joy_teleop_plugins/SensorheadTeleop" />
     <rosparam file="$(find hector_joy_teleop_plugins)/config/sensorhead/sensorhead_mapping_logitech_f710.yaml" ns="hector_joy_teleop_plugins/SensorheadTeleop" />
 
-
-
+    <!-- Image Projection Plugin Parameter -->
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/image_projection/image_projection_common.yaml" ns="hector_joy_teleop_plugins/ImageProjectionTeleop" />
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/image_projection/image_projection_mapping_logitech_f710.yaml" ns="hector_joy_teleop_plugins/ImageProjectionTeleop" />
   </node>
 
   <!-- Load initial plugins (the service call with parameter wait will be executed when the service is available) -->

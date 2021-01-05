@@ -7,7 +7,7 @@ namespace hector_joy_teleop_plugins
 
 void ImageProjectionTeleop::initialize(ros::NodeHandle& nh, ros::NodeHandle& pnh, std::shared_ptr<std::map<std::string, double>> property_map)
 {
-  TeleopBase::initializeBase(nh, pnh, property_map, "hector_joy_teleop_plugins::SensorheadTeleop");
+  TeleopBase::initializeBase(nh, pnh, property_map, "hector_joy_teleop_plugins::ImageProjectionTeleop");
 
   pan_ = 0;
   tilt_ = 0;
@@ -34,7 +34,7 @@ void ImageProjectionTeleop::initialize(ros::NodeHandle& nh, ros::NodeHandle& pnh
   hfov_update_topic_ = pnh_.param<std::string>(getParameterServerPrefix() + "/" + "hfov_update_topic", "camera/projection_parameters/parameter_updates");
 
   pose_cmd_pub_ = nh_.advertise<geometry_msgs::Pose>(pose_command_topic_, 10, false);
-  hfov_client_ = nh_.serviceClient<dynamic_reconfigure::Reconfigure>(hfov_update_topic_);
+  hfov_client_ = nh_.serviceClient<dynamic_reconfigure::Reconfigure>(hfov_command_topic_);
   pose_update_sub_ = nh_.subscribe<dynamic_reconfigure::Config>(pose_update_topic_, 10, &ImageProjectionTeleop::poseUpdateCallback, this);
   hfov_update_sub_ = nh_.subscribe<dynamic_reconfigure::Config>(hfov_update_topic_, 10, &ImageProjectionTeleop::hfovUpdateCallback, this);
 }
@@ -66,50 +66,69 @@ void ImageProjectionTeleop::executePeriodically(const ros::Rate& rate)
 
 void ImageProjectionTeleop::poseUpdateCallback(const dynamic_reconfigure::ConfigConstPtr& config_ptr)
 {
-  if (default_pose_received_) {
+  if (default_pose_received_)
+  {
     return;
   }
-  for (const dynamic_reconfigure::DoubleParameter& double_param: config_ptr->doubles) {
-    if (double_param.name == "pose_x") {
+  for (const dynamic_reconfigure::DoubleParameter& double_param: config_ptr->doubles)
+  {
+    if (double_param.name == "pose_x")
+    {
       default_position_.x = double_param.value;
       continue;
     }
-    if (double_param.name == "pose_y") {
+    if (double_param.name == "pose_y")
+    {
       default_position_.y = double_param.value;
       continue;
     }
-    if (double_param.name == "pose_z") {
+    if (double_param.name == "pose_z")
+    {
       default_position_.z = double_param.value;
       continue;
     }
-    if (double_param.name == "pose_pitch") {
+    if (double_param.name == "pose_pitch")
+    {
       default_tilt_ = double_param.value;
       continue;
     }
-    if (double_param.name == "pose_yaw") {
+    if (double_param.name == "pose_yaw")
+    {
       default_pan_ = double_param.value;
     }
   }
+  resetCommands();
   default_pose_received_ = true;
   pose_update_sub_.shutdown();
 }
 
 void ImageProjectionTeleop::hfovUpdateCallback(const dynamic_reconfigure::ConfigConstPtr& config_ptr)
 {
-  if (default_hfov_received_) {
+  if (default_hfov_received_)
+  {
     return;
   }
-  for (const dynamic_reconfigure::DoubleParameter& double_param: config_ptr->doubles) {
+  for (const dynamic_reconfigure::DoubleParameter& double_param: config_ptr->doubles)
+  {
     if (double_param.name == HFOV_PARAMETER_NAME) {
       default_hfov_received_ = true;
       default_hfov_ = double_param.value;
+      resetCommands();
       hfov_update_sub_.shutdown();
       break;
     }
   }
-  if (!default_hfov_received_) {
+  if (!default_hfov_received_)
+  {
     ROS_ERROR_STREAM("Could not find '" << HFOV_PARAMETER_NAME << "' in parameter update");
   }
+}
+
+void ImageProjectionTeleop::resetCommands()
+{
+  pan_ = default_pan_;
+  tilt_ = default_tilt_;
+  hfov_ = default_hfov_;
 }
 
 void ImageProjectionTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
@@ -125,7 +144,7 @@ void ImageProjectionTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
   float tilt_joystick;
   if (getJoyMeasurement("tilt", msg, tilt_joystick))
   {
-    tilt_speed_ = static_cast<double>(tilt_joystick) * speed_factor_ * M_PI / 180.0;
+    tilt_speed_ = -1 * static_cast<double>(tilt_joystick) * speed_factor_ * M_PI / 180.0;
   }
 
   // hfov
@@ -136,14 +155,12 @@ void ImageProjectionTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
   }
 
   // reset  position (and publish immediately as the position is not computed using the rate)
-  float reset_joystick;
+  bool reset_joystick;
   if (getJoyMeasurement("reset", msg, reset_joystick))
   {
-    if(reset_joystick == 0.0f)
+    if(reset_joystick)
     {
-      pan_ = default_pan_;
-      tilt_ = default_tilt_;
-      hfov_ = default_hfov_;
+      resetCommands();
       publishCommand();
     }
   }
@@ -157,7 +174,6 @@ void ImageProjectionTeleop::publishCommand()
   command_pose_.orientation.x = -sin(pan_ / 2) * sin(tilt_ / 2);
   command_pose_.orientation.y = cos(pan_ / 2) * sin(tilt_ / 2);
   command_pose_.orientation.z = sin(pan_ / 2) * cos(tilt_ / 2);
-
   pose_cmd_pub_.publish(command_pose_);
 
   // publish hfov command

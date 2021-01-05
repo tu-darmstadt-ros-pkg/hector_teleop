@@ -239,6 +239,17 @@ bool TeleopBase::getJoyMeasurement(std::string name,
     return false;
 }
 
+bool TeleopBase::getJoyMeasurement(std::string name, const sensor_msgs::JoyConstPtr& msg, bool& result, bool print_missing_parameter)
+{
+  float value;
+  if (!getJoyMeasurement(name, msg, value, print_missing_parameter)) {
+    return false;
+  } else {
+    result = (value != 0.0f);
+    return true;
+  }
+}
+
 sensor_msgs::JoyPtr TeleopBase::mapTriggerAxes(const sensor_msgs::JoyConstPtr& msg)
 {
     // copy const message into a new non-const one

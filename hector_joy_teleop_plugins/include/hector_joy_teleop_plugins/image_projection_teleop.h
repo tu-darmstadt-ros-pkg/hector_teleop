@@ -22,6 +22,7 @@ public:
 private:
   void poseUpdateCallback(const dynamic_reconfigure::ConfigConstPtr& config_ptr);
   void hfovUpdateCallback(const dynamic_reconfigure::ConfigConstPtr& config_ptr);
+  void resetCommands();
 
   void publishCommand();
   double constrainAngle(double angle);

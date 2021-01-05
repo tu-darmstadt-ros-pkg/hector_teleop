@@ -90,6 +90,11 @@ class TeleopBase
                          const sensor_msgs::JoyConstPtr& msg,
                          float& result,
                          bool print_missing_parameter = true);
+  bool getJoyMeasurement(std::string name,
+                         const sensor_msgs::JoyConstPtr& msg,
+                         bool& result,
+                         bool print_missing_parameter = true);
+
 
   /**
    * Map the trigger axes from [-1,1] (with 1 as default) to [0,1] (with 0 as default)

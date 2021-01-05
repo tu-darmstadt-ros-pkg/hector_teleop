@@ -55,6 +55,7 @@
   <depend>actionlib</depend>
   <depend>hector_joy_teleop_plugin_interface</depend>
   <depend>hector_joy_teleop_plugin_msgs</depend>
+  <depend>dynamic_reconfigure</depend>
 
 
 

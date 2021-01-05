@@ -44,24 +44,27 @@ void ImageProjectionTeleop::executePeriodically(const ros::Rate& rate)
   // The publishing needs to be done here, as the joy messages are published only once when holding a joystick at a
   // fixed position
 
-  // if there are no changes, don't publish anything
-  if (pan_speed_ == 0.0 && tilt_speed_ == 0.0 && hfov_speed_ == 0.0)
-  {
-    return;
-  }
-
   double dt = rate.expectedCycleTime().toSec();
 
-  pan_ += dt * pan_speed_;
-  pan_ = constrainAngle(pan_);
+  // if there are no changes, don't publish anything
+  if (pan_speed_ != 0.0 || tilt_speed_ != 0.0)
+  {
+    pan_ += dt * pan_speed_;
+    pan_ = constrainAngle(pan_);
 
-  tilt_ += dt * tilt_speed_;
-  tilt_ = constrainAngle(tilt_);
+    tilt_ += dt * tilt_speed_;
+    tilt_ = constrainAngle(tilt_);
 
-  hfov_ += dt * hfov_speed_;
-  hfov_ = limitValue(hfov_, 1, 359);
+    publishPoseCommand();
+  }
 
-  publishCommand();
+  if (hfov_speed_ != 0.0)
+  {
+    hfov_ += dt * hfov_speed_;
+    hfov_ = limitValue(hfov_, 1, 359);
+
+    publishHFOVCommand();
+  }
 }
 
 void ImageProjectionTeleop::poseUpdateCallback(const dynamic_reconfigure::ConfigConstPtr& config_ptr)
@@ -161,12 +164,13 @@ void ImageProjectionTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
     if(reset_joystick)
     {
       resetCommands();
-      publishCommand();
+      publishPoseCommand();
+      publishHFOVCommand();
     }
   }
 }
 
-void ImageProjectionTeleop::publishCommand()
+void ImageProjectionTeleop::publishPoseCommand()
 {
   // publish pose command
   command_pose_.position = default_position_;
@@ -176,6 +180,10 @@ void ImageProjectionTeleop::publishCommand()
   command_pose_.orientation.z = sin(pan_ / 2) * cos(tilt_ / 2);
   pose_cmd_pub_.publish(command_pose_);
 
+}
+
+void ImageProjectionTeleop::publishHFOVCommand()
+{
   // publish hfov command
   dynamic_reconfigure::DoubleParameter double_param;
   double_param.name = HFOV_PARAMETER_NAME;

@@ -24,7 +24,8 @@ private:
   void hfovUpdateCallback(const dynamic_reconfigure::ConfigConstPtr& config_ptr);
   void resetCommands();
 
-  void publishCommand();
+  void publishPoseCommand();
+  void publishHFOVCommand();
   double constrainAngle(double angle);
   double limitValue(double value, double min, double max);
 

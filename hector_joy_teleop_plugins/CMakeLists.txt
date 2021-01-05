@@ -44,6 +44,7 @@ set(HEADER_FILES
         include/${PROJECT_NAME}/manage_properties.h
         include/${PROJECT_NAME}/manipulator_teleop.h
         include/${PROJECT_NAME}/sensorhead_teleop.h
+        include/${PROJECT_NAME}/image_projection_teleop.h
 
         include/${PROJECT_NAME}/controller_helper.h
         )
@@ -57,6 +58,7 @@ set(SOURCES
         src/manage_properties.cpp
         src/manipulator_teleop.cpp
         src/sensorhead_teleop.cpp
+        src/image_projection_teleop.cpp
 
         src/controller_helper.cpp
         )

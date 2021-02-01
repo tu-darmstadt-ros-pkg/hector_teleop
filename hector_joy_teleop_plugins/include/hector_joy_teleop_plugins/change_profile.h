@@ -19,7 +19,8 @@ class ChangeProfile : public hector_joy_teleop_plugin_interface::TeleopBase
  public:
   void initialize(ros::NodeHandle& nh,
                   ros::NodeHandle& pnh,
-                  std::shared_ptr<std::map<std::string, double>> property_map) override;
+                  std::shared_ptr<std::map<std::string, double>> property_map,
+                  std::string plugin_name) override;
 
   void forwardMsg(const sensor_msgs::JoyConstPtr& msg) override;
 

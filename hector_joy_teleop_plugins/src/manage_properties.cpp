@@ -5,10 +5,10 @@ namespace hector_joy_teleop_plugins
 
 void ManageProperties::initialize(ros::NodeHandle& nh,
                                   ros::NodeHandle& pnh,
-                                  std::shared_ptr<std::map<std::string,
-                                                           double>> property_map)
+                                  std::shared_ptr<std::map<std::string, double>> property_map,
+                                  std::string plugin_name)
 {
-    TeleopBase::initializeBase(nh, pnh, property_map, "hector_joy_teleop_plugins::ManageProperties");
+    TeleopBase::initializeBase(nh, pnh, property_map, plugin_name, "hector_joy_teleop_plugins::ManageProperties");
 
     // get start values from config file
     property_map_->emplace("direction", pnh_.param<double>(getParameterServerPrefix() + "/" + "direction", 1.0));

@@ -6,9 +6,10 @@ namespace hector_joy_teleop_plugins
 
 void ChangeProfile::initialize(ros::NodeHandle& nh,
                                ros::NodeHandle& pnh,
-                               std::shared_ptr<std::map<std::string, double>> property_map)
+                               std::shared_ptr<std::map<std::string, double>> property_map,
+                               std::string plugin_name)
 {
-    TeleopBase::initializeBase(nh, pnh, property_map, "hector_joy_teleop_plugins::ChangeProfile");
+    TeleopBase::initializeBase(nh, pnh, property_map, plugin_name, "hector_joy_teleop_plugins::ChangeProfile");
 
     // get values from common config file
     change_forward_ = pnh_.param<int>(getParameterServerPrefix() + "/" + "change_backward", 5);
@@ -17,6 +18,7 @@ void ChangeProfile::initialize(ros::NodeHandle& nh,
 
     reload_profile_ = pnh_.param<int>(getParameterServerPrefix() + "/" + "reload_profile", 6);
 
+    // TODO consider using XmlRpc::XmlRpcValue instead of profiles list and pluginlist per profile separately
     // get profile list
     std::vector<std::string> profile_list;
     pnh_.getParam(getParameterServerPrefix() + "/" + "profiles", profile_list);

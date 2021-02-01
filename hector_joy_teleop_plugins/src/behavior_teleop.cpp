@@ -7,9 +7,12 @@ BehaviorTeleop::BehaviorTeleop() : action_client_("/flexbe/execute_behavior")
 {
 }
 
-void BehaviorTeleop::initialize(ros::NodeHandle& nh, ros::NodeHandle& pnh, std::shared_ptr<std::map<std::string, double>> property_map)
+void BehaviorTeleop::initialize(ros::NodeHandle& nh,
+                                ros::NodeHandle& pnh,
+                                std::shared_ptr<std::map<std::string, double>> property_map,
+                                std::string plugin_name)
 {
-    TeleopBase::initializeBase(nh, pnh, property_map, "hector_joy_teleop_plugins::BehaviorTeleop");
+    TeleopBase::initializeBase(nh, pnh, property_map, plugin_name, "hector_joy_teleop_plugins::BehaviorTeleop");
 }
 
 void BehaviorTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)

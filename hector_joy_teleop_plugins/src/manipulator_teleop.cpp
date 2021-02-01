@@ -5,9 +5,10 @@ namespace hector_joy_teleop_plugins
 
 void ManipulatorTeleop::initialize(ros::NodeHandle& nh,
                                    ros::NodeHandle& pnh,
-                                   std::shared_ptr<std::map<std::string, double>> property_map)
+                                   std::shared_ptr<std::map<std::string, double>> property_map,
+                                   std::string plugin_name)
 {
-    TeleopBase::initializeBase(nh, pnh, property_map, "hector_joy_teleop_plugins::ManipulatorTeleop");
+    TeleopBase::initializeBase(nh, pnh, property_map, plugin_name, "hector_joy_teleop_plugins::ManipulatorTeleop");
 
     // get values from common config file
     max_speed_linear_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "max_speed_linear", 0.1);

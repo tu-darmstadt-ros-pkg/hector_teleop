@@ -5,9 +5,12 @@
 namespace hector_joy_teleop_plugins
 {
 
-void SensorheadTeleop::initialize(ros::NodeHandle& nh, ros::NodeHandle& pnh, std::shared_ptr<std::map<std::string, double>> property_map)
+void SensorheadTeleop::initialize(ros::NodeHandle& nh,
+                                  ros::NodeHandle& pnh,
+                                  std::shared_ptr<std::map<std::string, double>> property_map,
+                                  std::string plugin_name)
 {
-    TeleopBase::initializeBase(nh, pnh, property_map, "hector_joy_teleop_plugins::SensorheadTeleop");
+    TeleopBase::initializeBase(nh, pnh, property_map, plugin_name, "hector_joy_teleop_plugins::SensorheadTeleop");
 
     sensorhead_mode_ = pnh_.param(getParameterServerPrefix() + "/" + "sensorhead_mode", std::string("base_stabilized"));
     sensorhead_speed_ = pnh_.param(getParameterServerPrefix() + "/" + "sensorhead_speed", 60.0);
@@ -15,7 +18,8 @@ void SensorheadTeleop::initialize(ros::NodeHandle& nh, ros::NodeHandle& pnh, std
     sensorhead_max_tilt_down_ = pnh_.param(getParameterServerPrefix() + "/" + "sensorhead_max_tilt_down", 30.0);
     sensorhead_max_tilt_up_ = pnh_.param(getParameterServerPrefix() + "/" + "sensorhead_max_tilt_up", 30.0);
 
-    sensorhead_command_topic_ = pnh_.param<std::string>(getParameterServerPrefix() + "/" + "sensorhead_command_topic", "camera/command");
+    sensorhead_command_topic_ =
+            pnh_.param<std::string>(getParameterServerPrefix() + "/" + "sensorhead_command_topic", "camera/command");
 
     sensorhead_pub_ = nh_.advertise<geometry_msgs::QuaternionStamped>(sensorhead_command_topic_, 10, false);
 
@@ -83,7 +87,7 @@ void SensorheadTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
     float reset_joystick;
     if (getJoyMeasurement("reset", msg, reset_joystick))
     {
-        if(reset_joystick)
+        if (reset_joystick)
         {
             sensorhead_pan_ = 0;
             sensorhead_tilt_ = 0;

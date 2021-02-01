@@ -7,7 +7,8 @@ namespace hector_joy_teleop_plugin_interface
 void TeleopBase::initializeBase(ros::NodeHandle& nh,
                                 ros::NodeHandle& pnh,
                                 std::shared_ptr<std::map<std::string, double>> property_map,
-                                std::string plugin_name)
+                                std::string plugin_name,
+                                std::string plugin_type)
 {
     nh_ = nh;
     pnh_ = pnh;
@@ -19,8 +20,10 @@ void TeleopBase::initializeBase(ros::NodeHandle& nh,
     property_map_ = property_map;
 
     std::string delimiter = ":";
-    plugin_namespace_ = plugin_name.substr(0, plugin_name.find(delimiter));
-    plugin_name_ = plugin_name.substr(plugin_name.find_last_of(delimiter) + 1);
+    plugin_namespace_ = plugin_type.substr(0, plugin_type.find(delimiter));
+    plugin_type_ = plugin_type.substr(plugin_type.find_last_of(delimiter) + 1);
+
+    plugin_name_ = plugin_name;
 
 
     // get axes mapping from parameter server
@@ -94,7 +97,12 @@ std::pair<std::map<std::string, int>&, std::map<std::string, int>&> TeleopBase::
 
 std::string TeleopBase::getPluginName()
 {
-    return plugin_namespace_ + "::" + plugin_name_;
+    return plugin_name_;
+}
+
+std::string TeleopBase::getPluginType()
+{
+  return plugin_namespace_ + "::" + plugin_type_;
 }
 
 
@@ -222,7 +230,7 @@ bool TeleopBase::getJoyMeasurement(std::string name,
 
 
     // if values for both parts of axis are found, combine them into one axis result
-    if(inc_found && dec_found)
+    if (inc_found && dec_found)
     {
         result = inc_result - dec_result;
         return true;
@@ -233,7 +241,8 @@ bool TeleopBase::getJoyMeasurement(std::string name,
     if (print_missing_parameter)
     {
         ROS_ERROR_STREAM(plugin_name_ << ": The required axis/button mapping for value \"" << name
-                                      << "\" or at least one of its parts \"" << name_inc << "\" or \"" << name_dec << "\" is missing or maybe misspelled.");
+                                      << "\" or at least one of its parts \"" << name_inc << "\" or \"" << name_dec
+                                      << "\" is missing or maybe misspelled.");
     }
 
     return false;
@@ -279,7 +288,7 @@ std::string TeleopBase::onUnload()
 
 std::string TeleopBase::getParameterServerPrefix()
 {
-    return plugin_namespace_ + "/" + plugin_name_;
+    return plugin_namespace_ + "/" + plugin_type_ + "/" + plugin_name_;
 }
 
 TeleopBase::~TeleopBase()

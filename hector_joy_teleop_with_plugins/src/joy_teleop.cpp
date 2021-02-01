@@ -1,4 +1,5 @@
 
+
 #include "hector_joy_teleop_with_plugins/joy_teleop.h"
 
 namespace hector_joy_teleop_with_plugins
@@ -11,16 +12,40 @@ JoyTeleop::JoyTeleop(ros::NodeHandle& nh, ros::NodeHandle& pnh)
                                   "hector_joy_teleop_plugin_interface::TeleopBase")
 {
 
+    try
+    {
+        // get list of available plugins with name and type from parameter server
+        XmlRpc::XmlRpcValue plugin_list_ps;
+
+        pnh.getParam("plugins", plugin_list_ps);
+
+        // add all plugins to map
+        for (int i = 0; i < plugin_list_ps.size(); i++)
+        {
+            std::string name = plugin_list_ps[i]["name"];
+            std::string type = plugin_list_ps[i]["type"];
+            plugin_names_types_.emplace(name, type);
+        }
+    }
+    catch (const XmlRpc::XmlRpcException& e)
+    {
+        ROS_ERROR_STREAM(
+            "hector_joy_teleop_with_plugins: Error while getting parameter \"plugins\" from parameterserver or parsing it: "
+                << e.getCode() << ", " << e.getMessage());
+        throw;
+    }
+
     // create an empty property map
     property_map_ = std::make_shared<std::map<std::string, double>>();
 
     // get the name of the top plugin and init its vector index with -1
-    top_plugin_ = std::make_pair(pnh_.param<std::string>("top_plugin", "ChangeProfile"), -1);
+    top_plugin_ = std::make_pair(pnh_.param<std::string>("top_plugin", "Profile"), -1);
 
     // setup topics and services
     joy_sub_ = nh_.subscribe<sensor_msgs::Joy>("joy", 10, &JoyTeleop::JoyCallback, this);
 
     load_plugin_service_ = pnh_.advertiseService("load_plugin", &JoyTeleop::LoadPluginServiceCB, this);
+
 }
 
 void JoyTeleop::executePeriodically(const ros::Rate& rate)
@@ -140,7 +165,8 @@ bool JoyTeleop::LoadPluginServiceCB(hector_joy_teleop_plugin_msgs::LoadTeleopPlu
                         plugins_[plugin_idx]->setActive(true);
                         response.result = response.SUCCESS;
                         ROS_INFO_STREAM(
-                            "joy_teleop_with_plugins: Plugin \"" << request.plugin_name << "\" loaded successfully.");
+                            "joy_teleop_with_plugins: Plugin \"" << request.plugin_name
+                                                                 << "\" loaded successfully.");
                     } else
                     {
 
@@ -355,25 +381,33 @@ int JoyTeleop::pluginFactory(std::string teleop_plugin_name)
     // otherwise create an instance and return its index
     try
     {
+        // get plugin type from map
+        std::string plugin_type = plugin_names_types_[teleop_plugin_name];
 
         TeleopBasePtr ptr;
 
+        // create instance
         hector_joy_teleop_plugin_interface::TeleopBase* projection_ptr =
-            teleop_plugin_class_loader_.createUnmanagedInstance(teleop_plugin_name);
+            teleop_plugin_class_loader_.createUnmanagedInstance(plugin_type);
+
+        // reset pointer including unloader
         ptr.reset(projection_ptr,
                   std::bind(&TeleopPluginClassLoader::unloadLibraryForClass,
                             &teleop_plugin_class_loader_,
-                            teleop_plugin_name));
+                            plugin_type));
 
-        ptr->initialize(nh_, pnh_, property_map_);
+        // initialize plugin
+        ptr->initialize(nh_, pnh_, property_map_, teleop_plugin_name);
 
+        // add plugin to plugins_list
         plugins_.push_back(ptr);
 
+        // return the plugin's id
         return ((int) plugins_.size() - 1);
 
     } catch (pluginlib::PluginlibException& ex)
     {
-        ROS_ERROR_STREAM("The plugin failed to load: " << ex.what());
+        ROS_ERROR_STREAM("The plugin \"" << teleop_plugin_name << "\" failed to load: " << ex.what());
     }
 
     return -1;

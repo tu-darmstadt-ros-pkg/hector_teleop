@@ -5,6 +5,7 @@
 #include <memory>
 #include <ros/ros.h>
 #include <sensor_msgs/Joy.h>
+#include <xmlrpcpp/XmlRpcException.h>
 
 #include <pluginlib/class_loader.h>
 #include <hector_joy_teleop_plugin_interface/teleop_base.h>
@@ -82,7 +83,9 @@ class JoyTeleop
 
   std::vector<TeleopBasePtr> plugins_;
 
-  std::pair<std::string, int> top_plugin_;
+  std::pair<std::string, int> top_plugin_; //<< Name and index of top plugin
+
+  std::map<std::string, std::string> plugin_names_types_; //<<< all available plugins with name and type
 
   TeleopPluginClassLoader teleop_plugin_class_loader_;
 

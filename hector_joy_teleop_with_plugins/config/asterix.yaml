@@ -1,0 +1,27 @@
+top_plugin: Profile
+
+
+plugins:
+  - name: Profile
+    type: hector_joy_teleop_plugins::ChangeProfile
+
+  - name: Drive
+    type: hector_joy_teleop_plugins::DriveTeleop
+
+  - name: Flipper
+    type: hector_joy_teleop_plugins::FlipperTeleop
+
+  - name: FlipperPoses
+    type: hector_joy_teleop_plugins::BehaviorTeleop
+
+  - name: Properties
+    type: hector_joy_teleop_plugins::ManageProperties
+
+  - name: Sensorhead
+    type: hector_joy_teleop_plugins::SensorheadTeleop
+
+  - name: Manipulator
+    type: hector_joy_teleop_plugins::ManipulatorTeleop
+
+  - name: ManipulatorPoses
+    type: hector_joy_teleop_plugins::BehaviorTeleop

@@ -14,13 +14,16 @@ class TeleopBase
   void initializeBase(ros::NodeHandle& nh,
                       ros::NodeHandle& pnh,
                       std::shared_ptr<std::map<std::string, double>> property_map,
-                      std::string plugin_name);
+                      std::string plugin_name,
+                      std::string plugin_type);
 
   bool isActive();
 
   void setActive(bool active);
 
   std::string getPluginName();
+
+  std::string getPluginType();
 
   /**
    * get button mappings of plugin
@@ -35,7 +38,8 @@ class TeleopBase
    */
   virtual void initialize(ros::NodeHandle& nh,
                           ros::NodeHandle& pnh,
-                          std::shared_ptr<std::map<std::string, double>> property_map) = 0;
+                          std::shared_ptr<std::map<std::string, double>> property_map,
+                          std::string plugin_name) = 0;
 
   /**
    * Convert and forward joy message to respective topic/package. Details in each plugin.
@@ -100,7 +104,7 @@ class TeleopBase
   sensor_msgs::JoyPtr mapTriggerAxes(const sensor_msgs::JoyConstPtr& msg);
 
   /**
-   * Get the string "<namespace>/<classname>" as prefix for getting parameters from parameter server
+   * Get the string "<namespace>/<plugin_type_>/<plugin_name>" as prefix for getting parameters from parameter server
    * @return
    */
   std::string getParameterServerPrefix();
@@ -117,11 +121,10 @@ class TeleopBase
   // in the axes map to check overlapping mappings
   std::map<std::string, std::pair<int, bool>> axis_split_;
 
-  std::string
-      plugin_namespace_; //<<< plugin namespace (first part from <namespace>::<classname> of complete pluginname used for service calls)
-  std::string plugin_name_; //<<< plugin name: <classname>
+  std::string plugin_namespace_; //<<< plugin namespace (first part from <namespace>::<classname> of complete plugintype used for service calls)
+  std::string plugin_name_; //<<< plugin name
+  std::string plugin_type_; //<<< <namespace>::<classname>
 
-  //NOTE: also change to shared pointer if required
   ros::NodeHandle nh_;
   ros::NodeHandle pnh_;
 

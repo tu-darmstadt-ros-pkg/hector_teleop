@@ -5,9 +5,12 @@
 namespace hector_joy_teleop_plugins
 {
 
-void ImageProjectionTeleop::initialize(ros::NodeHandle& nh, ros::NodeHandle& pnh, std::shared_ptr<std::map<std::string, double>> property_map)
+void ImageProjectionTeleop::initialize(ros::NodeHandle& nh,
+                                       ros::NodeHandle& pnh,
+                                       std::shared_ptr<std::map<std::string, double>> property_map,
+                                       std::string plugin_name)
 {
-  TeleopBase::initializeBase(nh, pnh, property_map, "hector_joy_teleop_plugins::ImageProjectionTeleop");
+  TeleopBase::initializeBase(nh, pnh, property_map, plugin_name, "hector_joy_teleop_plugins::ImageProjectionTeleop");
 
   pan_ = 0;
   tilt_ = 0;
@@ -113,7 +116,8 @@ void ImageProjectionTeleop::hfovUpdateCallback(const dynamic_reconfigure::Config
   }
   for (const dynamic_reconfigure::DoubleParameter& double_param: config_ptr->doubles)
   {
-    if (double_param.name == HFOV_PARAMETER_NAME) {
+    if (double_param.name == HFOV_PARAMETER_NAME)
+    {
       default_hfov_received_ = true;
       default_hfov_ = double_param.value;
       resetCommands();
@@ -161,7 +165,7 @@ void ImageProjectionTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
   bool reset_joystick;
   if (getJoyMeasurement("reset", msg, reset_joystick))
   {
-    if(reset_joystick)
+    if (reset_joystick)
     {
       resetCommands();
       publishPoseCommand();
@@ -190,7 +194,8 @@ void ImageProjectionTeleop::publishHFOVCommand()
   double_param.value = hfov_;
   dynamic_reconfigure::Reconfigure reconfigure_srv;
   reconfigure_srv.request.config.doubles.push_back(double_param);
-  if (!hfov_client_.call(reconfigure_srv)) {
+  if (!hfov_client_.call(reconfigure_srv))
+  {
     ROS_ERROR_STREAM("Failed to update horizontal fov");
   }
 }

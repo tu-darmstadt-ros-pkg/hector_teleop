@@ -12,14 +12,16 @@ namespace hector_joy_teleop_plugins
 class ImageProjectionTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
 {
   const std::string HFOV_PARAMETER_NAME = "horizontal_fov";
-public:
-  void initialize(ros::NodeHandle& nh, ros::NodeHandle& pnh, std::shared_ptr<std::map<std::string, double>> property_map) override;
+ public:
+  void initialize(ros::NodeHandle& nh,
+                  ros::NodeHandle& pnh,
+                  std::shared_ptr<std::map<std::string, double>> property_map) override;
 
   void forwardMsg(const sensor_msgs::JoyConstPtr& msg) override;
 
   void executePeriodically(const ros::Rate& rate) override;
 
-private:
+ private:
   void poseUpdateCallback(const dynamic_reconfigure::ConfigConstPtr& config_ptr);
   void hfovUpdateCallback(const dynamic_reconfigure::ConfigConstPtr& config_ptr);
   void resetCommands();

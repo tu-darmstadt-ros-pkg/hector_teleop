@@ -20,6 +20,9 @@ plugins:
   - name: Sensorhead
     type: hector_joy_teleop_plugins::SensorheadTeleop
 
+  - name: ImageProjection
+    type: hector_joy_teleop_plugins::ImageProjectionTeleop
+
   - name: Manipulator
     type: hector_joy_teleop_plugins::ManipulatorTeleop
 

@@ -1,0 +1,7 @@
+speed_factor: 60.0
+zoom_speed_factor: 30.0
+
+pose_command_topic: "/camera360_pinhole_front/set_pose"
+hfov_command_topic: "/camera360_pinhole_front/projection_parameters/set_parameters"
+pose_update_topic: "/camera360_pinhole_front/parameter_updates"
+hfov_update_topic: "/camera360_pinhole_front/projection_parameters/parameter_updates"

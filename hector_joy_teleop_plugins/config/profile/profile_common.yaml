@@ -15,7 +15,7 @@ drive:
     - Drive
     - Flipper
     - Properties
-    - Sensorhead
+    - ImageProjection
     - FlipperPoses
 
 arm:

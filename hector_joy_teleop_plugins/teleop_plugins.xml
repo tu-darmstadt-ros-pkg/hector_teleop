@@ -20,4 +20,7 @@
     <class type="hector_joy_teleop_plugins::SensorheadTeleop" base_class_type="hector_joy_teleop_plugin_interface::TeleopBase">
         <description>Move sensorhead</description>
     </class>
+    <class type="hector_joy_teleop_plugins::ImageProjectionTeleop" base_class_type="hector_joy_teleop_plugin_interface::TeleopBase">
+        <description>Move virtual pinhole projection viewport</description>
+    </class>
 </library>

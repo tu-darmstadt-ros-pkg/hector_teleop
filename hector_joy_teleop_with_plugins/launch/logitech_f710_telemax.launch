@@ -28,13 +28,13 @@
     <!-- Sensorhead Teleop Plugin Parameter -->
     <rosparam file="$(find hector_joy_teleop_plugins)/config/sensorhead/sensorhead_common.yaml" ns="hector_joy_teleop_plugins/SensorheadTeleop" />
     <rosparam file="$(find hector_joy_teleop_plugins)/config/sensorhead/sensorhead_mapping_logitech_f710.yaml" ns="hector_joy_teleop_plugins/SensorheadTeleop" />
+
+    <!-- Image Projection Plugin Parameter -->
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/image_projection/image_projection_common.yaml" ns="hector_joy_teleop_plugins/ImageProjectionTeleop" />
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/image_projection/image_projection_mapping_logitech_f710.yaml" ns="hector_joy_teleop_plugins/ImageProjectionTeleop" />
   </node>
 
   <!-- Load initial plugins (the service call with parameter wait will be executed when the service is available) -->
-  <node pkg="rosservice" type="rosservice" name="LoadPluginDrive" args="call --wait /hector_joy_teleop_with_plugins/load_plugin &quot;{plugin_name: 'hector_joy_teleop_plugins::DriveTeleop', load: true}&quot;" />
   <node pkg="rosservice" type="rosservice" name="LoadPluginProfile" args="call --wait /hector_joy_teleop_with_plugins/load_plugin &quot;{plugin_name: 'hector_joy_teleop_plugins::ChangeProfile', load: true}&quot;" />
-  <node pkg="rosservice" type="rosservice" name="LoadPluginFlipper" args="call --wait /hector_joy_teleop_with_plugins/load_plugin &quot;{plugin_name: 'hector_joy_teleop_plugins::FlipperTeleop', load: true}&quot;" />
-  <node pkg="rosservice" type="rosservice" name="LoadPluginSensorhead" args="call --wait /hector_joy_teleop_with_plugins/load_plugin &quot;{plugin_name: 'hector_joy_teleop_plugins::SensorheadTeleop', load: true}&quot;" />
-  <node pkg="rosservice" type="rosservice" name="LoadPluginManageProperties" args="call --wait /hector_joy_teleop_with_plugins/load_plugin &quot;{plugin_name: 'hector_joy_teleop_plugins::ManageProperties', load: true}&quot;" />
 
 </launch>

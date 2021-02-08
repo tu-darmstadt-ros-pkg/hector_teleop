@@ -5,7 +5,7 @@ In order to implement a new plugin the followings steps need to be done:
     1. Locate it e.g. in the existing namespace "hector_joy_teleop_plugins" or in a new namespace.
     2. Make it an derived class of class "hector_joy_teleop_plugin_interface::TeleopBase".
     3. Overwrite the initialize method and inside of it first call the method 
-    `TeleopBase::initializeBase(nh, pnh, property_map, "<namespace>::<pluginname>");`.
+    `TeleopBase::initializeBase(nh, pnh, property_map, plugin_name, "<namespace>::<classname>");`.
     4. Overwrite / Implement the function  
     `void forwardMsg(const sensor_msgs::JoyConstPtr& msg) override;` with the plugin functionality.\
     *Note*: use the protected method `TeleopBase::getJoyMeasurement` to get the joy measurement without caring whether the requested measurement is part of the buttons or axes array of the joy message.
@@ -30,5 +30,5 @@ In order to implement a new plugin the followings steps need to be done:
         1. In order to get the so defined parameters from parameterserver use `pnh_.param(getParameterServerPrefix() + "/" + "parametername", defaultvalue);`
 5. Add plugin to launch file of hector_joy_with_plugins:
     1. Add the configuration files to the node in its own namespace e.g. using
-    `<rosparam file="$(find <package containing plugin>)/config/<plugin-(short-)name>/<plugin-(short-)name>_mapping_logitech_f710.yaml" ns="<namespace of plugin>/<Pluginname>" />`
-    2. If the plugin shall be loaded on startup add it to the list of the rosparam "init_plugins" with `<namespace>::<Pluginname>`.
+    `<rosparam file="$(find <package containing plugin>)/config/<plugin-(short-)name>/<plugin-(short-)name>_mapping_logitech_f710.yaml" ns="<namespace of plugin>/<Plugintype>/<Pluginname>" />`
+    2. If the plugin shall be loaded on startup add it to the list of the rosparam "init_plugins" with `<Pluginname>`.

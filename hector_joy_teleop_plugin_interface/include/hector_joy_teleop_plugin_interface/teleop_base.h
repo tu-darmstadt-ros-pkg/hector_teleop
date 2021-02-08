@@ -35,6 +35,8 @@ class TeleopBase
    * initialize method for plugins
    * @param nh nodehandle
    * @param pnh nodehandle for private namespace
+   * @param property_map shared pointer to property map
+   * @param plugin_name name of plugin (not type!)
    */
   virtual void initialize(ros::NodeHandle& nh,
                           ros::NodeHandle& pnh,

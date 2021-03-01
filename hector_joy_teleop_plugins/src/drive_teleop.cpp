@@ -12,10 +12,12 @@ void DriveTeleop::initialize(ros::NodeHandle& nh,
     TeleopBase::initializeBase(nh, pnh, property_map, plugin_name, "hector_joy_teleop_plugins::DriveTeleop");
 
     // get values from common config file
-    speed_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "speed", 0.0);
-    turn_speed_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "turn_speed", 0.0);
-    slow_factor_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "slow_factor", 1.0);
-    very_slow_factor_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "very_slow_factor", 1.0);
+    max_linear_speed_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "max_linear_speed", 0.0);
+    max_angular_speed_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "max_angular_speed", 0.0);
+
+    slow_factor_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "slow_factor", 0.5);
+    normal_factor_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "normal_factor", 0.75);
+    fast_factor_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "fast_factor", 1.0);
 
     drive_command_topic_ = pnh_.param<std::string>(getParameterServerPrefix() + "/" + "drive_command_topic", "cmd_vel");
     drive_pub_ = nh_.advertise<geometry_msgs::Twist>(drive_command_topic_, 10, false);
@@ -33,7 +35,7 @@ void DriveTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
     float speed_joystick;
     if (getJoyMeasurement("speed", msg, speed_joystick))
     {
-        drive_command_.linear.x = speed_joystick * speed_ * direction;
+        drive_command_.linear.x = speed_joystick * max_linear_speed_ * direction;
     }
 
 
@@ -41,32 +43,28 @@ void DriveTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
     float steer_joystick;
     if (getJoyMeasurement("steer", msg, steer_joystick))
     {
-        drive_command_.angular.z = steer_joystick * turn_speed_;
+        drive_command_.angular.z = steer_joystick * max_angular_speed_;
     }
 
 
-    // compute slow linear and angular speed
-    float slow_joystick;
-    if (getJoyMeasurement("slow", msg, slow_joystick))
+    // compute slow / normal / fast linear and angular speed
+    float slow_joystick, fast_joystick;
+    if (getJoyMeasurement("slow", msg, slow_joystick) && slow_joystick == 1.0)
     {
-        if (slow_joystick == 1.0)
-        {
-            drive_command_.linear.x *= slow_factor_;
-            drive_command_.angular.z *= slow_factor_;
-        }
+        drive_command_.linear.x *= slow_factor_;
+        drive_command_.angular.z *= slow_factor_;
     }
-
-
-    // compute very slow linear and angular speed
-    float very_slow_joystick;
-    if (getJoyMeasurement("very_slow", msg, very_slow_joystick))
+    else if(getJoyMeasurement("fast", msg, fast_joystick) && fast_joystick == 1.0)
     {
-        if (very_slow_joystick == 1.0)
-        {
-            drive_command_.linear.x *= very_slow_factor_;
-            drive_command_.angular.z *= very_slow_factor_;
-        }
+        drive_command_.linear.x *= fast_factor_;
+        drive_command_.angular.z *= fast_factor_;
     }
+    else
+    {
+        drive_command_.linear.x *= normal_factor_;
+        drive_command_.angular.z *= normal_factor_;
+    }
+
 
     drive_pub_.publish(drive_command_);
 }

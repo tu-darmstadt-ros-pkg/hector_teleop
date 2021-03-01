@@ -21,10 +21,12 @@ class DriveTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
   void executePeriodically(const ros::Rate& rate) override;
 
  private:
-  double speed_;
-  double turn_speed_;
+  double max_linear_speed_;
+  double max_angular_speed_;
+
   double slow_factor_;
-  double very_slow_factor_;
+  double normal_factor_;
+  double fast_factor_;
 
   std::string drive_command_topic_;
   ros::Publisher drive_pub_;

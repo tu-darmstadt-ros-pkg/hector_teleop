@@ -23,7 +23,7 @@ axes:
 
 buttons:
   - ""           # 0: A
-  - very_slow    # 1: B
+  - fast         # 1: B
   - ""           # 2: X
   - slow         # 3: Y
   - ""           # 4: LB

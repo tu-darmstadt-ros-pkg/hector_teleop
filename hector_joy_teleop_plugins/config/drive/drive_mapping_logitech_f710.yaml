@@ -22,10 +22,10 @@ axes:
 
 
 buttons:
-  - ""           # 0: A
-  - fast         # 1: B
-  - ""           # 2: X
-  - slow         # 3: Y
+  - fast         # 0: A
+  - ""           # 1: B
+  - slow         # 2: X
+  - ""           # 3: Y
   - ""           # 4: LB
   - ""           # 5: RB
   - ""           # 6: back

@@ -22,12 +22,12 @@ axes:
 
 
 buttons:
-  - "rotate_yaw_inc"  # 0: A
-  - "rotate_yaw_dec"  # 1: B
+  - "reset_pose"  # 0: A
+  - "hold_pose"  # 1: B
   - "gripper_dec"  # 2: X
   - "gripper_inc"  # 3: Y
-  - "reset_pose"  # 4: LB
-  - "hold_pose"  # 5: RB
+  - "rotate_yaw_inc"  # 4: LB
+  - "rotate_yaw_dec"  # 5: RB
   - ""  # 6: back
   - ""  # 7: start
   - ""  # 8: logitech

@@ -21,7 +21,7 @@ axes:
   - ""  # 4: right joystick: up/down
   - ""  # 5: RT
   - "Move asterix flipper to drive compact;Move asterix flipper to drive default"  # 6: cross: left/right
-  - ""  # 7: cross: up/down
+  - "Move asterix flipper to flat;Move asterix flipper to flat"  # 7: cross: up/down
 
 
 buttons:

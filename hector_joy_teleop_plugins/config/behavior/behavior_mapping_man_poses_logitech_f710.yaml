@@ -20,8 +20,8 @@ axes:
   - ""  # 3: right joystick: left/right
   - ""  # 4: right joystick: up/down
   - ""  # 5: RT
-  - ""  # 6: cross: left/right
-  - "Fold arm;Manipulate position"  # 7: cross: up/down
+  - "Move asterix arm to folded position;Unpack asterix arm from folded position"  # 6: cross: left/right
+  - "Move asterix arm to manipulation position;Move asterix arm to manipulation position"  # 7: cross: up/down
 
 
 buttons:

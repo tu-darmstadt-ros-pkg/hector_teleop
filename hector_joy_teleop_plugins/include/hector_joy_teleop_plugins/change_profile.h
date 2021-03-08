@@ -2,6 +2,7 @@
 
 #include <hector_joy_teleop_plugin_interface/teleop_base.h>
 #include <pluginlib/class_list_macros.h>
+#include <std_msgs/String.h>
 
 #include <hector_joy_teleop_plugin_msgs/LoadTeleopPlugin.h>
 
@@ -55,6 +56,9 @@ class ChangeProfile : public hector_joy_teleop_plugin_interface::TeleopBase
 
   std::vector<Profile>::iterator current_profile_; ///< Iterator to currently loaded profile
 
+  std::string current_profile_topic_;
+  ros::Publisher current_profile_pub_;
+  std_msgs::String current_profile_msg_;
 
   ros::ServiceClient load_teleop_plugins_srv_client_;
   hector_joy_teleop_plugin_msgs::LoadTeleopPlugin load_teleop_plugin_srv_msg_;

@@ -11,6 +11,10 @@ void ChangeProfile::initialize(ros::NodeHandle& nh,
 {
     TeleopBase::initializeBase(nh, pnh, property_map, plugin_name, "hector_joy_teleop_plugins::ChangeProfile");
 
+    current_profile_topic_ = pnh.param<std::string>(getParameterServerPrefix() + "/" + "current_profile_topic", "/joy_teleop_profile");
+    current_profile_pub_ = nh_.advertise<std_msgs::String>(current_profile_topic_, 10, true);
+
+
     // get values from common config file
     change_forward_ = pnh_.param<int>(getParameterServerPrefix() + "/" + "change_backward", 5);
     change_backward_ = pnh_.param<int>(getParameterServerPrefix() + "/" + "change_forward", 4);
@@ -183,7 +187,9 @@ void ChangeProfile::setCurrentProfile(std::vector<Profile>::iterator new_positio
         }
     }
 
-    // TODO publish current profile
+    // publish current profile
+    current_profile_msg_.data = current_profile_->name;
+    current_profile_pub_.publish(current_profile_msg_);
 
 }
 

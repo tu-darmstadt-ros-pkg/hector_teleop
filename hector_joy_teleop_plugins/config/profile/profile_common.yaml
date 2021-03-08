@@ -28,3 +28,5 @@ change_forward: 5
 change_backward: 4
 use_buttons_to_iter: true
 reload_profile: 6
+
+current_profile_topic: /joy_teleop_profile

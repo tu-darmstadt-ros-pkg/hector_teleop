@@ -17,7 +17,7 @@
     <rosparam file="$(find hector_joy_teleop_plugins)/config/profile/profile_mapping_logitech_f710.yaml" ns="hector_joy_teleop_plugins/ChangeProfile/Profile" />
 
     <!-- Drive Teleop Plugin Parameter -->
-    <rosparam file="$(find hector_joy_teleop_plugins)/config/drive/drive_common.yaml" ns="hector_joy_teleop_plugins/DriveTeleop/Drive" />
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/drive/drive_asterix.yaml" ns="hector_joy_teleop_plugins/DriveTeleop/Drive" />
     <rosparam file="$(find hector_joy_teleop_plugins)/config/drive/drive_mapping_logitech_f710.yaml" ns="hector_joy_teleop_plugins/DriveTeleop/Drive" />
 
     <!-- Flipper Teleop Plugin Parameter -->

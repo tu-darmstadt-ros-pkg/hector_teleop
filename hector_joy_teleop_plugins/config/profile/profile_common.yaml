@@ -8,20 +8,18 @@
 #    false and set one of the iteration keys to +axis_index, the other to -axis_index (+ = use positive part of axis, - = use negative part)
 
 profiles:
-    - drive
-    - arm
-
-drive:
-    - Drive
-    - Flipper
-    - Properties
-    - ImageProjection
-    - FlipperPoses
-
-arm:
-    - Properties
-    - Manipulator
-    - ManipulatorPoses
+    - name: drive
+      plugins:
+          - Drive
+          - Flipper
+          - Properties
+          - ImageProjection
+          - FlipperPoses
+    - name: arm
+      plugins:
+          - Manipulator
+          - ManipulatorPoses
+          - Properties
 
 
 change_forward: 5

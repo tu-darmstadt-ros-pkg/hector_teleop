@@ -22,28 +22,43 @@ void ChangeProfile::initialize(ros::NodeHandle& nh,
 
     reload_profile_ = pnh_.param<int>(getParameterServerPrefix() + "/" + "reload_profile", 6);
 
-    // TODO consider using XmlRpc::XmlRpcValue instead of profiles list and pluginlist per profile separately
-    // get profile list
-    std::vector<std::string> profile_list;
-    pnh_.getParam(getParameterServerPrefix() + "/" + "profiles", profile_list);
 
-    // get plugin list for each profile and add to vector
-    for (auto& profile_name : profile_list)
+    // get profiles with plugins
+    try
     {
-        std::vector<std::string> plugin_list;
-        bool res = pnh_.getParam(getParameterServerPrefix() + "/" + profile_name, plugin_list);
+        // get profile list
+        XmlRpc::XmlRpcValue profile_list_ps;
 
-        if (!res)
+        pnh_.getParam(getParameterServerPrefix() + "/" + "profiles", profile_list_ps);
+
+        // add all plugins to map
+        for (int i = 0; i < profile_list_ps.size(); i++)
         {
-            ROS_WARN_STREAM("No plugins found for profile " << profile_name
-                                                            << " in config file. Profile will not be loaded in list.");
-            continue;
+            std::string profile_name = profile_list_ps[i]["name"];
+
+            // get plugin list
+            std::vector<std::string> plugin_list;
+
+            XmlRpc::XmlRpcValue plugin_list_ps = profile_list_ps[i]["plugins"];
+            for(int j = 0; j < plugin_list_ps.size(); j++)
+            {
+                plugin_list.push_back(plugin_list_ps[j]);
+            }
+
+            // create and store profile
+            Profile tmp_profile{profile_name, plugin_list};
+
+            profiles_.push_back(tmp_profile);
         }
-
-        Profile tmp_profile{profile_name, plugin_list};
-
-        profiles_.push_back(tmp_profile);
     }
+    catch (const XmlRpc::XmlRpcException& e)
+    {
+        ROS_ERROR_STREAM(
+            "hector_joy_teleop_with_plugins: Error while getting parameter \"profiles\" from parameterserver or parsing it: "
+                << e.getCode() << ", " << e.getMessage());
+        throw;
+    }
+
 
     load_teleop_plugins_srv_client_ = pnh_.serviceClient<hector_joy_teleop_plugin_msgs::LoadTeleopPlugin>(
         "/hector_joy_teleop_with_plugins/load_plugin");
@@ -58,7 +73,7 @@ std::string ChangeProfile::onLoad()
         return "No profiles found. Stop loading plugin ChangeProfile.";
     }
 
-    if(!load_teleop_plugins_srv_client_.waitForExistence(ros::Duration(5)))
+    if (!load_teleop_plugins_srv_client_.waitForExistence(ros::Duration(5)))
     {
         return "hector_joy_teleop_with_plugins: Service " + load_teleop_plugins_srv_client_.getService() + " does not exist (timed out after 5 sec).";
     }

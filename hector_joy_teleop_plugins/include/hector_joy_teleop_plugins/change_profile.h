@@ -3,6 +3,7 @@
 #include <hector_joy_teleop_plugin_interface/teleop_base.h>
 #include <pluginlib/class_list_macros.h>
 #include <std_msgs/String.h>
+#include <xmlrpcpp/XmlRpcException.h>
 
 #include <hector_joy_teleop_plugin_msgs/LoadTeleopPlugin.h>
 

@@ -1,5 +1,5 @@
-max_linear_speed: 0.6
-max_angular_speed: 1
+max_linear_speed: 1.0
+max_angular_speed: 1.5
 
 slow_factor: 0.5
 normal_factor: 0.75

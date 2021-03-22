@@ -4,18 +4,18 @@
   <node name="hector_joy_teleop_with_plugins" pkg="hector_joy_teleop_with_plugins" type="hector_joy_teleop_with_plugins_node" respawn="false" output="screen">
 
     <rosparam file="$(find hector_joy_teleop_with_plugins)/config/f710.yaml" />
-    <rosparam file="$(find hector_joy_teleop_with_plugins)/config/telemax.yaml" />
+    <rosparam file="$(find hector_joy_teleop_with_plugins)/config/telemax_plugins.yaml" />
 
     <!-- Behavior Teleop Plugin Parameter -->
     <rosparam file="$(find hector_joy_teleop_plugins)/config/behavior/behavior_common.yaml" ns="hector_joy_teleop_plugins/BehaviorTeleop/FlipperPoses" />
     <rosparam file="$(find hector_joy_teleop_plugins)/config/behavior/behavior_mapping_flipper_poses_logitech_f710.yaml" ns="hector_joy_teleop_plugins/BehaviorTeleop/FlipperPoses" />
 
     <!-- Change profile Plugin Parameter -->
-    <rosparam file="$(find hector_joy_teleop_plugins)/config/profile/profile_common.yaml" ns="hector_joy_teleop_plugins/ChangeProfile/Profile" />
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/profile/profile_telemax.yaml" ns="hector_joy_teleop_plugins/ChangeProfile/Profile" />
     <rosparam file="$(find hector_joy_teleop_plugins)/config/profile/profile_mapping_logitech_f710.yaml" ns="hector_joy_teleop_plugins/ChangeProfile/Profile" />
 
     <!-- Drive Teleop Plugin Parameter -->
-    <rosparam file="$(find hector_joy_teleop_plugins)/config/drive/drive_common.yaml" ns="hector_joy_teleop_plugins/DriveTeleop/Drive" />
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/drive/drive_telemax.yaml" ns="hector_joy_teleop_plugins/DriveTeleop/Drive" />
     <rosparam file="$(find hector_joy_teleop_plugins)/config/drive/drive_mapping_logitech_f710.yaml" ns="hector_joy_teleop_plugins/DriveTeleop/Drive" />
 
     <!-- Flipper Teleop Plugin Parameter -->

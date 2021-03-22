@@ -13,6 +13,10 @@ void FlipperTeleop::initialize(ros::NodeHandle& nh,
 
     speed_ = pnh_.param<float>(getParameterServerPrefix() + "/" + "speed", 0.0);
 
+    // factors to adapt commands (e.g. to inverse an axis)
+    flipper_front_factor_ = pnh_.param<float>(getParameterServerPrefix() + "/" + "flipper_front_factor", 1.0);
+    flipper_back_factor_  = pnh_.param<float>(getParameterServerPrefix() + "/" + "flipper_back_factor", 1.0);
+
 
     // get flipper topics
     flipper_front_command_topic_ =
@@ -94,11 +98,17 @@ void FlipperTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
     // publish
     if (!reverse_direction)
     {
+        flipper_front_command_.data *= flipper_front_factor_;
+        flipper_back_command_.data *= flipper_back_factor_;
+
         flipper_front_pub_.publish(flipper_front_command_);
         flipper_back_pub_.publish(flipper_back_command_);
     } else
     {
-        // in reverse mode also reverse button mapping for front and back flippers, hence swap commands
+        // in reverse mode also reverse button mapping for front and back flippers, hence swap commands (and factors)
+        flipper_front_command_.data *= flipper_back_factor_;
+        flipper_back_command_.data *= flipper_front_factor_;
+
         flipper_front_pub_.publish(flipper_back_command_);
         flipper_back_pub_.publish(flipper_front_command_);
     }

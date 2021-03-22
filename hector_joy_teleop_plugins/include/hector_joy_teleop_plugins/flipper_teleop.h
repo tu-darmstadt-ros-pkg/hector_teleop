@@ -30,6 +30,10 @@ class FlipperTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
   void joyToFlipperCommand(const sensor_msgs::JoyConstPtr& msg);
 
   float speed_;
+  float flipper_front_factor_;
+  float flipper_back_factor_;
+
+
   std::string flipper_front_command_topic_;
   std::string flipper_back_command_topic_;
 

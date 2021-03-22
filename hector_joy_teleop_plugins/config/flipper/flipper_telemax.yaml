@@ -16,3 +16,5 @@ teleop_controllers:
 
 num_tries_switch_controller: 5
 sleep_between_tries_sec: 1
+
+flipper_front_factor: -1.0

@@ -14,7 +14,7 @@ In order to implement a new plugin the followings steps need to be done:
         1. `executePeriodically(const ros::Rate& rate)` for parts that should be executed in every run of the ros loop.
         2. `onLoad()` which is called after a plugin is loaded successfully, right before active_ is set to true.
         3. `onUnload()` which is called before a plugin is unloaded, right after active_ is set to false.
-2. According to the usage of the ros pluginlib add the following line at the bottom of the source file of the new plugin:
+2. According to the usage of the ros pluginlib, add the following line at the bottom of the source file of the new plugin:
     `PLUGINLIB_EXPORT_CLASS(<namespace>::<classname>, hector_joy_teleop_plugin_interface::TeleopBase)`
 3. Also according to the usage of the ros pluginlib add the following lines for the new plugin to a xml file containing the library:
     ```xml
@@ -31,4 +31,5 @@ In order to implement a new plugin the followings steps need to be done:
 5. Add plugin to launch file of hector_joy_with_plugins:
     1. Add the configuration files to the node in its own namespace e.g. using
     `<rosparam file="$(find <package containing plugin>)/config/<plugin-(short-)name>/<plugin-(short-)name>_mapping_logitech_f710.yaml" ns="<namespace of plugin>/<Plugintype>/<Pluginname>" />`
-    2. If the plugin shall be loaded on startup add it to the list of the rosparam "init_plugins" with `<Pluginname>`.
+    2. In the robot specific config file (\<robotname\>_plugins.yaml), add a new plugin entry with the name of the plugin and its type.
+    3. If the plugin should be part of a profile, add its name in the profile_<robotname>.yaml file for one or multiple profiles.

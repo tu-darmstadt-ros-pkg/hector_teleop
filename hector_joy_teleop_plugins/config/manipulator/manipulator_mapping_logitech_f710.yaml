@@ -14,14 +14,14 @@
 # Hence, when splitting a left/right axis, the first value is on the RIGHT part, the second on the LEFT part of axis.
 
 axes:
-  - "translate_y_inc;translate_y_dec"  # 0: left joystick: left/right
-  - "translate_z_inc;translate_z_dec"  # 1: left joystick: up/down
+  - "translate_y_inc;translate_y_dec"  # 0: left joystick: right/left
+  - "translate_z_inc;translate_z_dec"  # 1: left joystick: down/up
   - "translate_x_dec"  # 2: LT
-  - "rotate_roll_inc;rotate_roll_dec"  # 3: right joystick: left/right
-  - "rotate_pitch_inc;rotate_pitch_dec"  # 4: right joystick: up/down
+  - "rotate_roll_inc;rotate_roll_dec"  # 3: right joystick: right/left
+  - "rotate_pitch_inc;rotate_pitch_dec"  # 4: right joystick: down/up
   - "translate_x_inc"  # 5: RT
-  - ""  # 6: cross: left/right
-  - ""  # 7: cross: up/down
+  - ""  # 6: cross: right/left
+  - ""  # 7: cross: down/up
 
 
 buttons:

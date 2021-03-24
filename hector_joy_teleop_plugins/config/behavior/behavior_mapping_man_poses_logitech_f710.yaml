@@ -17,14 +17,14 @@
 ## If an axis is used for two behaviors list both of them in one string, separated with a semicolon, e.g. "Behavior 1;Behavior 2"
 ##    The first is the one which will be executed for value -1 (when left/right axis: right), the second for +1 (when left/right axis: left).
 axes:
-  - ""  # 0: left joystick: left/right
-  - ""  # 1: left joystick: up/down
+  - ""  # 0: left joystick: right/left
+  - ""  # 1: left joystick: down/up
   - ""  # 2: LT
-  - ""  # 3: right joystick: left/right
-  - ""  # 4: right joystick: up/down
+  - ""  # 3: right joystick: right/left
+  - ""  # 4: right joystick: down/up
   - ""  # 5: RT
-  - "Move asterix arm to folded position;Unpack asterix arm from folded position"  # 6: cross: left/right
-  - "Move asterix arm to manipulation position;Move asterix arm to manipulation position"  # 7: cross: up/down
+  - "Unpack asterix arm from folded position;Move asterix arm to folded position"  # 6: cross: right/left
+  - "Move asterix arm to manipulation position;Move asterix arm to manipulation position"  # 7: cross: down/up
 
 
 buttons:

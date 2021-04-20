@@ -23,7 +23,7 @@ axes:
   - ""  # 3: right joystick: right/left
   - ""  # 4: right joystick: down/up
   - ""  # 5: RT
-  - "Move asterix flipper to stair;Move asterix flipper to drive compact"  # 6: cross: right/left
+  - "Move asterix flipper to inverted drive compact;Move asterix flipper to drive compact"  # 6: cross: right/left
   - "Move asterix flipper to flat;Move asterix flipper to drive default"  # 7: cross: down/up
 
 

@@ -243,8 +243,7 @@ std_msgs::Float64 ManipulatorTeleop::joyToGripper(const sensor_msgs::JoyConstPtr
 std::string ManipulatorTeleop::onLoad()
 {
     // As the controllers should only be loaded in the unfold arm behavior, comment it here out.
-    //return controller_helper_.switchControllers(teleop_controllers_, standard_controllers_);
-    return "";
+    return controller_helper_.switchControllers(teleop_controllers_, standard_controllers_);
 }
 
 std::string ManipulatorTeleop::onUnload()

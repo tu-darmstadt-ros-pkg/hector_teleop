@@ -15,7 +15,11 @@ profiles:
           - Properties
           - ImageProjection
           - FlipperPoses
-
+    - name: arm
+      plugins:
+          - Manipulator
+          - ManipulatorPoses
+          - Properties
 
 change_forward: 5
 change_backward: 4

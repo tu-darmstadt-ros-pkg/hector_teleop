@@ -22,3 +22,9 @@ plugins:
 
   - name: ImageProjection
     type: hector_joy_teleop_plugins::ImageProjectionTeleop
+    
+  - name: Manipulator
+    type: hector_joy_teleop_plugins::ManipulatorTeleop
+    
+  - name: ManipulatorPoses
+    type: hector_joy_teleop_plugins::BehaviorTeleop

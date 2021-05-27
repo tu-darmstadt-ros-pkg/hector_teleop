@@ -17,11 +17,11 @@ reset_tool_center_service: /manipulator_arm_control/arm_tcp_controller/reset_too
 controller_manager_switch_service: /manipulator_arm_control/controller_manager/switch_controller
 controller_manager_list_service: /manipulator_arm_control/controller_manager/list_controllers
 
-standard_controllers:
-  - manipulator_arm_traj_controller
-  - gripper_traj_controller
-teleop_controllers:
-  - arm_tcp_controller
+standard_controllers: []
+  #- manipulator_arm_traj_controller
+  #- gripper_traj_controller
+teleop_controllers: []
+  #- arm_tcp_controller
 
 
 num_tries_switch_controller: 5

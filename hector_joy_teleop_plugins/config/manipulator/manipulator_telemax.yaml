@@ -1,0 +1,28 @@
+max_speed_linear: 0.1
+max_speed_angular: 0.4
+
+max_gripper_speed: 0.02
+
+manipulator_command_topic: /telemax_control/arm_tcp_controller/twist_cmd
+gripper_command_topic: /telemax_control/arm_tcp_controller/gripper_cmd
+
+
+hold_pose_service: /telemax_control/arm_tcp_controller/hold_pose
+reset_pose_service: /telemax_control/arm_tcp_controller/reset_pose
+
+move_tool_center_service: /telemax_control/arm_tcp_controller/move_tool_center
+reset_tool_center_service: /telemax_control/arm_tcp_controller/reset_tool_center
+
+
+controller_manager_switch_service: /telemax_control/controller_manager/switch_controller
+controller_manager_list_service: /telemax_control/controller_manager/list_controllers
+
+standard_controllers:
+  - manipulator_arm_traj_controller
+  - gripper_traj_controller
+teleop_controllers:
+  - arm_tcp_controller
+
+
+num_tries_switch_controller: 5
+sleep_between_tries_sec: 1

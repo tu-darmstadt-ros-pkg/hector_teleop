@@ -64,7 +64,7 @@ void ImageProjectionTeleop::executePeriodically(const ros::Rate& rate)
   if (hfov_speed_ != 0.0)
   {
     hfov_ += dt * hfov_speed_;
-    hfov_ = limitValue(hfov_, 1, 359);
+    hfov_ = limitValue(hfov_, 40, 150);
 
     publishHFOVCommand();
   }

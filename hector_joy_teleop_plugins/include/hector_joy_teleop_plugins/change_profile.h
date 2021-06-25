@@ -53,6 +53,8 @@ class ChangeProfile : public hector_joy_teleop_plugin_interface::TeleopBase
   bool use_buttons_to_iter_;
   int reload_profile_;
 
+  bool change_finished_;
+
   std::vector<Profile> profiles_; ///< list of profiles in same order as in config file
 
   std::vector<Profile>::iterator current_profile_; ///< Iterator to currently loaded profile

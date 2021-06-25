@@ -22,6 +22,8 @@ void ChangeProfile::initialize(ros::NodeHandle& nh,
 
     reload_profile_ = pnh_.param<int>(getParameterServerPrefix() + "/" + "reload_profile", 6);
 
+    // no change in progress
+    change_finished_ = true;
 
     // get profiles with plugins
     try
@@ -93,17 +95,24 @@ void ChangeProfile::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
 
 void ChangeProfile::iterProfile(sensor_msgs::JoyPtr& msg)
 {
+
     float enabled = false;
     if (getJoyMeasurement("enable_change", msg, enabled))
     {
+        if(!change_finished_)
+        {
+            ROS_ERROR_STREAM("Change not finished.");
+        }
+
         // if enabled is pressed
-        if (enabled != 0.0)
+        if (enabled != 0.0 && change_finished_)
         {
             used_msg_ = true;
 
             // reload profile
             if (reload_profile_ >= 0 && reload_profile_ < msg->buttons.size() && msg->buttons[reload_profile_])
             {
+                change_finished_ = false;
                 ROS_INFO_STREAM("Reload profile " + current_profile_->name);
                 setCurrentProfile(current_profile_);
             } else
@@ -113,11 +122,13 @@ void ChangeProfile::iterProfile(sensor_msgs::JoyPtr& msg)
                 {
                     if (change_forward_ >= 0 && change_forward_ < msg->buttons.size() && msg->buttons[change_forward_])
                     {
+                        change_finished_ = false;
                         nextProfile();
 
                     } else if (change_backward_ >= 0 && change_backward_ < msg->buttons.size()
                         && msg->buttons[change_backward_])
                     {
+                        change_finished_ = false;
                         previousProfile();
                     }
                 } else
@@ -140,6 +151,39 @@ void ChangeProfile::iterProfile(sensor_msgs::JoyPtr& msg)
                 }
             }
 
+        }
+        else
+        {
+            // check if change has been finished, means, that a message with 0 at the respective positions was received
+            if(enabled == 0)
+            {
+                change_finished_ = true;
+            }
+            else
+            {
+                if (use_buttons_to_iter_)
+                {
+                    // NOTE: maybe here errors occur, if one of change_forward/_backward is not in valid range
+                    if (change_forward_ >= 0 && change_forward_ < msg->buttons.size() && msg->buttons[change_forward_] == 0
+                    && change_backward_ >= 0 && change_backward_ < msg->buttons.size() && msg->buttons[change_backward_] == 0)
+                    {
+                        change_finished_ = true;
+                    }
+                } else
+                {
+                    if (abs(change_forward_) > msg->axes.size())
+                    {
+                        return;
+                    }
+
+                    float axis_value = msg->axes[abs(change_forward_)];
+
+                    if (axis_value == 0)
+                    {
+                        change_finished_ = true;
+                    }
+                }
+            }
         }
     }
 }

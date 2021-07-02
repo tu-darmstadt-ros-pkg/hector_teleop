@@ -34,6 +34,6 @@ buttons:
   - ""  # 5: RB
   - ""  # 6: back
   - ""  # 7: start
-  - ""  # 8: logitech
+  - ""  # 8: logitech/big X button/mode
   - ""  # 9: left joystick press
   - ""  # 10:right joystick press

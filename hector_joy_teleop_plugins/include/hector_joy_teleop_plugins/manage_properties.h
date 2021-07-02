@@ -36,6 +36,7 @@ class ManageProperties : public hector_joy_teleop_plugin_interface::TeleopBase
   ros::ServiceServer set_property_service_;
 
 
+  bool direction_finished_;
 };
 
 }

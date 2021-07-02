@@ -39,9 +39,11 @@ void ChangeProfile::initialize(ros::NodeHandle& nh,
             std::string profile_name = profile_list_ps[i]["name"];
 
             // get plugin list
-            std::vector<std::string> plugin_list;
-
             XmlRpc::XmlRpcValue plugin_list_ps = profile_list_ps[i]["plugins"];
+
+            std::vector<std::string> plugin_list;
+            plugin_list.reserve(plugin_list_ps.size());
+
             for(int j = 0; j < plugin_list_ps.size(); j++)
             {
                 plugin_list.push_back(plugin_list_ps[j]);
@@ -65,7 +67,7 @@ void ChangeProfile::initialize(ros::NodeHandle& nh,
     load_teleop_plugins_srv_client_ = pnh_.serviceClient<hector_joy_teleop_plugin_msgs::LoadTeleopPlugin>(
         "/hector_joy_teleop_with_plugins/load_plugin");
 
-    // TODO Service for changing profile
+    // TODO Service for changing profile e.g. from UI?
 }
 
 std::string ChangeProfile::onLoad()
@@ -99,12 +101,8 @@ void ChangeProfile::iterProfile(sensor_msgs::JoyPtr& msg)
     float enabled = false;
     if (getJoyMeasurement("enable_change", msg, enabled))
     {
-        if(!change_finished_)
-        {
-            ROS_ERROR_STREAM("Change not finished.");
-        }
 
-        // if enabled is pressed
+        // if enabled is pressed and change finished
         if (enabled != 0.0 && change_finished_)
         {
             used_msg_ = true;
@@ -120,6 +118,7 @@ void ChangeProfile::iterProfile(sensor_msgs::JoyPtr& msg)
                 // search in buttons or axes vector for change direction in profile list
                 if (use_buttons_to_iter_)
                 {
+                    // check if index is valid and value is 1, if so, switch profile in requested direction
                     if (change_forward_ >= 0 && change_forward_ < msg->buttons.size() && msg->buttons[change_forward_])
                     {
                         change_finished_ = false;
@@ -133,6 +132,7 @@ void ChangeProfile::iterProfile(sensor_msgs::JoyPtr& msg)
                     }
                 } else
                 {
+                    // check if axes index is valid
                     if (abs(change_forward_) > msg->axes.size())
                     {
                         return;
@@ -140,6 +140,7 @@ void ChangeProfile::iterProfile(sensor_msgs::JoyPtr& msg)
 
                     float axis_value = msg->axes[abs(change_forward_)];
 
+                    // switch profile in requested direction
                     if ((axis_value > 0 && change_forward_ > 0) || (axis_value < 0 && change_forward_ < 0))
                     {
                         nextProfile();
@@ -161,16 +162,18 @@ void ChangeProfile::iterProfile(sensor_msgs::JoyPtr& msg)
             }
             else
             {
+                // when enable button is still pressed, check if change_forward/backward values are zero
                 if (use_buttons_to_iter_)
                 {
-                    // NOTE: maybe here errors occur, if one of change_forward/_backward is not in valid range
-                    if (change_forward_ >= 0 && change_forward_ < msg->buttons.size() && msg->buttons[change_forward_] == 0
-                    && change_backward_ >= 0 && change_backward_ < msg->buttons.size() && msg->buttons[change_backward_] == 0)
+                    // check if change_forward/backward button index is valid and value is zero (only if valid) for both
+                    if ((!(change_forward_ >= 0  && change_forward_  < msg->buttons.size()) || msg->buttons[change_forward_]  == 0)
+                    &&  (!(change_backward_ >= 0 && change_backward_ < msg->buttons.size()) || msg->buttons[change_backward_] == 0))
                     {
                         change_finished_ = true;
                     }
                 } else
                 {
+                    //check if axes index is valid
                     if (abs(change_forward_) > msg->axes.size())
                     {
                         return;
@@ -178,6 +181,7 @@ void ChangeProfile::iterProfile(sensor_msgs::JoyPtr& msg)
 
                     float axis_value = msg->axes[abs(change_forward_)];
 
+                    // if value is zero, axes is not set, so change is finished
                     if (axis_value == 0)
                     {
                         change_finished_ = true;

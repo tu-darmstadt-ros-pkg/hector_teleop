@@ -48,6 +48,9 @@ void ManipulatorTeleop::initialize(ros::NodeHandle& nh,
     move_tc_srv_client_ = pnh.serviceClient<std_srvs::SetBool>(move_tc_srv);
     reset_tc_srv_client_ = pnh.serviceClient<std_srvs::Empty>(reset_tc_srv);
 
+    hold_finished_ = true;
+    move_tc_finished_ = true;
+
     // get parameter for switching controllers
     standard_controllers_ =
         pnh_.param<std::vector<std::string>>(getParameterServerPrefix() + "/" + "standard_controllers",
@@ -105,20 +108,29 @@ void ManipulatorTeleop::executePeriodically(const ros::Rate& rate)
 bool ManipulatorTeleop::joyToSpecial(const sensor_msgs::JoyConstPtr& msg)
 {
     float hold_pose_joy;
-    if (getJoyMeasurement("hold_pose", msg, hold_pose_joy) && hold_pose_joy != 0)
+    if (getJoyMeasurement("hold_pose", msg, hold_pose_joy))
     {
-        std_srvs::SetBool srv;
-        srv.request.data = !hold_pose_;
+        if(hold_pose_joy != 0 && hold_finished_)
+        {
+            std_srvs::SetBool srv;
+            srv.request.data = !hold_pose_;
 
-        // send value
-        if (hold_pose_srv_client_.call(srv) && srv.response.success)
-        {
-            hold_pose_ = !hold_pose_;
-            return true;
-        } else
-        {
-            ROS_ERROR_STREAM("Manipulator_teleop: Unable to send value " << !hold_pose_ << " to service " << hold_pose_srv_client_.getService() << ". Please try again.");
+            // send value
+            if (hold_pose_srv_client_.call(srv) && srv.response.success)
+            {
+              hold_pose_ = !hold_pose_;
+              hold_finished_ = false;
+              return true;
+            } else
+            {
+              ROS_ERROR_STREAM("Manipulator_teleop: Unable to send value " << !hold_pose_ << " to service " << hold_pose_srv_client_.getService() << ". Please try again.");
+            }
         }
+        else if(hold_pose_joy == 0 && !hold_finished_)
+        {
+            hold_finished_ = true;
+        }
+
     }
 
 
@@ -139,20 +151,29 @@ bool ManipulatorTeleop::joyToSpecial(const sensor_msgs::JoyConstPtr& msg)
 
 
     float move_tool_center_joy;
-    if (getJoyMeasurement("move_tool_center", msg, move_tool_center_joy, false) && move_tool_center_joy != 0)
+    if (getJoyMeasurement("move_tool_center", msg, move_tool_center_joy, false))
     {
-        std_srvs::SetBool srv;
-        srv.request.data = !move_tool_center_;
+        if(move_tool_center_joy != 0 && move_tc_finished_)
+        {
+            std_srvs::SetBool srv;
+            srv.request.data = !move_tool_center_;
 
-        // send value
-        if (move_tc_srv_client_.call(srv) && srv.response.success)
-        {
-            move_tool_center_ = !move_tool_center_;
-            return true;
-        } else
-        {
-            ROS_ERROR_STREAM("Manipulator_teleop: Unable to send value " << !move_tool_center_ << " to service " << move_tc_srv_client_.getService() << ". Please try again.");
+            // send value
+            if (move_tc_srv_client_.call(srv) && srv.response.success)
+            {
+              move_tool_center_ = !move_tool_center_;
+              move_tc_finished_ = false;
+              return true;
+            } else
+            {
+              ROS_ERROR_STREAM("Manipulator_teleop: Unable to send value " << !move_tool_center_ << " to service " << move_tc_srv_client_.getService() << ". Please try again.");
+            }
         }
+        else if(move_tool_center_joy == 0 && !move_tc_finished_)
+        {
+            move_tc_finished_ = true;
+        }
+
     }
 
 

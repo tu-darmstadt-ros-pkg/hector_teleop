@@ -33,6 +33,12 @@ class ManipulatorTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
 
  private:
 
+  /**
+   * Checks if message contains pressed buttons for hold_pose, reset_pose, move_tool_center, reset_tool_center and calls
+   * the respective services.
+   * @param msg
+   * @return true if message was used, false otherwise
+   */
   bool joyToSpecial(const sensor_msgs::JoyConstPtr& msg);
   geometry_msgs::Twist joyToTwist(const sensor_msgs::JoyConstPtr& msg);
   std_msgs::Float64 joyToGripper(const sensor_msgs::JoyConstPtr& msg);
@@ -52,6 +58,9 @@ class ManipulatorTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
 
   bool hold_pose_ = false;
   bool move_tool_center_ = false;
+
+  bool hold_finished_;
+  bool move_tc_finished_;
 
   ros::ServiceClient hold_pose_srv_client_;
   ros::ServiceClient reset_pose_srv_client_;

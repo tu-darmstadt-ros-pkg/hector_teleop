@@ -18,31 +18,43 @@ void ManageProperties::initialize(ros::NodeHandle& nh,
     direction_status_pub_ = pnh_.advertise<std_msgs::Float64>("direction_status", 10, true);
 
     set_property_service_ = pnh_.advertiseService("set_property", &ManageProperties::SetPropertyServiceCB, this);
+
+    direction_finished_ = true;
 }
 
 void ManageProperties::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
 {
-    // if direction button is pressed, reverse current direction
+    // change direction parameter
     float direction;
-    if (getJoyMeasurement("direction", msg, direction) && direction != 0)
+    if (getJoyMeasurement("direction", msg, direction))
     {
-        if (property_map_->at("direction") == 1.0)
+        // if direction button is pressed (and was 0 before): reverse current direction
+        if(direction != 0 && direction_finished_)
         {
-            property_map_->at("direction") = -1.0;
-        } else
+            direction_finished_ = false;
+            if (property_map_->at("direction") == 1.0)
+            {
+                property_map_->at("direction") = -1.0;
+            } else
+            {
+                property_map_->at("direction") = 1.0;
+            }
+
+            // publish change for UI
+            publishPropertyChanged("direction");
+
+        }
+        else if(direction == 0 && !direction_finished_)
         {
-            property_map_->at("direction") = 1.0;
+            direction_finished_ = true;
         }
 
-        // publish change for UI
-        publishPropertyChanged("direction");
     }
 
 }
 
 void ManageProperties::executePeriodically(const ros::Rate& rate)
 {
-    //TODO publish all properties?
 }
 
 void ManageProperties::publishPropertyChanged(std::string property_name)

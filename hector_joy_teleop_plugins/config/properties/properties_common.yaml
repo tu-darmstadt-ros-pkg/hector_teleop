@@ -1,2 +1,4 @@
 # direction: 1.0 is forwards, -1.0 is backwards
 direction: 1.0
+
+current_direction_topic: /joy_teleop_direction

@@ -31,7 +31,8 @@ class ManageProperties : public hector_joy_teleop_plugin_interface::TeleopBase
   bool SetPropertyServiceCB(hector_joy_teleop_plugin_msgs::SetProperty::Request& request,
                             hector_joy_teleop_plugin_msgs::SetProperty::Response& response);
 
-  ros::Publisher direction_status_pub_;
+  std::string current_direction_topic_;
+  ros::Publisher current_direction_pub_;
 
   ros::ServiceServer set_property_service_;
 

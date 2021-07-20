@@ -15,7 +15,8 @@ void ManageProperties::initialize(ros::NodeHandle& nh,
 
 
     // setup service and topics
-    direction_status_pub_ = pnh_.advertise<std_msgs::Float64>("direction_status", 10, true);
+    current_direction_topic_ = pnh.param<std::string>(getParameterServerPrefix() + "/" + "current_direction_topic", "/joy_teleop_direction");
+    current_direction_pub_ = nh_.advertise<std_msgs::Float64>(current_direction_topic_, 10, true);
 
     set_property_service_ = pnh_.advertiseService("set_property", &ManageProperties::SetPropertyServiceCB, this);
 
@@ -64,7 +65,7 @@ void ManageProperties::publishPropertyChanged(std::string property_name)
         std_msgs::Float64 msg;
         msg.data = property_map_->at("direction");
 
-        direction_status_pub_.publish(msg);
+        current_direction_pub_.publish(msg);
     }
 }
 

@@ -25,6 +25,11 @@ void DriveTeleop::initialize(ros::NodeHandle& nh,
 
 void DriveTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
 {
+    bool last_command_zero = false;
+    if(drive_command_.linear.x == 0 && drive_command_.angular.z == 0)
+    {
+      last_command_zero = true;
+    }
 
     // if the direction value is available in map use it, otherwise use default value of 1.0
     // (1.0 => forward mode, -1.0 => reverse mode)
@@ -63,6 +68,12 @@ void DriveTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
     {
         drive_command_.linear.x *= normal_factor_;
         drive_command_.angular.z *= normal_factor_;
+    }
+
+    // only publish a zero command, if last command was not zero to avoid interrupting other controllers
+    if(last_command_zero && drive_command_.linear.x == 0 && drive_command_.angular.z == 0)
+    {
+        return;
     }
 
 

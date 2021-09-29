@@ -2,6 +2,7 @@
 
 #include "hector_joy_teleop_plugins/sensorhead_teleop.h"
 
+
 namespace hector_joy_teleop_plugins
 {
 
@@ -17,6 +18,7 @@ void SensorheadTeleop::initialize(ros::NodeHandle& nh,
     sensorhead_max_pan_ = pnh_.param(getParameterServerPrefix() + "/" + "sensorhead_max_pan", 120.0);
     sensorhead_max_tilt_down_ = pnh_.param(getParameterServerPrefix() + "/" + "sensorhead_max_tilt_down", 30.0);
     sensorhead_max_tilt_up_ = pnh_.param(getParameterServerPrefix() + "/" + "sensorhead_max_tilt_up", 30.0);
+    sensorhead_tilt_speed_ = pnh_.param(getParameterServerPrefix() + "/" + "sensorhead_tilt_inverted", false);
 
     sensorhead_command_topic_ =
             pnh_.param<std::string>(getParameterServerPrefix() + "/" + "sensorhead_command_topic", "camera/command");
@@ -79,7 +81,15 @@ void SensorheadTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
     float tilt_joystick;
     if (getJoyMeasurement("tilt", msg, tilt_joystick))
     {
-        sensorhead_tilt_speed_ = tilt_joystick * sensorhead_speed_ * M_PI / 180.0;
+        if(sensorhead_tilt_inverted_)
+        {
+            sensorhead_tilt_speed_ = tilt_joystick * sensorhead_speed_ * M_PI / 180.0;
+        }
+        else
+        {
+          sensorhead_tilt_speed_ = -tilt_joystick * sensorhead_speed_ * M_PI / 180.0;
+        }
+
     }
 
 

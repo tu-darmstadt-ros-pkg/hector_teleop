@@ -35,6 +35,8 @@ class SensorheadTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
   double sensorhead_max_tilt_down_;
   double sensorhead_max_tilt_up_;
 
+  bool sensorhead_tilt_inverted_;
+
   std::string sensorhead_command_topic_;
   geometry_msgs::QuaternionStamped sensorhead_command_;
   ros::Publisher sensorhead_pub_;

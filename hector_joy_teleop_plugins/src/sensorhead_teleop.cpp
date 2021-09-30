@@ -15,9 +15,12 @@ void SensorheadTeleop::initialize(ros::NodeHandle& nh,
 
     sensorhead_mode_ = pnh_.param(getParameterServerPrefix() + "/" + "sensorhead_mode", std::string("base_stabilized"));
     sensorhead_speed_ = pnh_.param(getParameterServerPrefix() + "/" + "sensorhead_speed", 60.0);
-    sensorhead_max_pan_ = pnh_.param(getParameterServerPrefix() + "/" + "sensorhead_max_pan", 120.0);
-    sensorhead_max_tilt_down_ = pnh_.param(getParameterServerPrefix() + "/" + "sensorhead_max_tilt_down", 30.0);
-    sensorhead_max_tilt_up_ = pnh_.param(getParameterServerPrefix() + "/" + "sensorhead_max_tilt_up", 30.0);
+
+    sensorhead_max_tilt_ = pnh_.param(getParameterServerPrefix() + "/" + "sensorhead_max_tilt", 0.73);
+    sensorhead_min_tilt_ = pnh_.param(getParameterServerPrefix() + "/" + "sensorhead_min_tilt", -1.27);
+    sensorhead_max_pan_ = pnh_.param(getParameterServerPrefix() + "/" + "sensorhead_max_pan", 1.57);
+    sensorhead_min_pan_ = pnh_.param(getParameterServerPrefix() + "/" + "sensorhead_min_pan", -1.57);
+
     sensorhead_tilt_speed_ = pnh_.param(getParameterServerPrefix() + "/" + "sensorhead_tilt_inverted", false);
 
     sensorhead_command_topic_ =
@@ -43,24 +46,23 @@ void SensorheadTeleop::executePeriodically(const ros::Rate& rate)
     double dt = rate.expectedCycleTime().toSec();
 
     sensorhead_pan_ += dt * sensorhead_pan_speed_;
-    if (sensorhead_pan_ > sensorhead_max_pan_ * M_PI / 180.0)
+    if (sensorhead_pan_ > sensorhead_max_pan_)
     {
-        sensorhead_pan_ = sensorhead_max_pan_ * M_PI / 180.0;
+        sensorhead_pan_ = sensorhead_max_pan_;
     }
-
-    if (sensorhead_pan_ < -sensorhead_max_pan_ * M_PI / 180.0)
+    if (sensorhead_pan_ < sensorhead_min_pan_)
     {
-        sensorhead_pan_ = -sensorhead_max_pan_ * M_PI / 180.0;
+        sensorhead_pan_ = sensorhead_min_pan_;
     }
 
     sensorhead_tilt_ += dt * sensorhead_tilt_speed_;
-    if (sensorhead_tilt_ > sensorhead_max_tilt_down_ * M_PI / 180.0)
+    if (sensorhead_tilt_ > sensorhead_max_tilt_)
     {
-        sensorhead_tilt_ = sensorhead_max_tilt_down_ * M_PI / 180.0;
+        sensorhead_tilt_ = sensorhead_max_tilt_;
     }
-    if (sensorhead_tilt_ < -sensorhead_max_tilt_up_ * M_PI / 180.0)
+    if (sensorhead_tilt_ < sensorhead_min_tilt_)
     {
-        sensorhead_tilt_ = -sensorhead_max_tilt_up_ * M_PI / 180.0;
+        sensorhead_tilt_ = sensorhead_min_tilt_;
     }
 
     publishCommand();

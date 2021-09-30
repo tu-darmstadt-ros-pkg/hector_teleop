@@ -31,9 +31,11 @@ class SensorheadTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
 
   double sensorhead_pan_speed_ = 0;
   double sensorhead_tilt_speed_ = 0;
+
   double sensorhead_max_pan_;
-  double sensorhead_max_tilt_down_;
-  double sensorhead_max_tilt_up_;
+  double sensorhead_min_pan_;
+  double sensorhead_max_tilt_;
+  double sensorhead_min_tilt_;
 
   bool sensorhead_tilt_inverted_;
 

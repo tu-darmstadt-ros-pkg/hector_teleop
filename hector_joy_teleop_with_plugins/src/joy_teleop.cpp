@@ -12,6 +12,10 @@ JoyTeleop::JoyTeleop(ros::NodeHandle& nh, ros::NodeHandle& pnh)
                                   "hector_joy_teleop_plugin_interface::TeleopBase")
 {
 
+    // get joy timeout parameter
+    joy_timeout_ = pnh.param<double>("joy_timeout", 2.0);
+
+
     try
     {
         // get list of available plugins with name and type from parameter server
@@ -50,6 +54,30 @@ JoyTeleop::JoyTeleop(ros::NodeHandle& nh, ros::NodeHandle& pnh)
 
 void JoyTeleop::executePeriodically(const ros::Rate& rate)
 {
+    // if last joy message was received more than joy_timeout_ seconds ago, send a zero message
+    if(!last_joy_msg_received_.isZero() && ros::Time::now().toSec() - last_joy_msg_received_.toSec() > joy_timeout_)
+    {
+        sensor_msgs::JoyPtr zeroMsg = boost::make_shared<sensor_msgs::Joy>();
+        zeroMsg->header.stamp = ros::Time::now();
+
+        // resize the arrays, so that at each required position there is a zero
+        if(!axes_.empty())
+        {
+            zeroMsg->axes.resize((axes_.rbegin()->first) + 1);
+            // set trigger values to 1 as expected as default value
+            zeroMsg->axes[pnh_.param<int>("left_trigger", 2)] = 1.0;
+            zeroMsg->axes[pnh_.param<int>("right_trigger", 5)] = 1.0;
+        }
+        if(!buttons_.empty())
+        {
+            zeroMsg->buttons.resize((buttons_.rbegin()->first) + 1);
+        }
+
+        JoyCallback(zeroMsg);
+
+        ROS_WARN_STREAM_NAMED("hector_joy_teleop_with_plugins", "Timeout! More than " << joy_timeout_ << " seconds since last joy message.");
+    }
+
     for (auto& plugin : plugins_)
     {
         if (plugin->isActive())
@@ -233,6 +261,7 @@ bool JoyTeleop::LoadPluginServiceCB(hector_joy_teleop_plugin_msgs::LoadTeleopPlu
 
 void JoyTeleop::JoyCallback(const sensor_msgs::JoyConstPtr& msg)
 {
+    last_joy_msg_received_ = ros::Time::now();
 
     // check that no mapping indices are greater than message array lengths
     if (!axes_.empty() && axes_.rbegin()->first >= msg->axes.size())

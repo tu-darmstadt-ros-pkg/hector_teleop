@@ -75,6 +75,10 @@ class JoyTeleop
 
   ros::Subscriber joy_sub_;
 
+
+  double joy_timeout_;
+  ros::Time last_joy_msg_received_;
+
   ros::ServiceServer load_plugin_service_;
 
   // store current gamepad mapping (index in vector is index in joy message array, string is pluginname)

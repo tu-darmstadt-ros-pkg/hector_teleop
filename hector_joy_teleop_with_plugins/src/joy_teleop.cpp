@@ -55,7 +55,7 @@ JoyTeleop::JoyTeleop(ros::NodeHandle& nh, ros::NodeHandle& pnh)
 void JoyTeleop::executePeriodically(const ros::Rate& rate)
 {
     // if last joy message was received more than joy_timeout_ seconds ago, send a zero message
-    if(!last_joy_msg_received_.isZero() && ros::Time::now().toSec() - last_joy_msg_received_.toSec() > joy_timeout_)
+    if(!last_joy_msg_received_.isZero() && (ros::Time::now().toSec() - last_joy_msg_received_.toSec() > joy_timeout_))
     {
         sensor_msgs::JoyPtr zeroMsg = boost::make_shared<sensor_msgs::Joy>();
         zeroMsg->header.stamp = ros::Time::now();
@@ -73,6 +73,7 @@ void JoyTeleop::executePeriodically(const ros::Rate& rate)
             zeroMsg->buttons.resize((buttons_.rbegin()->first) + 1);
         }
 
+        timed_out_ = true;
         JoyCallback(zeroMsg);
 
         ROS_WARN_STREAM_NAMED("hector_joy_teleop_with_plugins", "Timeout! More than " << joy_timeout_ << " seconds since last joy message.");
@@ -261,7 +262,17 @@ bool JoyTeleop::LoadPluginServiceCB(hector_joy_teleop_plugin_msgs::LoadTeleopPlu
 
 void JoyTeleop::JoyCallback(const sensor_msgs::JoyConstPtr& msg)
 {
-    last_joy_msg_received_ = ros::Time::now();
+    // if timed out, set time to zero instead of now (so that time_out is not checked again until a new joy message is received)
+    if(!timed_out_)
+    {
+      last_joy_msg_received_ = ros::Time::now();
+    }
+    else
+    {
+      last_joy_msg_received_ = ros::Time(0);
+      timed_out_ = false;
+    }
+
 
     // check that no mapping indices are greater than message array lengths
     if (!axes_.empty() && axes_.rbegin()->first >= msg->axes.size())

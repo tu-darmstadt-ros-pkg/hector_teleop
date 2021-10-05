@@ -78,6 +78,7 @@ class JoyTeleop
 
   double joy_timeout_;
   ros::Time last_joy_msg_received_;
+  bool timed_out_ = false;
 
   ros::ServiceServer load_plugin_service_;
 

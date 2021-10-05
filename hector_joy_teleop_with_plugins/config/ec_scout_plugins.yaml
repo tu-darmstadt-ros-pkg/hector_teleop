@@ -1,0 +1,19 @@
+top_plugin: Profile
+
+
+plugins:
+  - name: Profile
+    type: hector_joy_teleop_plugins::ChangeProfile
+
+  - name: Drive
+    type: hector_joy_teleop_plugins::DriveTeleop
+
+  - name: Properties
+    type: hector_joy_teleop_plugins::ManageProperties
+
+  - name: Sensorhead
+    type: hector_joy_teleop_plugins::SensorheadTeleop
+
+  - name: ImageProjection
+    type: hector_joy_teleop_plugins::ImageProjectionTeleop
+

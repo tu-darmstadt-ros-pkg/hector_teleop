@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+
+<launch>
+  <node name="hector_joy_teleop_with_plugins" pkg="hector_joy_teleop_with_plugins" type="hector_joy_teleop_with_plugins_node" respawn="false" output="screen">
+
+    <rosparam file="$(find hector_joy_teleop_with_plugins)/config/f710.yaml" />
+    <rosparam file="$(find hector_joy_teleop_with_plugins)/config/ec_scout_plugins.yaml" />
+
+    <!-- Change profile Plugin Parameter -->
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/profile/profile_ec_scout.yaml" ns="hector_joy_teleop_plugins/ChangeProfile/Profile" />
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/profile/profile_mapping_logitech_f710.yaml" ns="hector_joy_teleop_plugins/ChangeProfile/Profile" />
+
+    <!-- Drive Teleop Plugin Parameter -->
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/drive/drive_ec_scout.yaml" ns="hector_joy_teleop_plugins/DriveTeleop/Drive" />
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/drive/drive_mapping_logitech_f710.yaml" ns="hector_joy_teleop_plugins/DriveTeleop/Drive" />
+
+    <!-- Manage properties Plugin Parameter -->
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/properties/properties_common.yaml" ns="hector_joy_teleop_plugins/ManageProperties/Properties" />
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/properties/properties_mapping_logitech_f710.yaml" ns="hector_joy_teleop_plugins/ManageProperties/Properties" />
+
+    <!-- Sensorhead Teleop Plugin Parameter -->
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/sensorhead/sensorhead_common.yaml" ns="hector_joy_teleop_plugins/SensorheadTeleop/Sensorhead" />
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/sensorhead/sensorhead_mapping_logitech_f710.yaml" ns="hector_joy_teleop_plugins/SensorheadTeleop/Sensorhead" />
+
+    <!-- Image Projection Plugin Parameter -->
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/image_projection/image_projection_common.yaml" ns="hector_joy_teleop_plugins/ImageProjectionTeleop/ImageProjection" />
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/image_projection/image_projection_mapping_logitech_f710.yaml" ns="hector_joy_teleop_plugins/ImageProjectionTeleop/ImageProjection" />
+  </node>
+
+  <!-- Load initial plugins (the service call with parameter wait will be executed when the service is available) -->
+  <node pkg="rosservice" type="rosservice" name="LoadPluginProfile" args="call --wait /hector_joy_teleop_with_plugins/load_plugin &quot;{plugin_name: 'Profile', load: true}&quot;" />
+
+</launch>

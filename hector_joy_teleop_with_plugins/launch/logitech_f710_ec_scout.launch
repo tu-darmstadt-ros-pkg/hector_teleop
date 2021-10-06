@@ -19,7 +19,7 @@
     <rosparam file="$(find hector_joy_teleop_plugins)/config/properties/properties_mapping_logitech_f710.yaml" ns="hector_joy_teleop_plugins/ManageProperties/Properties" />
 
     <!-- Sensorhead Teleop Plugin Parameter -->
-    <rosparam file="$(find hector_joy_teleop_plugins)/config/sensorhead/sensorhead_common.yaml" ns="hector_joy_teleop_plugins/SensorheadTeleop/Sensorhead" />
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/sensorhead/sensorhead_ec_scout.yaml" ns="hector_joy_teleop_plugins/SensorheadTeleop/Sensorhead" />
     <rosparam file="$(find hector_joy_teleop_plugins)/config/sensorhead/sensorhead_mapping_logitech_f710.yaml" ns="hector_joy_teleop_plugins/SensorheadTeleop/Sensorhead" />
 
     <!-- Image Projection Plugin Parameter -->

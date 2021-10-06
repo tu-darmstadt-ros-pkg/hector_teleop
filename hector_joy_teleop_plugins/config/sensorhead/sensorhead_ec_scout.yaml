@@ -1,0 +1,14 @@
+sensorhead_mode: base_stabilized
+sensorhead_speed: 20.0
+
+# in rad
+sensorhead_max_tilt: 0.73
+sensorhead_min_tilt: -1.27
+
+
+sensorhead_max_pan: 1.57
+sensorhead_min_pan: -1.57
+
+sensorhead_tilt_inverted: false
+
+sensorhead_command_topic: "camera/command"

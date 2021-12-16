@@ -277,13 +277,13 @@ void JoyTeleop::JoyCallback(const sensor_msgs::JoyConstPtr& msg)
     // check that no mapping indices are greater than message array lengths
     if (!axes_.empty() && axes_.rbegin()->first >= msg->axes.size())
     {
-        ROS_ERROR_STREAM("Invalid axes mapping of plugin " << axes_.rbegin()->second << " (exceeds message length).");
+        ROS_ERROR_STREAM_THROTTLE_NAMED(1, "hector_joy_teleop_with_plugins", "Either the axes mapping is invalid for plugin " << axes_.rbegin()->second << " or an incompatible Joystick is connected.");
         return;
     }
     if (!buttons_.empty() && buttons_.rbegin()->first >= msg->buttons.size())
     {
-        ROS_ERROR_STREAM(
-            "Invalid buttons mapping of plugin " << buttons_.rbegin()->second << " (exceeds message length).");
+      ROS_ERROR_STREAM_THROTTLE_NAMED(1, "hector_joy_teleop_with_plugins",
+                                      "Either the button mapping is invalid for plugin " << buttons_.rbegin()->second << " or an incompatible Joystick is connected.");
         return;
     }
 

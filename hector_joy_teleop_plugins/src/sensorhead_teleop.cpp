@@ -55,7 +55,7 @@ void SensorheadTeleop::executePeriodically(const ros::Rate& rate)
         sensorhead_pan_ = sensorhead_min_pan_;
     }
 
-    sensorhead_tilt_ += dt * sensorhead_tilt_speed_;
+    sensorhead_tilt_ -= dt * sensorhead_tilt_speed_;
     if (sensorhead_tilt_ > sensorhead_max_tilt_)
     {
         sensorhead_tilt_ = sensorhead_max_tilt_;

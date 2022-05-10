@@ -11,6 +11,11 @@ class DriveTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
 {
 
  public:
+   enum ResponseCurveMode {
+     Linear,
+     Parabola
+   };
+
   void initialize(ros::NodeHandle& nh,
                   ros::NodeHandle& pnh,
                   std::shared_ptr<std::map<std::string, double>> property_map,
@@ -29,6 +34,7 @@ class DriveTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
   double fast_factor_;
 
   std::string drive_command_topic_;
+  ResponseCurveMode response_curve_;
   ros::Publisher drive_pub_;
   geometry_msgs::Twist drive_command_;
 };

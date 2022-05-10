@@ -5,4 +5,6 @@ slow_factor: 0.4
 normal_factor: 0.6
 fast_factor: 1
 
+response_curve: "parabola"
+
 drive_command_topic: "cmd_vel"

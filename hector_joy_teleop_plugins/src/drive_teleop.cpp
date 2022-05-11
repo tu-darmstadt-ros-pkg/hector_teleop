@@ -4,6 +4,21 @@
 namespace hector_joy_teleop_plugins
 {
 
+namespace
+{
+float applyResponseCurve(float value, DriveTeleop::ResponseCurveMode curve)
+{
+    switch (curve)
+    {
+        case DriveTeleop::Parabola:
+            return (value < 0 ? -1.f : 1.f) * value * value;
+        case DriveTeleop::Linear:
+        default:
+            return value;
+    }
+}
+}
+
 void DriveTeleop::initialize(ros::NodeHandle& nh,
                              ros::NodeHandle& pnh,
                              std::shared_ptr<std::map<std::string, double>> property_map,
@@ -18,6 +33,21 @@ void DriveTeleop::initialize(ros::NodeHandle& nh,
     slow_factor_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "slow_factor", 0.5);
     normal_factor_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "normal_factor", 0.75);
     fast_factor_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "fast_factor", 1.0);
+
+    std::string response_curve = pnh_.param<std::string>(getParameterServerPrefix() + "/" + "response_curve", "linear");
+    if (response_curve == "parabola")
+    {
+        response_curve_ = ResponseCurveMode::Parabola;
+    }
+    else if (response_curve == "linear")
+    {
+        response_curve_ = ResponseCurveMode::Linear;
+    }
+    else
+    {
+        ROS_ERROR_NAMED("hector_joy_teleop_with_plugins", "Response curve mode '%s' is unknown. Using linear.", response_curve.c_str());
+        response_curve_ = ResponseCurveMode::Linear;
+    }
 
     drive_command_topic_ = pnh_.param<std::string>(getParameterServerPrefix() + "/" + "drive_command_topic", "cmd_vel");
     drive_pub_ = nh_.advertise<geometry_msgs::Twist>(drive_command_topic_, 10, false);
@@ -40,6 +70,7 @@ void DriveTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
     float speed_joystick;
     if (getJoyMeasurement("speed", msg, speed_joystick))
     {
+        speed_joystick = applyResponseCurve(speed_joystick, response_curve_);
         drive_command_.linear.x = speed_joystick * max_linear_speed_ * direction;
     }
 
@@ -48,6 +79,7 @@ void DriveTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
     float steer_joystick;
     if (getJoyMeasurement("steer", msg, steer_joystick))
     {
+        steer_joystick = applyResponseCurve(steer_joystick, response_curve_);
         drive_command_.angular.z = steer_joystick * max_angular_speed_;
     }
 

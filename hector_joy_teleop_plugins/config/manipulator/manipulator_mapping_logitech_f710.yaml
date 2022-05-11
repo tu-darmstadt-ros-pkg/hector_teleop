@@ -17,7 +17,7 @@ axes:
   - "translate_y_inc;translate_y_dec"  # 0: left joystick: right/left
   - "translate_z_inc;translate_z_dec"  # 1: left joystick: down/up
   - "translate_x_dec"  # 2: LT
-  - "rotate_roll_inc;rotate_roll_dec"  # 3: right joystick: right/left
+  - "rotate_yaw_inc;rotate_yaw_dec"  # 3: right joystick: right/left
   - "rotate_pitch_dec;rotate_pitch_inc"  # 4: right joystick: down/up
   - "translate_x_inc"  # 5: RT
   - ""  # 6: cross: right/left
@@ -29,8 +29,8 @@ buttons:
   - "hold_pose"  # 1: B
   - "gripper_inc"  # 2: X
   - "gripper_dec"  # 3: Y
-  - "rotate_yaw_dec"  # 4: LB
-  - "rotate_yaw_inc"  # 5: RB
+  - "rotate_roll_dec"  # 4: LB
+  - "rotate_roll_inc"  # 5: RB
   - ""  # 6: back
   - ""  # 7: start
   - ""  # 8: logitech

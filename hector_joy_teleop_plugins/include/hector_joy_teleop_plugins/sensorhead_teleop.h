@@ -22,33 +22,32 @@ class SensorheadTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
 
  private:
 
-
+  void publishCommand();
   void publishTwistCommand();
 
   std::string sensorhead_mode_;
   double sensorhead_speed_;
 
-  //double sensorhead_pan_ = 0;
-  //double sensorhead_tilt_ = 0;
+  double sensorhead_pan_ = 0;
+  double sensorhead_tilt_ = 0;
 
-  //double sensorhead_pan_speed_ = 0;
-  //double sensorhead_tilt_speed_ = 0;
+  double sensorhead_pan_speed_ = 0;
+  double sensorhead_tilt_speed_ = 0;
 
-  //double sensorhead_max_pan_;
-  //double sensorhead_min_pan_;
-  //double sensorhead_max_tilt_;
-  //double sensorhead_min_tilt_;
+  double sensorhead_max_pan_;
+  double sensorhead_min_pan_;
+  double sensorhead_max_tilt_;
+  double sensorhead_min_tilt_;
 
   bool sensorhead_tilt_inverted_;
-  //float pan_joystick_;
-  //float tilt_joystick_;
-  double pan_twist_;
-  double tilt_twist_;
-  bool reset_=false;
+  
+  bool use_twist_command_;
 
   std::string sensorhead_command_topic_;
   geometry_msgs::Twist sensorhead_command_twist_;
+  geometry_msgs::QuaternionStamped sensorhead_command_;
   ros::Publisher sensorhead_pub_twist_;
+  ros::Publisher sensorhead_pub_;
 };
 
 }

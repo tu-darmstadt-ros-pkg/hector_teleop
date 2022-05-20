@@ -12,3 +12,5 @@ sensorhead_min_pan: -1.57
 sensorhead_tilt_inverted: false
 
 sensorhead_command_topic: "camera/command"
+
+use_twist_command : false

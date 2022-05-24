@@ -23,7 +23,7 @@ class SensorheadTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
  private:
 
 
-  void publishCommand();
+  void publishOrientationCommand();
   void publishTwistCommand();
 
   std::string sensorhead_mode_;

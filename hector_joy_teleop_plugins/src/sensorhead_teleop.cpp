@@ -71,7 +71,7 @@ void SensorheadTeleop::executePeriodically(const ros::Rate& rate)
         sensorhead_tilt_ = sensorhead_min_tilt_;
       }
 
-      publishCommand();
+      publishOrientationCommand();
     }else{
       publishTwistCommand();//send twist command for sensor head orientation
     }
@@ -112,14 +112,14 @@ void SensorheadTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
         {
             sensorhead_pan_ = 0;
             sensorhead_tilt_ = 0;
-            publishCommand();// use quaternion msg to reset orientation
+            publishOrientationCommand();// use quaternion msg to reset orientation
         }
 
     }
 }
 
 
-void SensorheadTeleop::publishCommand()
+void SensorheadTeleop::publishOrientationCommand()
 {
   // publish command
   sensorhead_command_.header.stamp = ros::Time::now();

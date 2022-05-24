@@ -23,14 +23,15 @@ void SensorheadTeleop::initialize(ros::NodeHandle& nh,
 
     sensorhead_tilt_inverted_ = pnh_.param(getParameterServerPrefix() + "/" + "sensorhead_tilt_inverted", false);
 
+
     sensorhead_command_topic_ =
             pnh_.param<std::string>(getParameterServerPrefix() + "/" + "sensorhead_command_topic", "camera/command");
+
 
     use_twist_command_ =  pnh_.param(getParameterServerPrefix() + "/" + "use_twist_command", true);
 
     if (use_twist_command_)sensorhead_pub_twist_ = nh_.advertise<geometry_msgs::Twist>(sensorhead_command_topic_+"_twist", 10, false);
     sensorhead_pub_ = nh_.advertise<geometry_msgs::QuaternionStamped>(sensorhead_command_topic_, 10, false);
-
 }
 
 void SensorheadTeleop::executePeriodically(const ros::Rate& rate)
@@ -41,6 +42,7 @@ void SensorheadTeleop::executePeriodically(const ros::Rate& rate)
     // and is published.
 
     // if there are no changes, don't publish anything
+
     if (sensorhead_tilt_speed_ == 0.0 && sensorhead_pan_speed_ == 0.0)
     {
         return;
@@ -74,8 +76,6 @@ void SensorheadTeleop::executePeriodically(const ros::Rate& rate)
       publishTwistCommand();//send twist command for sensor head orientation
     }
 
-
-
 }
 
 void SensorheadTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
@@ -94,7 +94,7 @@ void SensorheadTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
     {
         if(sensorhead_tilt_inverted_)
         {
-            sensorhead_tilt_speed_ = tilt_joystick * sensorhead_speed_ * M_PI / 180.0;
+          sensorhead_tilt_speed_ = tilt_joystick * sensorhead_speed_ * M_PI / 180.0;
         }
         else
         {
@@ -117,6 +117,7 @@ void SensorheadTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
 
     }
 }
+
 
 void SensorheadTeleop::publishCommand()
 {

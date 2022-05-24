@@ -22,6 +22,7 @@ class SensorheadTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
 
  private:
 
+
   void publishCommand();
   void publishTwistCommand();
 
@@ -40,6 +41,7 @@ class SensorheadTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
   double sensorhead_min_tilt_;
 
   bool sensorhead_tilt_inverted_;
+
   
   bool use_twist_command_;
 

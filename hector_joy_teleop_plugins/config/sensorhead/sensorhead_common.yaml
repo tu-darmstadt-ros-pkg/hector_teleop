@@ -1,4 +1,4 @@
-sensorhead_mode: base_stabilized
+sensorhead_mode: base_link
 sensorhead_speed: 60.0
 
 # in rad
@@ -12,3 +12,5 @@ sensorhead_min_pan: -1.57
 sensorhead_tilt_inverted: false
 
 sensorhead_command_topic: "camera/command"
+
+use_twist_command : true

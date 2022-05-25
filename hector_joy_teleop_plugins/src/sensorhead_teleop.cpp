@@ -16,19 +16,22 @@ void SensorheadTeleop::initialize(ros::NodeHandle& nh,
     sensorhead_mode_ = pnh_.param(getParameterServerPrefix() + "/" + "sensorhead_mode", std::string("base_stabilized"));
     sensorhead_speed_ = pnh_.param(getParameterServerPrefix() + "/" + "sensorhead_speed", 60.0);
 
-  /*  sensorhead_max_tilt_ = pnh_.param(getParameterServerPrefix() + "/" + "sensorhead_max_tilt", 0.73);
+    sensorhead_max_tilt_ = pnh_.param(getParameterServerPrefix() + "/" + "sensorhead_max_tilt", 0.73);
     sensorhead_min_tilt_ = pnh_.param(getParameterServerPrefix() + "/" + "sensorhead_min_tilt", -1.27);
     sensorhead_max_pan_ = pnh_.param(getParameterServerPrefix() + "/" + "sensorhead_max_pan", 1.57);
     sensorhead_min_pan_ = pnh_.param(getParameterServerPrefix() + "/" + "sensorhead_min_pan", -1.57);
 
-    sensorhead_tilt_speed_ = pnh_.param(getParameterServerPrefix() + "/" + "sensorhead_tilt_inverted", false);*/
+    sensorhead_tilt_inverted_ = pnh_.param(getParameterServerPrefix() + "/" + "sensorhead_tilt_inverted", false);
+
 
     sensorhead_command_topic_ =
             pnh_.param<std::string>(getParameterServerPrefix() + "/" + "sensorhead_command_topic", "camera/command");
 
 
-    sensorhead_pub_twist_ = nh_.advertise<geometry_msgs::Twist>(sensorhead_command_topic_+"_twist", 10, false);
+    use_twist_command_ =  pnh_.param(getParameterServerPrefix() + "/" + "use_twist_command", true);
 
+    if (use_twist_command_)sensorhead_pub_twist_ = nh_.advertise<geometry_msgs::Twist>(sensorhead_command_topic_+"_twist", 10, false);
+    sensorhead_pub_ = nh_.advertise<geometry_msgs::QuaternionStamped>(sensorhead_command_topic_, 10, false);
 }
 
 void SensorheadTeleop::executePeriodically(const ros::Rate& rate)
@@ -39,13 +42,39 @@ void SensorheadTeleop::executePeriodically(const ros::Rate& rate)
     // and is published.
 
     // if there are no changes, don't publish anything
-    if (tilt_twist_ == 0.0 && pan_twist_ == 0.0)
+
+    if (sensorhead_tilt_speed_ == 0.0 && sensorhead_pan_speed_ == 0.0)
     {
         return;
     }
+    if (!use_twist_command_)
+    {
+      double dt = rate.expectedCycleTime().toSec();
 
-    // client must check collision for collisions and limits !!
-    publishTwistCommand();//send twist command for sensor head orientation
+      sensorhead_pan_ += dt * sensorhead_pan_speed_;
+      if (sensorhead_pan_ > sensorhead_max_pan_)
+      {
+        sensorhead_pan_ = sensorhead_max_pan_;
+      }
+      if (sensorhead_pan_ < sensorhead_min_pan_)
+      {
+        sensorhead_pan_ = sensorhead_min_pan_;
+      }
+
+      sensorhead_tilt_ -= dt * sensorhead_tilt_speed_;
+      if (sensorhead_tilt_ > sensorhead_max_tilt_)
+      {
+        sensorhead_tilt_ = sensorhead_max_tilt_;
+      }
+      if (sensorhead_tilt_ < sensorhead_min_tilt_)
+      {
+        sensorhead_tilt_ = sensorhead_min_tilt_;
+      }
+
+      publishOrientationCommand();
+    }else{
+      publishTwistCommand();//send twist command for sensor head orientation
+    }
 
 }
 
@@ -56,7 +85,7 @@ void SensorheadTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
     float pan_joystick;
     if (getJoyMeasurement("pan", msg, pan_joystick))
     {
-        pan_twist_ = pan_joystick * sensorhead_speed_ * M_PI / 180.0 ;
+        sensorhead_pan_speed_ = pan_joystick * sensorhead_speed_ * M_PI / 180.0 ;
     }
 
     // tilt sensorhead
@@ -65,11 +94,11 @@ void SensorheadTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
     {
         if(sensorhead_tilt_inverted_)
         {
-            tilt_twist_ = tilt_joystick * sensorhead_speed_ * M_PI / 180.0;
+          sensorhead_tilt_speed_ = tilt_joystick * sensorhead_speed_ * M_PI / 180.0;
         }
         else
         {
-          tilt_twist_ = -tilt_joystick * sensorhead_speed_ * M_PI / 180.0;
+          sensorhead_tilt_speed_ = -tilt_joystick * sensorhead_speed_ * M_PI / 180.0;
         }
 
     }
@@ -81,28 +110,35 @@ void SensorheadTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
     {
         if (reset_joystick)
         {
-            //reset
-            reset_ = true;
-            publishTwistCommand();// use quaternion msg to reset orientation
+            sensorhead_pan_ = 0;
+            sensorhead_tilt_ = 0;
+            publishOrientationCommand();// use quaternion msg to reset orientation
         }
 
     }
 }
 
 
+void SensorheadTeleop::publishOrientationCommand()
+{
+  // publish command
+  sensorhead_command_.header.stamp = ros::Time::now();
+  sensorhead_command_.header.frame_id = sensorhead_mode_;
+  sensorhead_command_.quaternion.w = cos(sensorhead_pan_ / 2) * cos(sensorhead_tilt_ / 2);
+  sensorhead_command_.quaternion.x = -sin(sensorhead_pan_ / 2) * sin(sensorhead_tilt_ / 2);
+  sensorhead_command_.quaternion.y = cos(sensorhead_pan_ / 2) * sin(sensorhead_tilt_ / 2);
+  sensorhead_command_.quaternion.z = sin(sensorhead_pan_ / 2) * cos(sensorhead_tilt_ / 2);
+
+  sensorhead_pub_.publish(sensorhead_command_);
+}
+
 void SensorheadTeleop::publishTwistCommand()
 {
   // publish command
-  if(reset_){
-    ROS_WARN_STREAM("[publishTwistCommand] reset sensorhead");
-    sensorhead_command_twist_.linear.x = -1;
-    reset_ = false;
-  }else{
-    sensorhead_command_twist_.linear.x = 0;
-    sensorhead_command_twist_.angular.z = 0.2 * pan_twist_;
-    sensorhead_command_twist_.angular.y = 0.2 * tilt_twist_;
-    }
-    sensorhead_pub_twist_.publish( sensorhead_command_twist_ );
+  sensorhead_command_twist_.linear.x = 0;
+  sensorhead_command_twist_.angular.z = 0.2 * sensorhead_pan_speed_;
+  sensorhead_command_twist_.angular.y = -0.2 * sensorhead_tilt_speed_;
+  sensorhead_pub_twist_.publish( sensorhead_command_twist_ );
 }
 
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <launch>
-  <node name="hector_joy_teleop_with_plugins" pkg="hector_joy_teleop_with_plugins" type="hector_joy_teleop_with_plugins_node" respawn="false" output="screen">
+  <node name="hector_joy_teleop_with_plugins" pkg="hector_joy_teleop_with_plugins" type="hector_joy_teleop_with_plugins_node" respawn="true" output="screen">
 
     <rosparam file="$(find hector_joy_teleop_with_plugins)/config/f710.yaml" />
     <rosparam file="$(find hector_joy_teleop_with_plugins)/config/asterix_plugins.yaml" />

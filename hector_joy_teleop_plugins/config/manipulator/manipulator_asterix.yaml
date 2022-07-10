@@ -1,6 +1,7 @@
 max_speed_linear: 0.1
 max_speed_angular: 0.4
 response_curve: "parabola"
+driving_plugin: "Drive"
 
 max_gripper_speed: 1
 

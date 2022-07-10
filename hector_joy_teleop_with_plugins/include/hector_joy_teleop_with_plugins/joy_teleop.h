@@ -51,7 +51,7 @@ class JoyTeleop
    * @param plugin plugin whose mapping shall be added
    * @return empty string if was successful, otherwise name of plugin whose button mapping is overlapping
    */
-  std::string addMapping(TeleopBasePtr& plugin);
+  std::string addMapping(TeleopBasePtr& plugin, bool ignore_overlap=false);
 
   /**
    * remove mapping of passed plugin from current mapping

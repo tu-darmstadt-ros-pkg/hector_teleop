@@ -1,5 +1,7 @@
 #include "hector_joy_teleop_plugins/manipulator_teleop.h"
 
+#include <hector_joy_teleop_plugin_msgs/LoadTeleopPlugin.h>
+
 namespace hector_joy_teleop_plugins
 {
 
@@ -28,6 +30,7 @@ void ManipulatorTeleop::initialize(ros::NodeHandle& nh,
       ROS_ERROR_NAMED("hector_joy_teleop_with_plugins", "Response curve mode '%s' is unknown. Using linear.", response_curve.c_str());
       response_curve_ = ResponseCurveMode::Linear;
     }
+    driving_plugin_name_ = pnh_.param<std::string>(getParameterServerPrefix() + "/" + "driving_plugin", "Drive");
 
 
     // get topic names
@@ -55,6 +58,9 @@ void ManipulatorTeleop::initialize(ros::NodeHandle& nh,
 
     std::string reset_tc_srv = pnh_.param<std::string>(getParameterServerPrefix() + "/" + "reset_tool_center_service",
                                                         "/manipulator_arm_control/arm_tcp_controller/reset_tool_center");
+
+    load_teleop_plugins_srv_client_ = pnh_.serviceClient<hector_joy_teleop_plugin_msgs::LoadTeleopPlugin>(
+        "/hector_joy_teleop_with_plugins/load_plugin");
 
     // init service clients
     hold_pose_srv_client_ = pnh.serviceClient<std_srvs::SetBool>(hold_pose_srv);
@@ -106,16 +112,15 @@ void ManipulatorTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
         return;
     }
 
+    if (hold_pose_) return;
     twist_command_ = joyToTwist(mappedMsg);
-
     gripper_command_ = joyToGripper(mappedMsg);
-    gripper_pub_.publish(gripper_command_);
-
 }
 
 void ManipulatorTeleop::executePeriodically(const ros::Rate& rate)
 {
     twist_pub_.publish(twist_command_);
+    gripper_pub_.publish(gripper_command_);
 }
 
 
@@ -124,27 +129,14 @@ bool ManipulatorTeleop::joyToSpecial(const sensor_msgs::JoyConstPtr& msg)
     float hold_pose_joy;
     if (getJoyMeasurement("hold_pose", msg, hold_pose_joy))
     {
-        if(hold_pose_joy != 0 && hold_finished_)
+        if(hold_pose_joy > 0 && !hold_pose_)
         {
-            std_srvs::SetBool srv;
-            srv.request.data = !hold_pose_;
-
-            // send value
-            if (hold_pose_srv_client_.call(srv) && srv.response.success)
-            {
-              hold_pose_ = !hold_pose_;
-              hold_finished_ = false;
-              return true;
-            } else
-            {
-              ROS_ERROR_STREAM("Manipulator_teleop: Unable to send value " << !hold_pose_ << " to service " << hold_pose_srv_client_.getService() << ". Please try again.");
-            }
+          setHoldMode(true);
         }
-        else if(hold_pose_joy == 0 && !hold_finished_)
+        else if(hold_pose_joy <= 0 && hold_pose_)
         {
-            hold_finished_ = true;
+          setHoldMode(false);
         }
-
     }
 
 
@@ -214,8 +206,6 @@ bool ManipulatorTeleop::joyToSpecial(const sensor_msgs::JoyConstPtr& msg)
 geometry_msgs::Twist ManipulatorTeleop::joyToTwist(const sensor_msgs::JoyConstPtr& msg)
 {
     geometry_msgs::Twist twist;
-
-
     // linear
     float translate_x_joystick;
     if (getJoyMeasurement("translate_x", msg, translate_x_joystick))
@@ -288,6 +278,40 @@ std::string ManipulatorTeleop::onUnload()
     }
 
     return controller_helper_.switchControllers(standard_controllers_, teleop_controllers_);
+}
+bool ManipulatorTeleop::loadDrivingPlugin(bool enabled)
+{
+  hector_joy_teleop_plugin_msgs::LoadTeleopPlugin load_teleop_plugin_srv;
+  load_teleop_plugin_srv.request.plugin_name = driving_plugin_name_;
+  load_teleop_plugin_srv.request.load = enabled;
+  load_teleop_plugin_srv.request.ignore_overlap = true;
+
+  load_teleop_plugins_srv_client_.call(load_teleop_plugin_srv);
+
+  if (load_teleop_plugin_srv.response.result != load_teleop_plugin_srv.response.SUCCESS)
+  {
+    ROS_WARN_STREAM(
+        "Error changing profile: The plugin " + driving_plugin_name_ + " could not be loaded.");
+    return false;
+  }
+  return true;
+}
+
+bool ManipulatorTeleop::setHoldMode(bool enabled)
+{
+  std_srvs::SetBool srv;
+  srv.request.data = enabled;
+
+  // send value
+  if (hold_pose_srv_client_.call(srv) && srv.response.success)
+  {
+    hold_pose_ = enabled;
+    return loadDrivingPlugin(enabled);
+  } else
+  {
+    ROS_ERROR_STREAM("Manipulator_teleop: Unable to send value " << enabled << " to service " << hold_pose_srv_client_.getService() << ". Please try again.");
+    return false;
+  }
 }
 
 }

@@ -1,6 +1,7 @@
 #request fields
 string plugin_name
 bool load
+bool ignore_overlap
 ---
 #response constants
 int8 SUCCESS=0

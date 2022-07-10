@@ -175,7 +175,7 @@ bool JoyTeleop::loadPluginServiceCB(hector_joy_teleop_plugin_msgs::LoadTeleopPlu
             } else
             {
                 // try to add mapping of given plugin
-                std::string res_add_mapping = addMapping(plugins_[plugin_idx]);
+                std::string res_add_mapping = addMapping(plugins_[plugin_idx], request.ignore_overlap);
 
                 // if was successful, set plugin active
                 if (res_add_mapping.empty())
@@ -313,9 +313,8 @@ void JoyTeleop::joyCallback(const sensor_msgs::JoyConstPtr& msg)
 
 }
 
-std::string JoyTeleop::addMapping(TeleopBasePtr& plugin)
+std::string JoyTeleop::addMapping(TeleopBasePtr& plugin, bool ignore_overlap)
 {
-
     std::pair<std::map<std::string, int>&, std::map<std::string, int>&> axesButtons = plugin->getMapping();
 
     // backup current button mapping
@@ -327,7 +326,7 @@ std::string JoyTeleop::addMapping(TeleopBasePtr& plugin)
     {
         std::pair<std::map<int, std::string>::iterator, bool> res = axes_.insert({x.second, plugin->getPluginName()});
 
-        if (!res.second)
+        if (!res.second && !ignore_overlap)
         {
             // get name from iterator
             std::string overlapping_plugin_name = (res.first)->second;
@@ -354,7 +353,7 @@ std::string JoyTeleop::addMapping(TeleopBasePtr& plugin)
         std::pair<std::map<int, std::string>::iterator, bool>
             res = buttons_.insert({x.second, plugin->getPluginName()});
 
-        if (!res.second)
+        if (!res.second && !ignore_overlap)
         {
             // get name from iterator
             std::string overlapping_plugin_name = (res.first)->second;

@@ -31,6 +31,9 @@ class ManipulatorTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
 
   std::string onUnload() override;
 
+  bool setHoldMode(bool enabled);
+  bool loadDrivingPlugin(bool enabled);
+
 
  private:
 
@@ -48,7 +51,7 @@ class ManipulatorTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
   double max_speed_angular_;
   double max_gripper_speed_;
   ResponseCurveMode response_curve_;
-
+  std::string driving_plugin_name_;
   std::string manipulator_command_topic_;
   std::string gripper_command_topic_;
 
@@ -68,6 +71,7 @@ class ManipulatorTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
   ros::ServiceClient reset_pose_srv_client_;
   ros::ServiceClient move_tc_srv_client_;
   ros::ServiceClient reset_tc_srv_client_;
+  ros::ServiceClient load_teleop_plugins_srv_client_;
 
 
 

@@ -4,21 +4,6 @@
 namespace hector_joy_teleop_plugins
 {
 
-namespace
-{
-float applyResponseCurve(float value, DriveTeleop::ResponseCurveMode curve)
-{
-    switch (curve)
-    {
-        case DriveTeleop::Parabola:
-            return (value < 0 ? -1.f : 1.f) * value * value;
-        case DriveTeleop::Linear:
-        default:
-            return value;
-    }
-}
-}
-
 void DriveTeleop::initialize(ros::NodeHandle& nh,
                              ros::NodeHandle& pnh,
                              std::shared_ptr<std::map<std::string, double>> property_map,

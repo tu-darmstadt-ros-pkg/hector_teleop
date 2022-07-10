@@ -6,6 +6,7 @@
 #include <controller_manager_msgs/SwitchController.h>
 
 #include <hector_joy_teleop_plugins/controller_helper.h>
+#include <hector_joy_teleop_plugins/common.h>
 #include <std_msgs/Float64.h>
 #include <std_srvs/Empty.h>
 #include <std_srvs/SetBool.h>
@@ -46,6 +47,7 @@ class ManipulatorTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
   double max_speed_linear_;
   double max_speed_angular_;
   double max_gripper_speed_;
+  ResponseCurveMode response_curve_;
 
   std::string manipulator_command_topic_;
   std::string gripper_command_topic_;

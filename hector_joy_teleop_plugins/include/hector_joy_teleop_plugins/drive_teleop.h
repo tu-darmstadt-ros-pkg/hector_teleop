@@ -3,6 +3,8 @@
 #include <geometry_msgs/Twist.h>
 #include <hector_joy_teleop_plugin_interface/teleop_base.h>
 #include <pluginlib/class_list_macros.h>
+#include <hector_joy_teleop_plugins/common.h>
+
 
 namespace hector_joy_teleop_plugins
 {
@@ -11,11 +13,6 @@ class DriveTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
 {
 
  public:
-   enum ResponseCurveMode {
-     Linear,
-     Parabola
-   };
-
   void initialize(ros::NodeHandle& nh,
                   ros::NodeHandle& pnh,
                   std::shared_ptr<std::map<std::string, double>> property_map,

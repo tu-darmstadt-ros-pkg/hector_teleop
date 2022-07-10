@@ -68,7 +68,6 @@ void ManipulatorTeleop::initialize(ros::NodeHandle& nh,
     move_tc_srv_client_ = pnh.serviceClient<std_srvs::SetBool>(move_tc_srv);
     reset_tc_srv_client_ = pnh.serviceClient<std_srvs::Empty>(reset_tc_srv);
 
-    hold_finished_ = true;
     move_tc_finished_ = true;
 
     // get parameter for switching controllers

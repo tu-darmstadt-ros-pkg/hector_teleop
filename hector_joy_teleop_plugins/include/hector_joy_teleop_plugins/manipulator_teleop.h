@@ -64,7 +64,6 @@ class ManipulatorTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
   bool hold_pose_ = false;
   bool move_tool_center_ = false;
 
-  bool hold_finished_;
   bool move_tc_finished_;
 
   ros::ServiceClient hold_pose_srv_client_;

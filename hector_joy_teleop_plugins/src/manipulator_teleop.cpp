@@ -14,6 +14,20 @@ void ManipulatorTeleop::initialize(ros::NodeHandle& nh,
     max_speed_linear_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "max_speed_linear", 0.1);
     max_speed_angular_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "max_speed_angular", 0.4);
     max_gripper_speed_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "max_gripper_speed", 1);
+    std::string response_curve = pnh_.param<std::string>(getParameterServerPrefix() + "/" + "response_curve", "linear");
+    if (response_curve == "parabola")
+    {
+      response_curve_ = ResponseCurveMode::Parabola;
+    }
+    else if (response_curve == "linear")
+    {
+      response_curve_ = ResponseCurveMode::Linear;
+    }
+    else
+    {
+      ROS_ERROR_NAMED("hector_joy_teleop_with_plugins", "Response curve mode '%s' is unknown. Using linear.", response_curve.c_str());
+      response_curve_ = ResponseCurveMode::Linear;
+    }
 
 
     // get topic names
@@ -203,44 +217,42 @@ geometry_msgs::Twist ManipulatorTeleop::joyToTwist(const sensor_msgs::JoyConstPt
 
 
     // linear
-
     float translate_x_joystick;
     if (getJoyMeasurement("translate_x", msg, translate_x_joystick))
     {
-        twist.linear.x = max_speed_linear_ * translate_x_joystick;
+        twist.linear.x = max_speed_linear_ * applyResponseCurve(translate_x_joystick, response_curve_);
     }
 
     float translate_y_joystick;
     if (getJoyMeasurement("translate_y", msg, translate_y_joystick))
     {
-        twist.linear.y = max_speed_linear_ * translate_y_joystick;
+        twist.linear.y = max_speed_linear_ * applyResponseCurve(translate_y_joystick, response_curve_);
     }
 
     float translate_z_joystick;
     if (getJoyMeasurement("translate_z", msg, translate_z_joystick))
     {
-        twist.linear.z = max_speed_linear_ * translate_z_joystick;
+        twist.linear.z = max_speed_linear_ * applyResponseCurve(translate_z_joystick, response_curve_);
     }
 
 
     // angular
-
     float rotate_x_joystick;
     if (getJoyMeasurement("rotate_roll", msg, rotate_x_joystick))
     {
-        twist.angular.x = max_speed_angular_ * rotate_x_joystick;
+        twist.angular.x = max_speed_angular_ * applyResponseCurve(rotate_x_joystick, response_curve_);
     }
 
     float rotate_y_joystick;
     if (getJoyMeasurement("rotate_pitch", msg, rotate_y_joystick))
     {
-        twist.angular.y = max_speed_angular_ * rotate_y_joystick;
+        twist.angular.y = max_speed_angular_ * applyResponseCurve(rotate_y_joystick, response_curve_);
     }
 
     float rotate_z_joystick;
     if (getJoyMeasurement("rotate_yaw", msg, rotate_z_joystick))
     {
-        twist.angular.z = max_speed_angular_ * rotate_z_joystick;
+        twist.angular.z = max_speed_angular_ * applyResponseCurve(rotate_z_joystick, response_curve_);
     }
 
     return twist;

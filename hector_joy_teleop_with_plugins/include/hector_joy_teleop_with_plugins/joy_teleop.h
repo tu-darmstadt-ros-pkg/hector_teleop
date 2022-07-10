@@ -38,12 +38,12 @@ class JoyTeleop
   /**
    * forward message to all active plugins
    */
-  void JoyCallback(const sensor_msgs::Joy::ConstPtr& msg);
+  void joyCallback(const sensor_msgs::Joy::ConstPtr& msg);
 
   /**
    * Callback for service to load and unload plugins
    */
-  bool LoadPluginServiceCB(hector_joy_teleop_plugin_msgs::LoadTeleopPlugin::Request& request,
+  bool loadPluginServiceCB(hector_joy_teleop_plugin_msgs::LoadTeleopPlugin::Request& request,
                            hector_joy_teleop_plugin_msgs::LoadTeleopPlugin::Response& response);
 
   /**

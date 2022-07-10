@@ -46,9 +46,9 @@ JoyTeleop::JoyTeleop(ros::NodeHandle& nh, ros::NodeHandle& pnh)
     top_plugin_ = std::make_pair(pnh_.param<std::string>("top_plugin", "Profile"), -1);
 
     // setup topics and services
-    joy_sub_ = nh_.subscribe<sensor_msgs::Joy>("joy", 10, &JoyTeleop::JoyCallback, this);
+    joy_sub_ = nh_.subscribe<sensor_msgs::Joy>("joy", 10, &JoyTeleop::joyCallback, this);
 
-    load_plugin_service_ = pnh_.advertiseService("load_plugin", &JoyTeleop::LoadPluginServiceCB, this);
+    load_plugin_service_ = pnh_.advertiseService("load_plugin", &JoyTeleop::loadPluginServiceCB, this);
 
 }
 
@@ -74,7 +74,7 @@ void JoyTeleop::executePeriodically(const ros::Rate& rate)
         }
 
         timed_out_ = true;
-        JoyCallback(zeroMsg);
+        joyCallback(zeroMsg);
 
         ROS_WARN_STREAM_NAMED("hector_joy_teleop_with_plugins", "Timeout! More than " << joy_timeout_ << " seconds since last joy message.");
     }
@@ -88,7 +88,7 @@ void JoyTeleop::executePeriodically(const ros::Rate& rate)
     }
 }
 
-bool JoyTeleop::LoadPluginServiceCB(hector_joy_teleop_plugin_msgs::LoadTeleopPlugin::Request& request,
+bool JoyTeleop::loadPluginServiceCB(hector_joy_teleop_plugin_msgs::LoadTeleopPlugin::Request& request,
                                     hector_joy_teleop_plugin_msgs::LoadTeleopPlugin::Response& response)
 {
 
@@ -260,7 +260,7 @@ bool JoyTeleop::LoadPluginServiceCB(hector_joy_teleop_plugin_msgs::LoadTeleopPlu
 
 }
 
-void JoyTeleop::JoyCallback(const sensor_msgs::JoyConstPtr& msg)
+void JoyTeleop::joyCallback(const sensor_msgs::JoyConstPtr& msg)
 {
     // if timed out, set time to zero instead of now (so that time_out is not checked again until a new joy message is received)
     if(!timed_out_)
@@ -301,7 +301,7 @@ void JoyTeleop::JoyCallback(const sensor_msgs::JoyConstPtr& msg)
     // only forward the message to the other plugins if the top-plugin was not triggered
     if (!top_plugin_executed)
     {
-        // forward message to all active plugins so that they can convert and forward its parts to the respecitve topic/package
+        // forward message to all active plugins so that they can convert and forward its parts to the respective topic/package
         for (auto& plugin : plugins_)
         {
             if (plugin->isActive() && plugin->getPluginName() != top_plugin_.first)

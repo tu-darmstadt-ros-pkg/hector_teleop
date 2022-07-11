@@ -13,6 +13,9 @@ void BehaviorTeleop::initialize(ros::NodeHandle& nh,
                                 std::string plugin_name)
 {
     TeleopBase::initializeBase(nh, pnh, property_map, plugin_name, "hector_joy_teleop_plugins::BehaviorTeleop");
+    if (!action_client_.waitForServer(ros::Duration(1))) {
+      ROS_ERROR_STREAM("Failed to connect to action server '/flexbe/execute_behavior' in 1s.");
+    }
 }
 
 void BehaviorTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)

@@ -32,9 +32,9 @@ void BehaviorTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
         if (msg->axes[behavior.second] != 0)
         {
             name = behavior.first;
-            auto pos_delimiter = name.find(';');
 
             // if there is a semicolon in string check if first or second behavior is requested
+            auto pos_delimiter = name.find(';');
             if (pos_delimiter != std::string::npos)
             {
                 if (msg->axes[behavior.second] < 0)
@@ -60,15 +60,15 @@ void BehaviorTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
     flexbe_msgs::BehaviorExecutionGoal goal;
 
     // if a name was given and no behavior is currently running and no behavior button is pressed, start behavior
-    if (!name.empty() && !behavior_started && !behavior_button_triggered)
+    if (!name.empty() && !behavior_running && !behavior_button_pressed)
     {
         ROS_WARN_STREAM("hector_joy_teleop_with_plugins: Behavior Plugin: Try to start behavior : " + name);
         goal.behavior_name = name;
 
 
         action_client_.sendGoal(goal, boost::bind(&BehaviorTeleop::doneCB, this, _1, _2));
-        behavior_started = true;
-        behavior_button_triggered = true;
+        behavior_running = true;
+        behavior_button_pressed = true;
 
         return;
     }
@@ -77,13 +77,13 @@ void BehaviorTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
     if (name.empty())
     {
         //ROS_WARN_STREAM("Behavior name was empty");
-        if (behavior_started)
+        if (behavior_running)
         {
             ROS_WARN_STREAM("hector_joy_teleop_with_plugins: Behavior Plugin: Cancel goal");
             action_client_.cancelGoal();
         }
 
-        behavior_button_triggered = false;
+        behavior_button_pressed = false;
 
         return;
     }
@@ -98,7 +98,7 @@ void BehaviorTeleop::doneCB(const actionlib::SimpleClientGoalState& state,
         ROS_INFO_STREAM("hector_joy_teleop_with_plugins: Behavior Plugin: Behavior succeeded.");
     }
 
-    behavior_started = false;
+    behavior_running = false;
 }
 
 }

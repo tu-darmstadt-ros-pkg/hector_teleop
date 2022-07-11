@@ -28,9 +28,9 @@ class BehaviorTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
 
   actionlib::SimpleActionClient<flexbe_msgs::BehaviorExecutionAction> action_client_;
 
-  bool behavior_started = false;
+  bool behavior_running = false;
 
-  bool behavior_button_triggered = false;
+  bool behavior_button_pressed = false;
 };
 
 }

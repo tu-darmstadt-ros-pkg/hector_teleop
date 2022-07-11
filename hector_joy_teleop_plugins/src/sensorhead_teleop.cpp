@@ -108,7 +108,7 @@ void SensorheadTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
     float reset_joystick;
     if (getJoyMeasurement("reset", msg, reset_joystick))
     {
-        if (reset_joystick)
+        if (reset_joystick > 0)
         {
             sensorhead_pan_ = 0;
             sensorhead_tilt_ = 0;

@@ -1,4 +1,4 @@
-speed: 0.5
+speed: 0.9
 
 flipper_front_command_topic: /flipper_control/flipper_front_velocity_controller/command
 flipper_back_command_topic: /flipper_control/flipper_back_velocity_controller/command

@@ -121,32 +121,14 @@ void FlipperTeleop::joyToFlipperCommand(const sensor_msgs::JoyConstPtr& msg)
     float front_joystick;
     if (getJoyMeasurement("front", msg, front_joystick))
     {
-        if (front_joystick == 0.0)
-        {
-            flipper_front_command_.data = 0.0;
-        } else if (front_joystick > 0.0)
-        {
-            flipper_front_command_.data = speed_;
-        } else
-        {
-            flipper_front_command_.data = -speed_;
-        }
+        flipper_front_command_.data = front_joystick * speed_;
     }
 
     // back flipper
     float back_joystick;
     if (getJoyMeasurement("back", msg, back_joystick))
     {
-        if (back_joystick == 0.0)
-        {
-            flipper_back_command_.data = 0.0;
-        } else if (back_joystick > 0.0)
-        {
-            flipper_back_command_.data = speed_;
-        } else
-        {
-            flipper_back_command_.data = -speed_;
-        }
+        flipper_back_command_.data = back_joystick * speed_;
     }
 }
 

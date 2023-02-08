@@ -11,6 +11,6 @@ sensorhead_min_pan: -2.37
 
 sensorhead_tilt_inverted: false
 
-sensorhead_command_topic: "set_zoom_cam_twist"
+sensorhead_command_topic: "set_zoom_cam"
 
 use_twist_command : true

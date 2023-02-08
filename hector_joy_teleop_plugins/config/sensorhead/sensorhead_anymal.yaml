@@ -1,0 +1,16 @@
+sensorhead_mode: base_stabilized
+sensorhead_speed: 20.0
+
+# in rad
+sensorhead_max_tilt: 1.12
+sensorhead_min_tilt: -1.46
+
+
+sensorhead_max_pan: 2.40
+sensorhead_min_pan: -2.37
+
+sensorhead_tilt_inverted: false
+
+sensorhead_command_topic: "set_zoom_cam_twist"
+
+use_twist_command : true

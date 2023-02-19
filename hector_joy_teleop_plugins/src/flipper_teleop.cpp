@@ -1,6 +1,8 @@
 
 #include "hector_joy_teleop_plugins/flipper_teleop.h"
 
+
+
 namespace hector_joy_teleop_plugins
 {
 
@@ -103,6 +105,7 @@ void FlipperTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
 
         flipper_front_pub_.publish(flipper_front_command_);
         flipper_back_pub_.publish(flipper_back_command_);
+        //ROS_ERROR("Published front: %f, Published back: %f \n",flipper_front_command_.data,flipper_back_command_.data); 
     } else
     {
         // in reverse mode also reverse button mapping for front and back flippers, hence swap commands (and factors)
@@ -115,22 +118,78 @@ void FlipperTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
 
 }
 
+double f_first,b_first;
+bool f_set,b_set,f_inter,b_inter = false;
+/**
+ * This function checks if a R1 or L1 have been double-clicked and triggers the flipper_auto_lower feature
+ * @param msg the msg of the controller
+ * @param val the value of R1 or L1
+*/
+void trigger_Flipper_auto (const sensor_msgs::JoyConstPtr& msg, float val, std::string dir) {
+    bool* set;
+    bool* inter;
+    double* first;
+    //data-race solution
+    if(dir == "front") {
+        set = &f_set;
+        inter = &f_inter;
+        first = &f_first;
+    } 
+    else {
+        set = &b_set;
+        inter = &b_inter;
+        first = &b_first;
+    }
+    //end data-race solution
+    //init first R1 or L1 value
+    if(!(*set) && val == 1) {
+        *first = msg->header.stamp.toSec();
+        *set = true;
+        return;
+    }
+    //detect if button has been released
+    if((*set) && val == 0) {
+        *inter = true;
+        return;
+    }
+    //compute if second click was fast enough and trigger feature 
+    if((*set) && val == 1) {
+        if((*inter) && (abs((double)(*first) - msg->header.stamp.toSec()) < 0.1)) { //0.1 worked fine but can be changed (time between two clicks)
+            *inter = false;
+            //TODO trigger action 
+           ROS_INFO("Detected double click: %s", dir.c_str());
+        }
+        //setting up method for next event
+        *first = msg->header.stamp.toSec();
+    }
+}
+
+
 void FlipperTeleop::joyToFlipperCommand(const sensor_msgs::JoyConstPtr& msg)
 {
     // front flipper
     float front_joystick;
     if (getJoyMeasurement("front", msg, front_joystick))
-    {
+    {   
+        //ROS_ERROR("Msg front: %f", front_joystick);
+        trigger_Flipper_auto(msg,front_joystick,"front");
         flipper_front_command_.data = front_joystick * speed_;
+       
     }
 
     // back flipper
     float back_joystick;
     if (getJoyMeasurement("back", msg, back_joystick))
     {
+        //ROS_ERROR("Msg back: %f", back_joystick);
+        trigger_Flipper_auto(msg,back_joystick,"back");
         flipper_back_command_.data = back_joystick * speed_;
     }
 }
+
+
+
+
 
 std::string FlipperTeleop::onLoad()
 {

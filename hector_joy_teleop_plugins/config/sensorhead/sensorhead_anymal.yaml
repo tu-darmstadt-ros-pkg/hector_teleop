@@ -1,5 +1,5 @@
 sensorhead_mode: base_stabilized
-sensorhead_speed: 20.0
+sensorhead_speed: 100.0
 
 # in rad
 sensorhead_max_tilt: 1.12

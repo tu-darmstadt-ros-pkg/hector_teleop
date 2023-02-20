@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
         actionlib
         hector_joy_teleop_plugin_interface
         hector_joy_teleop_plugin_msgs
+        flipper_auto_control_msgs
         )
 
 
@@ -27,6 +28,7 @@ catkin_package(
         actionlib
         hector_joy_teleop_plugin_interface
         hector_joy_teleop_plugin_msgs
+        flipper_auto_control_msgs
 )
 
 

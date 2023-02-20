@@ -1,11 +1,17 @@
 
 #include "hector_joy_teleop_plugins/flipper_teleop.h"
 
+#include "flipper_auto_control_msgs/requestAction.h"
+#include "flipper_auto_control_msgs/requestGoal.h"
+#include <actionlib/client/simple_action_client.h>
+#include <actionlib/client/terminal_state.h>
+
 
 
 namespace hector_joy_teleop_plugins
 {
-
+    typedef actionlib::SimpleActionClient<flipper_auto_control_msgs::requestAction> Client;
+    Client client = NULL;
 void FlipperTeleop::initialize(ros::NodeHandle& nh,
                                ros::NodeHandle& pnh,
                                std::shared_ptr<std::map<std::string, double>> property_map,
@@ -62,6 +68,16 @@ void FlipperTeleop::initialize(ros::NodeHandle& nh,
                                           num_tries_switch_controller,
                                           sleep_time,
                                           plugin_name_);
+    //subscribe to action server for flipper_auto_lower_feature
+    client.reset("lower_Flipper",true);
+    ROS_INFO("Waiting for action server (flipper_auto_lower_feature) to start.");
+    if(!client_as.waitForServer(ros::Duration(10))) {
+         ROS_ERROR("Coudln't connect to action server (flipper_auto_lower_feature) in time.");
+    }
+    else{
+        ROS_INFO("Action server started (flipper_auto_lower_feature).");
+    } 
+ 
 
 }
 
@@ -120,6 +136,7 @@ void FlipperTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
 
 double f_first,b_first;
 bool f_set,b_set,f_inter,b_inter = false;
+
 /**
  * This function checks if a R1 or L1 have been double-clicked and triggers the flipper_auto_lower feature
  * @param msg the msg of the controller
@@ -154,13 +171,18 @@ void trigger_Flipper_auto (const sensor_msgs::JoyConstPtr& msg, float val, std::
     }
     //compute if second click was fast enough and trigger feature 
     if((*set) && val == 1) {
-        if((*inter) && (abs((double)(*first) - msg->header.stamp.toSec()) < 0.1)) { //0.1 worked fine but can be changed (time between two clicks)
-            *inter = false;
+        double interval = abs((double)(*first) - msg->header.stamp.toSec());
+        if((*inter) && (interval < 0.1)) { //0.1 worked fine but can be changed (time between two clicks)
             //TODO trigger action 
-           ROS_INFO("Detected double click: %s", dir.c_str());
+            ROS_INFO("Detected double click: %s , within %f", dir.c_str(),interval);
+            flipper_auto_control_msgs::requestGoal goal;
+            goal.flipper = dir; 
+            //(*clientPtr).sendGoalAndWait(goal);
+            //ROS_INFO("passed checkpoint: %s",clientPtr->getState().getText().c_str());
         }
         //setting up method for next event
         *first = msg->header.stamp.toSec();
+        *inter = false;
     }
 }
 

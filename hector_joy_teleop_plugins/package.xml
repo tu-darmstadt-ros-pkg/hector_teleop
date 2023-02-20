@@ -56,6 +56,7 @@
   <depend>hector_joy_teleop_plugin_interface</depend>
   <depend>hector_joy_teleop_plugin_msgs</depend>
   <depend>dynamic_reconfigure</depend>
+  <depend>flipper_auto_control_msgs</depend>
 
 
 

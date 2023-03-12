@@ -10,5 +10,6 @@
         "type_traits": "cpp",
         "chrono": "cpp",
         "complex": "cpp"
-    }
+    },
+    "cmake.sourceDirectory": "${workspaceFolder}/hector_joy_teleop_plugins"
 }

@@ -188,7 +188,7 @@ void FlipperTeleop::triggerFlipperAuto (const sensor_msgs::JoyConstPtr& msg, flo
         double interval = abs((double)(*first) - msg->header.stamp.toSec());
         if((*inter) && (interval < 0.1)) { //0.1 worked fine but can be changed (time between two clicks)
             //ROS_ERROR("Detected double click: %s , within %f", dir.c_str(),interval);
-            flipper_auto_control_msgs::requestGoal goal;
+            flipper_auto_control_msgs::LowerFlipperGoal goal;
             goal.flipper = dir; 
             client_->sendGoal(goal);
             flipper_auto_lower_feature_running_ = true;

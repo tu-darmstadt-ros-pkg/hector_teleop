@@ -7,8 +7,7 @@
 
 #include <hector_joy_teleop_plugins/controller_helper.h>
 
-#include <flipper_auto_control_msgs/requestAction.h>
-#include <flipper_auto_control_msgs/requestGoal.h>
+#include <flipper_auto_control_msgs/LowerFlipperAction.h>
 #include <actionlib/client/terminal_state.h>
 #include <actionlib/client/simple_action_client.h>
 #include <actionlib/client/simple_client_goal_state.h>
@@ -20,14 +19,14 @@ namespace hector_joy_teleop_plugins
 
 class FlipperTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
 {
-typedef actionlib::SimpleActionClient<flipper_auto_control_msgs::requestAction> Client;
+typedef actionlib::SimpleActionClient<flipper_auto_control_msgs::LowerFlipperAction> Client;
  public:
   void initialize(ros::NodeHandle& nh,
                   ros::NodeHandle& pnh,
                   std::shared_ptr<std::map<std::string, double>> property_map,
                   std::string plugin_name) override;
 
-  void forwardMsg(const sensor_msgs::JoyConstPtr& msg) override;
+  void forwardMsg(const sensor_msgs::JoyConstPtr& msg) override;  
 
   
 

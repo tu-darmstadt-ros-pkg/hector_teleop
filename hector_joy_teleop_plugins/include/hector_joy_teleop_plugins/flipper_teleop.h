@@ -7,8 +7,8 @@
 
 #include <hector_joy_teleop_plugins/controller_helper.h>
 
-#include "flipper_auto_control_msgs/requestAction.h"
-#include "flipper_auto_control_msgs/requestGoal.h"
+#include <flipper_auto_control_msgs/requestAction.h>
+#include <flipper_auto_control_msgs/requestGoal.h>
 #include <actionlib/client/terminal_state.h>
 #include <actionlib/client/simple_action_client.h>
 #include <actionlib/client/simple_client_goal_state.h>

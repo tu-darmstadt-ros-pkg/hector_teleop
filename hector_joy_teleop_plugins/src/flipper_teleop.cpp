@@ -64,7 +64,7 @@ void FlipperTeleop::initialize(ros::NodeHandle& nh,
                                           sleep_time,
                                           plugin_name_);
     //subscribe to action server for flipper_auto_lower_feature
-    client_ = new Client("lower_Flipper",true);
+    client_ = new Client("lower_flipper",true);
     
     ROS_INFO("Waiting for action server (flipper_auto_lower_feature) to start.");
     if(!client_->waitForServer(ros::Duration(10))) {
@@ -176,18 +176,22 @@ void FlipperTeleop::triggerFlipperAuto (const sensor_msgs::JoyConstPtr& msg, flo
     if(!(*set) && val == 1) {
         *first = msg->header.stamp.toSec();
         *set = true;
+        //ROS_ERROR("Detected first click with dir: %s", dir.c_str());
         return;
     }
     //detect if button has been released
     if((*set) && val == 0) {
         *inter = true;
+        //ROS_ERROR("Detected intermediate");
         return;
     }
     //compute if second click was fast enough and trigger feature 
     if((*set) && val == 1) {
+        //ROS_ERROR("Detected double click: %s",dir.c_str());
         double interval = abs((double)(*first) - msg->header.stamp.toSec());
-        if((*inter) && (interval < 0.1)) { //0.1 worked fine but can be changed (time between two clicks)
-            //ROS_ERROR("Detected double click: %s , within %f", dir.c_str(),interval);
+        //ROS_ERROR("Detected double click: %s , within %f not sure if inter", dir.c_str(),interval);
+        if((*inter) && (interval < 0.2)) { //0.1 worked fine but can be changed (time between two clicks)
+            ROS_ERROR("Detected double click: %s , within %f", dir.c_str(),interval);
             flipper_auto_control_msgs::LowerFlipperGoal goal;
             goal.flipper = dir; 
             client_->sendGoal(goal);

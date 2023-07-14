@@ -111,22 +111,25 @@ void FlipperTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
     }
 
     // publish
-    if (!reverse_direction)
-    {
-        flipper_front_command_.data *= flipper_front_factor_;
-        flipper_back_command_.data *= flipper_back_factor_;
+    if(!flipper_auto_lower_feature_running_) {
+        if (!reverse_direction)
+        {
+            flipper_front_command_.data *= flipper_front_factor_;
+            flipper_back_command_.data *= flipper_back_factor_;
 
-        flipper_front_pub_.publish(flipper_front_command_);
-        flipper_back_pub_.publish(flipper_back_command_);
-        //ROS_ERROR("Published front: %f, Published back: %f \n",flipper_front_command_.data,flipper_back_command_.data); 
-    } else
-    {
-        // in reverse mode also reverse button mapping for front and back flippers, hence swap commands (and factors)
-        flipper_front_command_.data *= flipper_back_factor_;
-        flipper_back_command_.data *= flipper_front_factor_;
+            flipper_front_pub_.publish(flipper_front_command_);
+            flipper_back_pub_.publish(flipper_back_command_);
+            //ROS_ERROR("Published front: %f, Published back: %f \n",flipper_front_command_.data,flipper_back_command_.data); 
+        } else
+        {
+            // in reverse mode also reverse button mapping for front and back flippers, hence swap commands (and factors)
+            flipper_front_command_.data *= flipper_back_factor_;
+            flipper_back_command_.data *= flipper_front_factor_;
 
-        flipper_front_pub_.publish(flipper_back_command_);
-        flipper_back_pub_.publish(flipper_front_command_);
+            flipper_front_pub_.publish(flipper_back_command_);
+            flipper_back_pub_.publish(flipper_front_command_);
+        }
+
     }
 
 }
@@ -192,10 +195,10 @@ void FlipperTeleop::triggerFlipperAuto (const sensor_msgs::JoyConstPtr& msg, flo
         //ROS_ERROR("Detected double click: %s , within %f not sure if inter", dir.c_str(),interval);
         if((*inter) && (interval < 0.2)) { //0.1 worked fine but can be changed (time between two clicks)
             ROS_ERROR("Detected double click: %s , within %f", dir.c_str(),interval);
+            flipper_auto_lower_feature_running_ = true;
             flipper_auto_control_msgs::LowerFlipperGoal goal;
             goal.flipper = dir; 
             client_->sendGoal(goal);
-            flipper_auto_lower_feature_running_ = true;
         }
     }
     //setting up method for next event

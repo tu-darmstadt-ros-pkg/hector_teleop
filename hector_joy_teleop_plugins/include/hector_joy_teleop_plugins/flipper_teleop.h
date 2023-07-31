@@ -12,7 +12,6 @@ namespace hector_joy_teleop_plugins
 
 class FlipperTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
 {
-
  public:
   void initialize(ros::NodeHandle& nh,
                   ros::NodeHandle& pnh,

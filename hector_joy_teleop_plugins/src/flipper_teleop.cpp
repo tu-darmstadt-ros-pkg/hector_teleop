@@ -11,19 +11,20 @@ void FlipperTeleop::initialize(ros::NodeHandle& nh,
 {
     TeleopBase::initializeBase(nh, pnh, property_map, plugin_name, "hector_joy_teleop_plugins::FlipperTeleop");
 
-    speed_ = pnh_.param<float>(getParameterServerPrefix() + "/" + "speed", 0.0);
+    ros::NodeHandle param_nh(pnh_, getParameterServerPrefix());
+    speed_ = param_nh.param<float>("speed", 0.0);
 
     // factors to adapt commands (e.g. to inverse an axis)
-    flipper_front_factor_ = pnh_.param<float>(getParameterServerPrefix() + "/" + "flipper_front_factor", 1.0);
-    flipper_back_factor_  = pnh_.param<float>(getParameterServerPrefix() + "/" + "flipper_back_factor", 1.0);
+    flipper_front_factor_ = param_nh.param<float>("flipper_front_factor", 1.0);
+    flipper_back_factor_  = param_nh.param<float>("flipper_back_factor", 1.0);
 
 
     // get flipper topics
     flipper_front_command_topic_ =
-        pnh_.param<std::string>(getParameterServerPrefix() + "/" + "flipper_front_command_topic",
+        param_nh.param<std::string>("flipper_front_command_topic",
                                 "/flipper_control/flipper_front_velocity_controller/command");
     flipper_back_command_topic_ =
-        pnh_.param<std::string>(getParameterServerPrefix() + "/" + "flipper_back_command_topic",
+        param_nh.param<std::string>("flipper_back_command_topic",
                                 "/flipper_control/flipper_back_velocity_controller/command");
 
     // init publisher
@@ -35,22 +36,21 @@ void FlipperTeleop::initialize(ros::NodeHandle& nh,
 
     // get names for switching controllers
     standard_controllers_ =
-        pnh_.param<std::vector<std::string>>(getParameterServerPrefix() + "/" + "standard_controllers",
+        param_nh.param<std::vector<std::string>>("standard_controllers",
                                              {});
-    teleop_controllers_ = pnh_.param<std::vector<std::string>>(getParameterServerPrefix() + "/" + "teleop_controllers",
-                                                               {});
+    teleop_controllers_ = param_nh.param<std::vector<std::string>>("teleop_controllers",{});
     // get values for switching controllers
     std::string controller_manager_switch_service =
-        pnh_.param<std::string>(getParameterServerPrefix() + "/" + "controller_manager_switch_service",
+        param_nh.param<std::string>("controller_manager_switch_service",
                                 "/flipper_control/controller_manager/switch_controller");
     std::string controller_manager_list_service =
-        pnh_.param<std::string>(getParameterServerPrefix() + "/" + "controller_manager_list_service",
+        param_nh.param<std::string>("controller_manager_list_service",
                                 "/flipper_control/controller_manager/list_controllers");
 
 
     int num_tries_switch_controller =
-        pnh_.param<int>(getParameterServerPrefix() + "/" + "num_tries_switch_controller", 5);
-    int sleep_time = pnh_.param<int>(getParameterServerPrefix() + "/" + "sleep_between_tries_sec", 1);
+        param_nh.param<int>("num_tries_switch_controller", 5);
+    int sleep_time = param_nh.param<int>("sleep_between_tries_sec", 1);
 
 
     // init ControllerHelper for switching services later

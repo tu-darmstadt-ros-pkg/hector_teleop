@@ -5,6 +5,10 @@ slow_factor: 0.4
 normal_factor: 0.6
 fast_factor: 1
 
+critical_stability_lower_threshold: 1.0
+critical_stability_upper_threshold: 1.2
+stability_margin_topic: /stability_visualization/stability_margin
+
 response_curve: "parabola"
 
 drive_command_topic: "cmd_vel"

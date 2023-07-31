@@ -11,6 +11,8 @@ void DriveTeleop::initialize(ros::NodeHandle& nh,
 {
     TeleopBase::initializeBase(nh, pnh, property_map, plugin_name, "hector_joy_teleop_plugins::DriveTeleop");
 
+    critical_stability_reached_ = false;
+
     // get values from common config file
     ros::NodeHandle param_nh(pnh_, getParameterServerPrefix());
     max_linear_speed_ = param_nh.param<double>("max_linear_speed", 0.0);
@@ -19,6 +21,10 @@ void DriveTeleop::initialize(ros::NodeHandle& nh,
     slow_factor_ = param_nh.param<double>("slow_factor", 0.5);
     normal_factor_ = param_nh.param<double>("normal_factor", 0.75);
     fast_factor_ = param_nh.param<double>("fast_factor", 1.0);
+
+    critical_stability_lower_threshold_ = param_nh.param<double>("critical_stability_lower_threshold", 0.5);
+    critical_stability_upper_threshold_ = param_nh.param<double>("critical_stability_upper_threshold", 0.7);
+    stability_margin_topic_ = param_nh.param<std::string>("stability_margin_topic", "stability_margin");
 
     std::string response_curve = param_nh.param<std::string>("response_curve", "linear");
     if (response_curve == "parabola")
@@ -37,12 +43,13 @@ void DriveTeleop::initialize(ros::NodeHandle& nh,
 
     drive_command_topic_ = param_nh.param<std::string>("drive_command_topic", "cmd_vel");
     drive_pub_ = nh_.advertise<geometry_msgs::Twist>(drive_command_topic_, 10, false);
+    stability_margin_sub_ = nh_.subscribe(stability_margin_topic_, 10, &DriveTeleop::stabilityMarginCallback, this);
 }
 
 void DriveTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
 {
     bool last_command_zero = false;
-    if(drive_command_.linear.x == 0 && drive_command_.angular.z == 0)
+    if (drive_command_.linear.x == 0 && drive_command_.angular.z == 0)
     {
       last_command_zero = true;
     }
@@ -77,7 +84,7 @@ void DriveTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
         drive_command_.linear.x *= slow_factor_;
         drive_command_.angular.z *= slow_factor_;
     }
-    else if(getJoyMeasurement("fast", msg, fast_joystick) && fast_joystick == 1.0)
+    else if (getJoyMeasurement("fast", msg, fast_joystick) && fast_joystick == 1.0)
     {
         drive_command_.linear.x *= fast_factor_;
         drive_command_.angular.z *= fast_factor_;
@@ -88,8 +95,18 @@ void DriveTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
         drive_command_.angular.z *= normal_factor_;
     }
 
+    // Check stability margin
+    if (critical_stability_reached_) {
+      float override_joystick;
+      bool override_button_pressed = getJoyMeasurement("stability_override", msg, override_joystick) && override_joystick == 1.0;
+      if (!override_button_pressed) {
+        drive_command_.linear.x = 0.0;
+        drive_command_.angular.z = 0.0;
+      }
+    }
+
     // only publish a zero command, if last command was not zero to avoid interrupting other controllers
-    if(last_command_zero && drive_command_.linear.x == 0 && drive_command_.angular.z == 0)
+    if (last_command_zero && drive_command_.linear.x == 0 && drive_command_.angular.z == 0)
     {
         return;
     }
@@ -108,6 +125,16 @@ void DriveTeleop::executePeriodically(const ros::Rate& rate)
     {
         drive_pub_.publish(drive_command_);
     }
+}
+void DriveTeleop::stabilityMarginCallback(const std_msgs::Float64ConstPtr& msg)
+{
+  if (msg->data < critical_stability_lower_threshold_)
+  {
+    critical_stability_reached_ = true;
+  } else if (msg->data > critical_stability_upper_threshold_)
+  {
+    critical_stability_reached_ = false;
+  }
 }
 
 }

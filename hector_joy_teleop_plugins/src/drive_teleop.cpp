@@ -12,14 +12,15 @@ void DriveTeleop::initialize(ros::NodeHandle& nh,
     TeleopBase::initializeBase(nh, pnh, property_map, plugin_name, "hector_joy_teleop_plugins::DriveTeleop");
 
     // get values from common config file
-    max_linear_speed_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "max_linear_speed", 0.0);
-    max_angular_speed_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "max_angular_speed", 0.0);
+    ros::NodeHandle param_nh(pnh_, getParameterServerPrefix());
+    max_linear_speed_ = param_nh.param<double>("max_linear_speed", 0.0);
+    max_angular_speed_ = param_nh.param<double>("max_angular_speed", 0.0);
 
-    slow_factor_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "slow_factor", 0.5);
-    normal_factor_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "normal_factor", 0.75);
-    fast_factor_ = pnh_.param<double>(getParameterServerPrefix() + "/" + "fast_factor", 1.0);
+    slow_factor_ = param_nh.param<double>("slow_factor", 0.5);
+    normal_factor_ = param_nh.param<double>("normal_factor", 0.75);
+    fast_factor_ = param_nh.param<double>("fast_factor", 1.0);
 
-    std::string response_curve = pnh_.param<std::string>(getParameterServerPrefix() + "/" + "response_curve", "linear");
+    std::string response_curve = param_nh.param<std::string>("response_curve", "linear");
     if (response_curve == "parabola")
     {
         response_curve_ = ResponseCurveMode::Parabola;
@@ -34,7 +35,7 @@ void DriveTeleop::initialize(ros::NodeHandle& nh,
         response_curve_ = ResponseCurveMode::Linear;
     }
 
-    drive_command_topic_ = pnh_.param<std::string>(getParameterServerPrefix() + "/" + "drive_command_topic", "cmd_vel");
+    drive_command_topic_ = param_nh.param<std::string>("drive_command_topic", "cmd_vel");
     drive_pub_ = nh_.advertise<geometry_msgs::Twist>(drive_command_topic_, 10, false);
 }
 

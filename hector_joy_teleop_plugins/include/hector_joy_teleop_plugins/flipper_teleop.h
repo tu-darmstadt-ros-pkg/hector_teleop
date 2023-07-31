@@ -24,6 +24,8 @@ class FlipperTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
 
   std::string onUnload() override;
 
+  void stabilityMarginCallback(const std_msgs::Float64ConstPtr& msg);
+
  private:
 
   void joyToFlipperCommand(const sensor_msgs::JoyConstPtr& msg);
@@ -32,6 +34,10 @@ class FlipperTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
   float flipper_front_factor_;
   float flipper_back_factor_;
 
+  bool critical_stability_reached_;
+  double critical_stability_lower_threshold_;
+  double critical_stability_upper_threshold_;
+  std::string stability_margin_topic_;
 
   std::string flipper_front_command_topic_;
   std::string flipper_back_command_topic_;
@@ -41,6 +47,8 @@ class FlipperTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
 
   ros::Publisher flipper_front_pub_;
   ros::Publisher flipper_back_pub_;
+
+  ros::Subscriber stability_margin_sub_;
 
 
   std::vector<std::string> standard_controllers_;

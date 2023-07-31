@@ -18,6 +18,11 @@ void FlipperTeleop::initialize(ros::NodeHandle& nh,
     flipper_front_factor_ = param_nh.param<float>("flipper_front_factor", 1.0);
     flipper_back_factor_  = param_nh.param<float>("flipper_back_factor", 1.0);
 
+    // stability margin parameters
+    critical_stability_lower_threshold_ = param_nh.param<double>("critical_stability_lower_threshold", 0.5);
+    critical_stability_upper_threshold_ = param_nh.param<double>("critical_stability_upper_threshold", 0.7);
+    stability_margin_topic_ = param_nh.param<std::string>("stability_margin_topic", "stability_margin");
+
 
     // get flipper topics
     flipper_front_command_topic_ =
@@ -52,6 +57,8 @@ void FlipperTeleop::initialize(ros::NodeHandle& nh,
         param_nh.param<int>("num_tries_switch_controller", 5);
     int sleep_time = param_nh.param<int>("sleep_between_tries_sec", 1);
 
+    stability_margin_sub_ = nh_.subscribe(stability_margin_topic_, 10, &FlipperTeleop::stabilityMarginCallback, this);
+
 
     // init ControllerHelper for switching services later
     controller_helper_ = ControllerHelper(pnh,
@@ -80,6 +87,16 @@ void FlipperTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
     // compute flipper commands
     joyToFlipperCommand(mappedMsg);
 
+    // Check stability margin
+    if (critical_stability_reached_) {
+      float override_joystick;
+      bool override_button_pressed = getJoyMeasurement("stability_override", msg, override_joystick, false)
+                                     && override_joystick == 1.0;
+      if (!override_button_pressed) {
+        flipper_front_command_.data = 0.0;
+        flipper_back_command_.data = 0.0;
+      }
+    }
 
     // check if current command is zero
     bool current_cmd_zero = abs(flipper_front_command_.data) < 0.05 && abs(flipper_back_command_.data) < 0.05;
@@ -140,6 +157,17 @@ std::string FlipperTeleop::onLoad()
 std::string FlipperTeleop::onUnload()
 {
     return controller_helper_.switchControllers(standard_controllers_, teleop_controllers_);
+}
+
+void FlipperTeleop::stabilityMarginCallback(const std_msgs::Float64ConstPtr& msg)
+{
+  if (msg->data < critical_stability_lower_threshold_)
+  {
+    critical_stability_reached_ = true;
+  } else if (msg->data > critical_stability_upper_threshold_)
+  {
+    critical_stability_reached_ = false;
+  }
 }
 
 }

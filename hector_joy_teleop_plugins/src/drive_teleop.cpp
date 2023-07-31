@@ -79,12 +79,12 @@ void DriveTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
 
     // compute slow / normal / fast linear and angular speed
     float slow_joystick, fast_joystick;
-    if (getJoyMeasurement("slow", msg, slow_joystick) && slow_joystick == 1.0)
+    if (getJoyMeasurement("slow", msg, slow_joystick, false) && slow_joystick == 1.0)
     {
         drive_command_.linear.x *= slow_factor_;
         drive_command_.angular.z *= slow_factor_;
     }
-    else if (getJoyMeasurement("fast", msg, fast_joystick) && fast_joystick == 1.0)
+    else if (getJoyMeasurement("fast", msg, fast_joystick, false) && fast_joystick == 1.0)
     {
         drive_command_.linear.x *= fast_factor_;
         drive_command_.angular.z *= fast_factor_;
@@ -98,7 +98,8 @@ void DriveTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
     // Check stability margin
     if (critical_stability_reached_) {
       float override_joystick;
-      bool override_button_pressed = getJoyMeasurement("stability_override", msg, override_joystick) && override_joystick == 1.0;
+      bool override_button_pressed = getJoyMeasurement("stability_override", msg, override_joystick, false) &&
+                                     override_joystick == 1.0;
       if (!override_button_pressed) {
         drive_command_.linear.x = 0.0;
         drive_command_.angular.z = 0.0;

@@ -6,8 +6,8 @@ flipper_back_command_topic: /flipper_control/flipper_back_velocity_controller/co
 controller_manager_switch_service: /flipper_control/controller_manager/switch_controller
 controller_manager_list_service: /flipper_control/controller_manager/list_controllers
 
-critical_stability_lower_threshold: 0.5
-critical_stability_upper_threshold: 0.7
+critical_stability_lower_threshold: -100
+critical_stability_upper_threshold: -100
 stability_margin_topic: /stability_visualization/stability_margin
 
 standard_controllers:

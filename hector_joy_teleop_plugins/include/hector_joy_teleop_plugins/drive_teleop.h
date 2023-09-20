@@ -21,8 +21,6 @@ class DriveTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
 
   void forwardMsg(const sensor_msgs::JoyConstPtr& msg) override;
 
-  void executePeriodically(const ros::Rate& rate) override;
-
   void stabilityMarginCallback(const std_msgs::Float64ConstPtr& msg);
 
  private:

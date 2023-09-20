@@ -116,17 +116,6 @@ void DriveTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
     drive_pub_.publish(drive_command_);
 }
 
-void DriveTeleop::executePeriodically(const ros::Rate& rate)
-{
-    // The publishing needs to be done here, as the joy messages are published only once when holding a joystick at a
-    // fixed position. So if the drive message is only send once, after a timeout of a few seconds the robot stops as
-    // there are no new commands. Not done for zero commands to avoid disturbing other modules sending on cmd_vel.
-
-    if (drive_command_.linear.x != 0.0 || drive_command_.angular.z != 0.0)
-    {
-        drive_pub_.publish(drive_command_);
-    }
-}
 void DriveTeleop::stabilityMarginCallback(const std_msgs::Float64ConstPtr& msg)
 {
   if (msg->data < critical_stability_lower_threshold_)

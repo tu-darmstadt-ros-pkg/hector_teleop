@@ -22,9 +22,10 @@ void DriveTeleop::initialize(ros::NodeHandle& nh,
     normal_factor_ = param_nh.param<double>("normal_factor", 0.75);
     fast_factor_ = param_nh.param<double>("fast_factor", 1.0);
 
-    critical_stability_lower_threshold_ = param_nh.param<double>("critical_stability_lower_threshold", 0.5);
-    critical_stability_upper_threshold_ = param_nh.param<double>("critical_stability_upper_threshold", 0.7);
-    stability_margin_topic_ = param_nh.param<std::string>("stability_margin_topic", "stability_margin");
+    bool use_stability_assistance =
+        param_nh.getParam("critical_stability_lower_threshold", critical_stability_lower_threshold_) &&
+        param_nh.getParam("critical_stability_upper_threshold", critical_stability_upper_threshold_) &&
+        param_nh.getParam("stability_margin_topic", stability_margin_topic_);
 
     std::string response_curve = param_nh.param<std::string>("response_curve", "linear");
     if (response_curve == "parabola")
@@ -43,7 +44,10 @@ void DriveTeleop::initialize(ros::NodeHandle& nh,
 
     drive_command_topic_ = param_nh.param<std::string>("drive_command_topic", "cmd_vel");
     drive_pub_ = nh_.advertise<geometry_msgs::Twist>(drive_command_topic_, 10, false);
-    stability_margin_sub_ = nh_.subscribe(stability_margin_topic_, 10, &DriveTeleop::stabilityMarginCallback, this);
+
+    if (use_stability_assistance) {
+      stability_margin_sub_ = nh_.subscribe(stability_margin_topic_, 10, &DriveTeleop::stabilityMarginCallback, this);
+    }
 }
 
 void DriveTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)

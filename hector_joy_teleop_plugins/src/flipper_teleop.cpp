@@ -19,9 +19,10 @@ void FlipperTeleop::initialize(ros::NodeHandle& nh,
     flipper_back_factor_  = param_nh.param<float>("flipper_back_factor", 1.0);
 
     // stability margin parameters
-    critical_stability_lower_threshold_ = param_nh.param<double>("critical_stability_lower_threshold", 0.5);
-    critical_stability_upper_threshold_ = param_nh.param<double>("critical_stability_upper_threshold", 0.7);
-    stability_margin_topic_ = param_nh.param<std::string>("stability_margin_topic", "stability_margin");
+    bool use_stability_assistance =
+        param_nh.getParam("critical_stability_lower_threshold", critical_stability_lower_threshold_) &&
+        param_nh.getParam("critical_stability_upper_threshold", critical_stability_upper_threshold_) &&
+        param_nh.getParam("stability_margin_topic", stability_margin_topic_);
 
 
     // get flipper topics
@@ -57,8 +58,9 @@ void FlipperTeleop::initialize(ros::NodeHandle& nh,
         param_nh.param<int>("num_tries_switch_controller", 5);
     int sleep_time = param_nh.param<int>("sleep_between_tries_sec", 1);
 
-    stability_margin_sub_ = nh_.subscribe(stability_margin_topic_, 10, &FlipperTeleop::stabilityMarginCallback, this);
-
+    if (use_stability_assistance) {
+      stability_margin_sub_ = nh_.subscribe(stability_margin_topic_, 10, &FlipperTeleop::stabilityMarginCallback, this);
+    }
 
     // init ControllerHelper for switching services later
     controller_helper_ = ControllerHelper(pnh,

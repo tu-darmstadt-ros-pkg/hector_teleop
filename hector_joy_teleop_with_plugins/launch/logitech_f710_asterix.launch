@@ -5,7 +5,7 @@
   <arg name="command_topic" unless="$(arg use_stability_assistance)"  value="command"/>
   <arg name="command_topic" if="$(arg use_stability_assistance)"      value="command_unlimited"/>
 
-  <node name="hector_joy_teleop_with_plugins" pkg="hector_joy_teleop_with_plugins" type="hector_joy_teleop_with_plugins_node" respawn="true" output="screen">
+  <node name="hector_joy_teleop_with_plugins" pkg="hector_joy_teleop_with_plugins" type="hector_joy_teleop_with_plugins_node" respawn="true" output="screen" clear_params="true">
 
     <rosparam file="$(find hector_joy_teleop_with_plugins)/config/f710.yaml" />
     <rosparam file="$(find hector_joy_teleop_with_plugins)/config/asterix_plugins.yaml" />

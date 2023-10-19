@@ -4,7 +4,6 @@
 
 
 
-
 namespace hector_joy_teleop_plugins
 {
 void FlipperTeleop::initialize(ros::NodeHandle& nh,
@@ -68,7 +67,7 @@ void FlipperTeleop::initialize(ros::NodeHandle& nh,
     
     ROS_INFO("Waiting for action server (flipper_auto_lower_feature) to start.");
     if(!client_->waitForServer(ros::Duration(10))) {
-         ROS_ERROR("Couldn't connect to action server (flipper_auto_lower_feature) in time.");
+        ROS_ERROR("Couldn't connect to action server (flipper_auto_lower_feature) in time.");
          flipper_auto_lower_feature_ = false;
     }
     else{
@@ -137,94 +136,96 @@ void FlipperTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
 
 
 
-void FlipperTeleop::triggerFlipperAuto (const sensor_msgs::JoyConstPtr& msg, float val, std::string dir) {
-    bool* set;
-    bool* inter;
-    double* first;
-    //data-race solution
-    if(dir == "front") {
-        set = &f_set_;
-        inter = &f_inter_;
-        first = &f_first_;
-    } 
-    else {
-        set = &b_set_;
-        inter = &b_inter_;
-        first = &b_first_;
-    }
-    //end data-race solution
-    //check if action is already in progress and it needs to be canceled
-    if(flipper_auto_lower_feature_running_) {
-        if(val) {
-            client_->cancelAllGoals();
-            //client_->waitForResult() does this work?
-            ROS_INFO("Goal canceled successfully (flipper_auto_lower_feature).");
-            //setting up method for next event
-            *first = msg->header.stamp.toSec();
-            *inter = false;
-            flipper_auto_lower_feature_running_ = false;
-            return;
-        }
-        if(client_->getState() == actionlib::SimpleClientGoalState::SUCCEEDED || client_->getState() == actionlib::SimpleClientGoalState::ABORTED) {
-            //setting up method for next event
-            *first = msg->header.stamp.toSec();
-            *inter = false;
-            flipper_auto_lower_feature_running_ = false;
-            return;
-        }
-        //still running -> do nothing
-        return;
-    }
-    //init first R1 or L1 value
-    if(!(*set) && val == 1) {
-        *first = msg->header.stamp.toSec();
-        *set = true;
-        //ROS_ERROR("Detected first click with dir: %s", dir.c_str());
-        return;
-    }
-    //detect if button has been released
-    if((*set) && val == 0) {
-        *inter = true;
-        //ROS_ERROR("Detected intermediate");
-        return;
-    }
-    //compute if second click was fast enough and trigger feature 
-    if((*inter) && (*set) && val == 1) {
-        //ROS_ERROR("Detected double click: %s",dir.c_str());
-        double interval = abs((double)(*first) - msg->header.stamp.toSec());
-        //ROS_ERROR("Detected double click: %s , within %f not sure if inter", dir.c_str(),interval);
-        if(interval < 0.2) { //0.1 worked fine but can be changed (time between two clicks)
-            ROS_ERROR("Detected double click: %s , within %f", dir.c_str(),interval);
-            flipper_auto_lower_feature_running_ = true;
-            flipper_auto_control_msgs::LowerFlipperGoal goal;
-            goal.flipper = dir; 
-            client_->sendGoal(goal);
-        }
-    }
-    //setting up method for next event
-    *first = msg->header.stamp.toSec();
-    *inter = false;
+void FlipperTeleop::triggerFlipperAuto (std::vector<float> val) {
+    std::cout << "cross " << val[0] << " r2 " << val[1] << " r1 " << val[2] << " l2 " << val[3] << " l1 " << val[4] << std::endl;
+    // bool* volatile set;
+    // bool* volatile inter;
+    // double* volatile first;
+    // //data-race solution
+    // if(dir == "front") {
+    //     set = &f_set_;
+    //     inter = &f_inter_;
+    //     first = &f_first_;
+    // } 
+    // else {
+    //     set = &b_set_;
+    //     inter = &b_inter_;
+    //     first = &b_first_;
+    // }
+    // //end data-race solution
+    // //check if action is already in progress and it needs to be canceled
+    // if(flipper_auto_lower_feature_running_) {
+    //     if(val) {
+    //         client_->cancelAllGoals();
+    //         //client_->waitForResult() does this work?
+    //         ROS_INFO("Goal canceled successfully (flipper_auto_lower_feature).");
+    //         //setting up method for next event
+    //         *first = msg->header.stamp.toSec();
+    //         *inter = false;
+    //         flipper_auto_lower_feature_running_ = false;
+    //         return;
+    //     }
+    //     if(client_->getState() == actionlib::SimpleClientGoalState::SUCCEEDED || client_->getState() == actionlib::SimpleClientGoalState::ABORTED) {
+    //         //setting up method for next event
+    //         *first = msg->header.stamp.toSec();
+    //         *inter = false;
+    //         flipper_auto_lower_feature_running_ = false;
+    //         return;
+    //     }
+    //     //still running -> do nothing
+    //     return;
+    // }
+    // //init first R1 or L1 value
+    // if(!(*set) && val == 1) {
+    //     *first = msg->header.stamp.toSec();
+    //     *set = true;
+    //     ROS_ERROR("Detected first click with dir: %s", dir.c_str());
+    //     return;
+    // }
+    // //detect if button has been released
+    // if((*set) && val == 0) {
+    //     *inter = true;
+    //     //ROS_ERROR("Detected intermediate");
+    //     return;
+    // }
+    // //std::cout << *inter << std::endl;
+    // //compute if second click was fast enough and trigger feature 
+    // if((*inter) && (*set) && val == 1) {
+    //     //ROS_ERROR("Detected double click: %s",dir.c_str());
+    //     double interval = abs((double)(*first) - msg->header.stamp.toSec());
+    //     //ROS_ERROR("Detected double click: %s , within %f not sure if inter", dir.c_str(),interval);
+    //     if(interval < 0.2) { //0.1 worked fine but can be changed (time between two clicks)
+    //         ROS_ERROR("Detected double click: %s , within %f", dir.c_str(),interval);
+    //         flipper_auto_lower_feature_running_ = true;
+    //         flipper_auto_control_msgs::LowerFlipperGoal goal;
+    //         goal.flipper = dir; 
+    //         client_->sendGoal(goal);
+    //     }
+    // }
+    // //setting up method for next event
+    // *first = msg->header.stamp.toSec();
+    // *inter = false;
 }
 
 
 void FlipperTeleop::joyToFlipperCommand(const sensor_msgs::JoyConstPtr& msg)
 {
+    //flipper auto lower feature
+    float cross_down, trigger_right,trigger_left,button_right,button_left;
+    //if(flipper_auto_lower_feature_ && getJoyMeasurement("cross_down_up",msg,cross_down) && (getJoyMeasurement("front_dec",msg,trigger_right) || getJoyMeasurement("back_dec",msg,trigger_left)) && (getJoyMeasurement("back_inc",msg,button_left) || getJoyMeasurement("front_inc",msg,button_right))) {
+    //    FlipperTeleop::triggerFlipperAuto(std::vector<float>({cross_down,trigger_right,button_right,trigger_left,button_left}));
+    //}
     // front flipper
     float front_joystick;
     if (getJoyMeasurement("front", msg, front_joystick))
     {   
-        if(flipper_auto_lower_feature_)
-            FlipperTeleop::triggerFlipperAuto(msg,front_joystick,"front");
         flipper_front_command_.data = front_joystick * speed_;
-       
     }
 
     // back flipper
     float back_joystick;
     if (getJoyMeasurement("back", msg, back_joystick))
     {
-        if(flipper_auto_lower_feature_)
-            FlipperTeleop::triggerFlipperAuto(msg,back_joystick,"back");
         flipper_back_command_.data = back_joystick * speed_;
     }
 }

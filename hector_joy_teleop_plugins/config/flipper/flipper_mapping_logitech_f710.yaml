@@ -21,7 +21,7 @@ axes:
   - ""  # 4: right joystick: down/up
   - "front_dec"  # 5: RT
   - ""  # 6: cross: right/left
-  - ""  # 7: cross: down/up
+  - "cross_down_up"  # 7: cross: down/up
 
 
 buttons:

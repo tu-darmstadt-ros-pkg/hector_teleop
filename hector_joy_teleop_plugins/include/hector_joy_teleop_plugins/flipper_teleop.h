@@ -12,6 +12,8 @@
 #include <actionlib/client/simple_action_client.h>
 #include <actionlib/client/simple_client_goal_state.h>
 
+//debug
+#include <iostream>
 
 
 namespace hector_joy_teleop_plugins
@@ -43,7 +45,7 @@ typedef actionlib::SimpleActionClient<flipper_auto_control_msgs::LowerFlipperAct
   * @param msg the msg of the controller
   * @param val the value of R1 or L1
   */
-  void triggerFlipperAuto (const sensor_msgs::JoyConstPtr& msg, float val, std::string dir);
+  void triggerFlipperAuto (std::vector<float> val);
 
   float speed_;
   float flipper_front_factor_;

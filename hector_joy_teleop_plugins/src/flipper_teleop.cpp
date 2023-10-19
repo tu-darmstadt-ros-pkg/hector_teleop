@@ -64,7 +64,7 @@ void FlipperTeleop::initialize(ros::NodeHandle& nh,
                                           plugin_name_);
     //subscribe to action server for flipper_auto_lower_feature
     client_ = new Client("lower_flipper",true);
-    
+    //TODO -> comment in the block
     ROS_INFO("Waiting for action server (flipper_auto_lower_feature) to start.");
     if(!client_->waitForServer(ros::Duration(10))) {
         ROS_ERROR("Couldn't connect to action server (flipper_auto_lower_feature) in time.");
@@ -137,7 +137,44 @@ void FlipperTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
 
 
 void FlipperTeleop::triggerFlipperAuto (std::vector<float> val) {
-    std::cout << "cross " << val[0] << " r2 " << val[1] << " r1 " << val[2] << " l2 " << val[3] << " l1 " << val[4] << std::endl;
+    //std::cout << "cross " << val[0] << " r2 " << val[1] << " r1 " << val[2] << " l2 " << val[3] << " l1 " << val[4] << std::endl; //corss -1, rest 1
+    if(flipper_auto_lower_feature_running_)  {
+        //check if action is already running and needs to be canceled
+        if(val[2] || val[4]) {
+            std::cout << " r2: " << val[1] << " r1: " << val[2] << " l2: " << val[3] << " l1: " << val[4] << std::endl;
+            client_->cancelAllGoals();
+            ROS_INFO("Goal canceled successfully (flipper_auto_lower_feature).");
+            flipper_auto_lower_feature_running_ = false;
+            return;
+        }
+        //check if action is finished or has been aborted
+        if(client_->getState() == actionlib::SimpleClientGoalState::SUCCEEDED || client_->getState() == actionlib::SimpleClientGoalState::ABORTED) {
+            //setting up method for next event
+            flipper_auto_lower_feature_running_ = false;
+            return;
+        }
+        //action still running -> to nothing
+        return;
+    }
+    //check if feature is to be triggered
+    if(val[0] == -1) {
+        if(val[1] == 1 && val[2] == 0 && val[3] == 0 && val[4] == 0) {
+            flipper_auto_lower_feature_running_ = true;
+            flipper_auto_control_msgs::LowerFlipperGoal goal;
+             goal.flipper = "front"; 
+             client_->sendGoal(goal);
+             return;
+        }
+        if(val[1] == 0 && val[2] == 0 && val[3] == 1 && val[4] == 0) {
+            flipper_auto_lower_feature_running_ = true;
+            flipper_auto_control_msgs::LowerFlipperGoal goal;
+             goal.flipper = "back"; 
+             client_->sendGoal(goal);
+             return;
+        }
+    }
+
+
     // bool* volatile set;
     // bool* volatile inter;
     // double* volatile first;
@@ -212,9 +249,9 @@ void FlipperTeleop::joyToFlipperCommand(const sensor_msgs::JoyConstPtr& msg)
 {
     //flipper auto lower feature
     float cross_down, trigger_right,trigger_left,button_right,button_left;
-    //if(flipper_auto_lower_feature_ && getJoyMeasurement("cross_down_up",msg,cross_down) && (getJoyMeasurement("front_dec",msg,trigger_right) || getJoyMeasurement("back_dec",msg,trigger_left)) && (getJoyMeasurement("back_inc",msg,button_left) || getJoyMeasurement("front_inc",msg,button_right))) {
-    //    FlipperTeleop::triggerFlipperAuto(std::vector<float>({cross_down,trigger_right,button_right,trigger_left,button_left}));
-    //}
+    if(flipper_auto_lower_feature_ && getJoyMeasurement("cross_down_up",msg,cross_down) && getJoyMeasurement("front_dec",msg,trigger_right) && getJoyMeasurement("back_dec",msg,trigger_left) && getJoyMeasurement("back_inc",msg,button_left) && getJoyMeasurement("front_inc",msg,button_right)) {
+        FlipperTeleop::triggerFlipperAuto(std::vector<float>({cross_down,trigger_right,button_right,trigger_left,button_left}));
+    }
     // front flipper
     float front_joystick;
     if (getJoyMeasurement("front", msg, front_joystick))

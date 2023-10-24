@@ -2,7 +2,7 @@ max_linear_speed: 1.0
 max_angular_speed: 1.0
 
 slow_factor: 0.2
-normal_factor: 0.4
+normal_factor: 0.6
 fast_factor: 1
 
 drive_command_topic: "cmd_vel"

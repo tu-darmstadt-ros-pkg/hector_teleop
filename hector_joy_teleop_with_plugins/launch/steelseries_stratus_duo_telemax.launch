@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+
+<launch>
+  <node name="hector_joy_teleop_with_plugins" pkg="hector_joy_teleop_with_plugins" type="hector_joy_teleop_with_plugins_node" respawn="true" output="screen">
+
+    <rosparam file="$(find hector_joy_teleop_with_plugins)/config/f710.yaml" />
+    <rosparam file="$(find hector_joy_teleop_with_plugins)/config/telemax_plugins.yaml" />
+
+    <!-- Behavior Teleop Plugin Parameter -->
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/behavior/behavior_common.yaml" ns="hector_joy_teleop_plugins/BehaviorTeleop/FlipperPoses" />
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/behavior/behavior_mapping_flipper_poses_steelseries_stratus_duo_telemax.yaml" ns="hector_joy_teleop_plugins/BehaviorTeleop/FlipperPoses" />
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/behavior/behavior_common.yaml" ns="hector_joy_teleop_plugins/BehaviorTeleop/ManipulatorPoses" />
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/behavior/behavior_mapping_man_poses_steelseries_stratus_duo_telemax.yaml" ns="hector_joy_teleop_plugins/BehaviorTeleop/ManipulatorPoses" />
+    
+    <!-- Change profile Plugin Parameter -->
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/profile/profile_telemax.yaml" ns="hector_joy_teleop_plugins/ChangeProfile/Profile" />
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/profile/profile_mapping_steelseries_stratus_duo.yaml" ns="hector_joy_teleop_plugins/ChangeProfile/Profile" />
+
+    <!-- Drive Teleop Plugin Parameter -->
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/drive/drive_telemax.yaml" ns="hector_joy_teleop_plugins/DriveTeleop/Drive" />
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/drive/drive_mapping_steelseries_stratus_duo.yaml" ns="hector_joy_teleop_plugins/DriveTeleop/Drive" />
+
+    <!-- Flipper Teleop Plugin Parameter -->
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/flipper/flipper_telemax.yaml" ns="hector_joy_teleop_plugins/FlipperTeleop/Flipper" />
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/flipper/flipper_mapping_steelseries_stratus_duo.yaml" ns="hector_joy_teleop_plugins/FlipperTeleop/Flipper" />
+
+    <!-- Manage properties Plugin Parameter -->
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/properties/properties_common.yaml" ns="hector_joy_teleop_plugins/ManageProperties/Properties" />
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/properties/properties_mapping_steelseries_stratus_duo.yaml" ns="hector_joy_teleop_plugins/ManageProperties/Properties" />
+    
+    <!-- Manipulator Teleop Plugin Parameter -->
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/manipulator/manipulator_telemax.yaml" ns="hector_joy_teleop_plugins/ManipulatorTeleop/Manipulator" />
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/manipulator/manipulator_mapping_steelseries_stratus_duo.yaml" ns="hector_joy_teleop_plugins/ManipulatorTeleop/Manipulator" />
+
+    <!-- Sensorhead Teleop Plugin Parameter -->
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/sensorhead/sensorhead_common.yaml" ns="hector_joy_teleop_plugins/SensorheadTeleop/Sensorhead" />
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/sensorhead/sensorhead_mapping_steelseries_stratus_duo.yaml" ns="hector_joy_teleop_plugins/SensorheadTeleop/Sensorhead" />
+
+    <!-- Image Projection Plugin Parameter -->
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/image_projection/image_projection_common.yaml" ns="hector_joy_teleop_plugins/ImageProjectionTeleop/ImageProjection" />
+    <rosparam file="$(find hector_joy_teleop_plugins)/config/image_projection/image_projection_mapping_steelseries_stratus_duo.yaml" ns="hector_joy_teleop_plugins/ImageProjectionTeleop/ImageProjection" />
+  </node>
+
+  <!-- Load initial plugins (the service call with parameter wait will be executed when the service is available) -->
+  <node pkg="rosservice" type="rosservice" name="LoadPluginProfile" args="call --wait /hector_joy_teleop_with_plugins/load_plugin &quot;{plugin_name: 'Profile', load: true}&quot;" />
+
+</launch>

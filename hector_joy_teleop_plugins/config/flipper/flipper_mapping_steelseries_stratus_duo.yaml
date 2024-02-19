@@ -17,9 +17,9 @@ axes:
   - ""  # 0: left joystick: right/left
   - ""  # 1: left joystick: down/up  
   - ""  # 2: right joystick: right/left
-  - ""  # 3: right joystick: down/up
-  - "back_dec"  # 4: LT
-  - "front_dec" # 5: RT
+  - ""  # 3: right joystick: down/up 
+  - "front_dec" # 4: RT
+  - "back_dec"  # 5: LT
   - ""  # 6: cross: right/left
   - ""  # 7: cross: down/up
 

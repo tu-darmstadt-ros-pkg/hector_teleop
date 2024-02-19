@@ -47,6 +47,8 @@ add_executable(${PROJECT_NAME}_node src/joy_teleop_node.cpp)
 add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
 
+catkin_add_env_hooks(50.export.controller.config SHELLS bash)
+
 
 install(DIRECTORY
         launch

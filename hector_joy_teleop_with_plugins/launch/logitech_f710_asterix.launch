@@ -3,7 +3,10 @@
 <launch>
   <arg name="use_stability_assistance" default="$(optenv HECTOR_USE_STABILITY_ASSISTANCE false)"/>
   <arg name="command_topic" unless="$(arg use_stability_assistance)"  value="command"/>
-  <arg name="command_topic" if="$(arg use_stability_assistance)"      value="command_unlimited"/>
+  <arg name="command_topic" if="$(arg use_stability_assistance)"      value="command_delay"/>
+
+  <!-- network delay simulator -->
+  <include file="$(find hector_joy_teleop_with_plugins)/launch/control_delay.launch"/>
 
   <node name="hector_joy_teleop_with_plugins" pkg="hector_joy_teleop_with_plugins" type="hector_joy_teleop_with_plugins_node" respawn="true" output="screen" clear_params="true">
 

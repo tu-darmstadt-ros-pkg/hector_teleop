@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<launch>
+  <arg name="delay" default="0.2"/>
+  <arg name="jitter" default="0.08"/>
+
+    <!-- network delay simulator -->
+    <node name="cmd_vel_delay" pkg="nodelet" type="nodelet"
+          args="standalone message_delay/MessageDelay" output="screen">
+        <remap from="topic_in" to="/cmd_vel_delay"/>
+        <remap from="topic_out" to="/cmd_vel"/>
+        <param name="delay" value="$(arg delay)"/>
+        <param name="jitter" value="$(arg jitter)"/>
+    </node>
+
+      <node name="flipper_front_velocity_delay" pkg="nodelet" type="nodelet"
+          args="standalone message_delay/MessageDelay" output="screen">
+        <remap from="topic_in" to="/flipper_control/flipper_front_velocity_controller/command_delay"/>
+        <remap from="topic_out" to="/flipper_control/flipper_front_velocity_controller/command_unlimited"/>
+        <param name="delay" value="$(arg delay)"/>
+        <param name="jitter" value="$(arg jitter)"/>
+    </node>
+
+    <node name="back_front_velocity_delay" pkg="nodelet" type="nodelet"
+          args="standalone message_delay/MessageDelay" output="screen">
+      <remap from="topic_in" to="/flipper_control/flipper_back_velocity_controller/command_delay"/>
+      <remap from="topic_out" to="/flipper_control/flipper_back_velocity_controller/command_unlimited"/>
+      <param name="delay" value="$(arg delay)"/>
+      <param name="jitter" value="$(arg jitter)"/>
+    </node>
+</launch>

@@ -1,9 +1,9 @@
 max_linear_speed: 1.0
-max_angular_speed: 1.5
+max_angular_speed: 2.0
 
-slow_factor: 0.4
-normal_factor: 0.6
-fast_factor: 1
+slow_factor: 0.2
+normal_factor: 0.4
+fast_factor: 0.6
 
 #critical_stability_lower_threshold: 0.5
 #critical_stability_upper_threshold: 0.7

@@ -28,7 +28,7 @@ buttons:
   - fast         # 0: A
   - ""           # 1: B
   - slow         # 2: X
-  - stability_override # 3: Y
+  - whole_body_assistance # 3: Y
   - ""           # 4: LB
   - ""           # 5: RB
   - ""           # 6: back

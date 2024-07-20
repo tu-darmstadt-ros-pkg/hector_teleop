@@ -1,6 +1,8 @@
 
 #include "hector_joy_teleop_plugins/drive_teleop.h"
 
+#include  <std_msgs/Bool.h>
+
 namespace hector_joy_teleop_plugins
 {
 
@@ -12,6 +14,7 @@ void DriveTeleop::initialize(ros::NodeHandle& nh,
     TeleopBase::initializeBase(nh, pnh, property_map, plugin_name, "hector_joy_teleop_plugins::DriveTeleop");
 
     critical_stability_reached_ = false;
+    wb_assistance_enabled_ = false;
 
     // get values from common config file
     ros::NodeHandle param_nh(pnh_, getParameterServerPrefix());
@@ -44,7 +47,11 @@ void DriveTeleop::initialize(ros::NodeHandle& nh,
 
     drive_command_topic_ = param_nh.param<std::string>("drive_command_topic", "cmd_vel");
     drive_pub_ = nh_.advertise<geometry_msgs::Twist>(drive_command_topic_, 10, false);
-
+    std::string wb_assistance_enable_topic;
+    bool use_wb_assistance = param_nh.getParam("wb_assistance_enable_topic", wb_assistance_enable_topic);
+    if (use_wb_assistance) {
+      wb_assistance_enable_pub_ = nh_.advertise<std_msgs::Bool>(wb_assistance_enable_topic, 10, false);
+    }
     if (use_stability_assistance) {
       stability_margin_sub_ = nh_.subscribe(stability_margin_topic_, 10, &DriveTeleop::stabilityMarginCallback, this);
     }
@@ -108,6 +115,17 @@ void DriveTeleop::forwardMsg(const sensor_msgs::JoyConstPtr& msg)
         drive_command_.linear.x = 0.0;
         drive_command_.angular.z = 0.0;
       }
+    }
+
+    // Whole-body assistance
+    float whole_body_assistance;
+    bool enable_wb_assistance_pressed = getJoyMeasurement("whole_body_assistance", msg, whole_body_assistance, false) &&
+        whole_body_assistance == 1.0;
+    if (enable_wb_assistance_pressed != wb_assistance_enabled_) {
+      wb_assistance_enabled_ = enable_wb_assistance_pressed;
+      std_msgs::Bool bool_msg;
+      bool_msg.data = enable_wb_assistance_pressed;
+      wb_assistance_enable_pub_.publish(bool_msg);
     }
 
     // only publish a zero command, if last command was not zero to avoid interrupting other controllers

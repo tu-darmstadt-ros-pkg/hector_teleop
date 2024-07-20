@@ -31,14 +31,19 @@ class DriveTeleop : public hector_joy_teleop_plugin_interface::TeleopBase
   double normal_factor_;
   double fast_factor_;
 
+  bool wb_assistance_enabled_;
+
   bool critical_stability_reached_;
   double critical_stability_lower_threshold_;
   double critical_stability_upper_threshold_;
   std::string stability_margin_topic_;
 
+  bool use_wb_assistance_;
+
   std::string drive_command_topic_;
   ResponseCurveMode response_curve_;
   ros::Publisher drive_pub_;
+  ros::Publisher wb_assistance_enable_pub_;
   ros::Subscriber stability_margin_sub_;
   geometry_msgs::Twist drive_command_;
 };
